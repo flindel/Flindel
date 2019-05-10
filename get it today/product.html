@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+<title>Get It Today</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<body>
+
+<h2>Get It Today</h2>
+
+<div>
+  <img class="mySlides" src="product.jpg" style="width: 225px;">
+  <img class="mySlides" src="product2.jpg" style="width:225px;">
+  <img class="mySlides" src="product3.jpg" style="width:225px;">
+  <img class="mySlides" src="p4.jpg" style="width:225px;">
+
+  <button onclick="plusDivs(-1)">&#10094;</button>
+  <button onclick="plusDivs(1)">&#10095;</button>
+</div>
+
+<script type = "text/javascript" src = "product.js"></script>
+
+<p id = "status">Status</p>
+<p id = "fStatus">Flindel Status: Accepted</p>
+<p id = "Quantity">Quantity: <script type = "text/javascript">document.write(quanity)</script></p>
+<br>
+insert info of product here like return policy and such
+<br>
+<input type="button" onclick="changeStatus()" value="Buy">
+<input type="button" onclick="reserve()" value="Reserve/Checkout">
+<input type="button" onclick = "increaseDay()" value = "Day">
+</body>
+</html>
