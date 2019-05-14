@@ -71,7 +71,7 @@ class ItemList extends Component {
         return (
             <div className="ItemList">
                 {this.props.items.map((item)=>{
-                    return <Item item={item} key={item.productID} handleSelect={this.handleSelect.bind(this)}/>
+                    return <Item item={item} key={item.variantID} handleSelect={this.handleSelect.bind(this)}/>
                 })}
 
                 <button onClick={this.handleClick}>CONFIRM</button>

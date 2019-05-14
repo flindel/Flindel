@@ -40,7 +40,7 @@ class Search extends Component {
                               <input type="text" className="order-number" placeholder="1234567" onChange={this.handleOrderNumChange} />
                           </div>
                           <div className="Search-block">
-                              <label>Email Address:</label>
+                              <label>Email Address or Phone number:</label>
                               <input type="email" className="email-add" placeholder="Sarah@example.com" onChange={this.handleEmailChange} />
                           </div>
                     </div>
