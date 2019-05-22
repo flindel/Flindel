@@ -14,19 +14,27 @@
   "license": "ISC",
   "dependencies": {
     "@shopify/koa-shopify-auth": "^3.1.20",
+    "@zeit/next-css": "^1.0.1",
+    "bootstrap": "^4.3.1",
     "dotenv": "^7.0.0",
     "firebase-admin": "^7.3.0",
     "isomorphic-fetch": "^2.2.1",
     "koa": "^2.7.0",
+    "koa-body": "^4.1.0",
     "koa-combine-routers": "^4.0.2",
     "koa-router": "^7.4.0",
     "koa-session": "^5.10.1",
     "libphonenumber-js": "^1.7.16",
     "next": "^8.0.4",
     "react": "^16.8.6",
+    "react-bootstrap": "^1.0.0-beta.8",
     "react-dom": "^16.8.6",
     "react-router-dom": "^5.0.0",
     "request": "^2.88.0",
     "request-promise": "^4.2.4"
+  },
+  "devDependencies": {
+    "css-loader": "^2.1.1",
+    "style-loader": "^0.23.1"
   }
 }

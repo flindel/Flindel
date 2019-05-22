@@ -8,18 +8,27 @@ const router = Router({
 
 router.get('/', async ctx => {
     // Get all orders
+    //const {name} = ctx.params.orderNum
+    //console.log(ctx.query.orderNum);
+    const name = ctx.query.orderNum;
+    console.log("orderNum:---------"+name)
     const { cookies } = ctx;
     const shop = cookies.get('shop_id');
     const accessToken = cookies.get('accessToken');
     const option = {
-        url: `https://${shop}/${api_link}/orders.json`,
+        url: `https://${shop}/${api_link}/orders.json?name=${name}&status=any`,
         headers: {
             'X-Shopify-Access-Token': accessToken
         },
         json: true,
     }
+    
+    //return info from shopify order API
+    ctx.body = await rp(option);
+    console.log("body..."+JSON.stringify(ctx.body));
     try {
         ctx.body = await rp(option);
+        //console.log("body..."+JSON.stringify(ctx.body));
     } catch (err) {
         console.log(err.message);
         if (err instanceof errors.StatusCodeError) {
@@ -30,6 +39,7 @@ router.get('/', async ctx => {
             ctx.message = err.message;
         }
     }
-});
+    });
+
 
 module.exports = router;

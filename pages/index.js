@@ -8,6 +8,7 @@ class Index extends React.Component{
     <div>
       <div>
           <p>Sample app using React and Next.js</p>
+          <IdentifyApp />
       </div>
     </div>
     );

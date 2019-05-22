@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import Search from './Search';
 import ItemList from './ItemList';
 import { parsePhoneNumberFromString, parsePhoneNumber, ParseError } from 'libphonenumber-js'
+import './IdentifyApp.css'
 
 const shopName="getordertest";
 
@@ -32,38 +33,40 @@ class IdentifyApp extends Component {
         console.log("orderNum="+orderNum);
         console.log("eamilAdd=" + emailAdd);
         this.initStatus=false;
+        const data = {orderNumber: orderNum, emailAddress:emailAdd};
 
         //get order info
-            fetch(`https://${shopName}.myshopify.com/admin/api/2019-04/orders.json?name=${orderNum}&status=any`, {
+        //call https://depres.../orders (backend)
+            fetch(`https://depereo.serveo.net/orders?orderNum=${encodeURIComponent(data.orderNumber)}`, {
+                //?orderNum=${encodeURIComponent(data.orderNumber)}
                 //mode: 'no-cors',
                 method: 'GET',
-
             })
-            .then(response => response.json())
-            .then(resData=>{
-                //check if order name exsits and the email address or phone number match
-                if(JSON.stringify(resData.orders)!="[]"  //check order number exsit or not
-                &&((resData.orders[0].email.toLowerCase()==emailAdd.toLowerCase())||(this.comparePhone(resData.orders[0].phone, emailAdd)))    //check email address match or not
-                ){
-                    this.setState({
-                        items:resData.orders[0].line_items.map(item=>{
-                            return {
-                                variantID:item.variant_id,
-                                productID: item.product_id,
-                                name: item.name,
-                                quantity: item.quantity,
-                                //returnQuantity: '0'
-                            }
-                        }),
-                        searchStatus : true
-                    })
+            .then(response => console.log("react response...."+JSON.stringify(response)))
+            // .then(resData=>{
+            //     //check if order name exsits and the email address or phone number match
+            //     if(JSON.stringify(resData.orders)!="[]"  //check order number exsit or not
+            //     &&((resData.orders[0].email.toLowerCase()==emailAdd.toLowerCase())||(this.comparePhone(resData.orders[0].phone, emailAdd)))    //check email address match or not
+            //     ){
+            //         this.setState({
+            //             items:resData.orders[0].line_items.map(item=>{
+            //                 return {
+            //                     variantID:item.variant_id,
+            //                     productID: item.product_id,
+            //                     name: item.name,
+            //                     quantity: item.quantity,
+            //                     //returnQuantity: '0'
+            //                 }
+            //             }),
+            //             searchStatus : true
+            //         })
                  
-                }else{
-                        this.setState({
-                            searchStatus: false
-                        })              
-                }
-            })
+            //     }else{
+            //             this.setState({
+            //                 searchStatus: false
+            //             })              
+            //     }
+            // })
 		
     }
     
@@ -72,14 +75,14 @@ class IdentifyApp extends Component {
 	render() {
         if(!this.state.searchStatus&&this.initStatus){
 		return (
-			<div>
-	 		<h1>{shopName}</h1>
+			<div className="App">
+	 		    <h1>{shopName}</h1>
 	  			<Search identifyCustomerID={this.identifyCustomerID} identifyItems={this.identifyItems} />
 			</div>
         );
         }else if(!this.initStatus&&!this.state.searchStatus){
             return (
-                <div>
+                <div className="App">
                  <h1>{shopName}</h1>
                       <Search identifyCustomerID={this.identifyCustomerID} identifyItems={this.identifyItems} />
                       <p>Order not found!</p>
