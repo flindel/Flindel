@@ -42,31 +42,32 @@ class IdentifyApp extends Component {
                 //mode: 'no-cors',
                 method: 'GET',
             })
-            .then(response => console.log("react response...."+JSON.stringify(response)))
-            // .then(resData=>{
-            //     //check if order name exsits and the email address or phone number match
-            //     if(JSON.stringify(resData.orders)!="[]"  //check order number exsit or not
-            //     &&((resData.orders[0].email.toLowerCase()==emailAdd.toLowerCase())||(this.comparePhone(resData.orders[0].phone, emailAdd)))    //check email address match or not
-            //     ){
-            //         this.setState({
-            //             items:resData.orders[0].line_items.map(item=>{
-            //                 return {
-            //                     variantID:item.variant_id,
-            //                     productID: item.product_id,
-            //                     name: item.name,
-            //                     quantity: item.quantity,
-            //                     //returnQuantity: '0'
-            //                 }
-            //             }),
-            //             searchStatus : true
-            //         })
+            .then(response => response.json())
+            //.then(resData => console.log(resData))
+            .then(resData=>{
+                //check if order name exsits and the email address or phone number match
+                if(JSON.stringify(resData.orders)!="[]"  //check order number exsit or not
+                &&((resData.orders[0].email.toLowerCase()==emailAdd.toLowerCase())||(this.comparePhone(resData.orders[0].phone, emailAdd)))    //check email address match or not
+                ){
+                    this.setState({
+                        items:resData.orders[0].line_items.map(item=>{
+                            return {
+                                variantID:item.variant_id,
+                                productID: item.product_id,
+                                name: item.name,
+                                quantity: item.quantity,
+                                //returnQuantity: '0'
+                            }
+                        }),
+                        searchStatus : true
+                    })
                  
-            //     }else{
-            //             this.setState({
-            //                 searchStatus: false
-            //             })              
-            //     }
-            // })
+                }else{
+                        this.setState({
+                            searchStatus: false
+                        })              
+                }
+            })
 		
     }
     

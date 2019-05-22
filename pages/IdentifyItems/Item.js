@@ -57,7 +57,8 @@ class Item extends Component {
 
     componentWillMount(){
         //get img src
-        fetch(`https://getordertest.myshopify.com/admin/api/2019-04/products/${this.props.item.productID}.json?fields=image`, {
+        
+        fetch(`https://depereo.serveo.net/products?id=${encodeURIComponent(this.props.item.productID)}`, {
             method: 'GET',})
         .then(response => response.json())
         .then(resData=>{

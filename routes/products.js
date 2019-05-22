@@ -3,20 +3,20 @@ const rp = require('request-promise');
 const errors = require('request-promise/errors');
 const { api_link } = require('../default-shopify-api.json');
 const router = Router({
-    prefix: '/orders'
+    prefix: '/products'
 });
 
 router.get('/', async ctx => {
-    // Get all orders
-    //const {name} = ctx.params.orderNum
-    //console.log(ctx.query.orderNum);
-    const name = ctx.query.orderNum;
-    console.log("orderNum:---------"+name)
+    // Get product img src
+
+    const productid = ctx.query.id;
+    console.log("productID:---------"+productid)
     const { cookies } = ctx;
     const shop = cookies.get('shop_id');
     const accessToken = cookies.get('accessToken');
     const option = {
-        url: `https://${shop}/${api_link}/orders.json?name=${name}&status=any`,
+        //`https://getordertest.myshopify.com/admin/api/2019-04/products/${this.props.item.productID}.json?fields=image`
+        url: `https://${shop}/${api_link}/products/${productid}.json?fields=image`,
         headers: {
             'X-Shopify-Access-Token': accessToken
         },
