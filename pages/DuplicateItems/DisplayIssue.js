@@ -9,16 +9,15 @@ const row = {
 
 const cell = {
   textAlign: 'left',
-  margin: '0px',
+  margin: '10px',
   width: '200px',
   height: 'fill',
   padding: '0px',
-  backgroundColor: '#a3a3a3',
 };
 
 const cellR = {
   textAlign: 'left',
-  margin: '0px',
+  margin: '10px',
   width: '200px',
   height: 'fill',
   padding: '0px',
@@ -27,7 +26,7 @@ const cellR = {
 
 const cellG = {
   textAlign: 'left',
-  margin: '0px',
+  margin: '10px',
   width: '200px',
   height: 'fill',
   padding: '0px',
@@ -35,6 +34,7 @@ const cellG = {
 };
 
 function DisplayIssue(props){
+  console.log("Display Issue Props: :", props);
   if (props.parameterIssues.length == 0
     && props.variantIssues.length == 0
     && props.issue == null){
@@ -48,6 +48,7 @@ function DisplayIssue(props){
                       <div style={cell}>Orignal Value</div>
                       <div style={cell}>Get it Today Value</div>
                     </div>)
+
     const parameter_issues_display = props.parameterIssues.map(issue =>
       <div style={row}>
         <div style={cell}>{issue.parameter}</div>

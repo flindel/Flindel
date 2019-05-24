@@ -7,7 +7,7 @@ class Index extends React.Component{
   render(){
     return (
     <div>
-      <p>AHHHHHHHHH</p>
+      <DuplicateApp />
     </div>
     );
   }
