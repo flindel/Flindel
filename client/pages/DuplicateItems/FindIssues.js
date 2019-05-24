@@ -35,7 +35,6 @@ class FindIssues extends Component {
     .then(resData =>{
       this.setState({all: resData});
       this.setState({load_all: false});
-      console.log("All", this.state.all);
     })
     fetch(`https://${shopName}.myshopify.com/admin/api/2019-04/products.json?collection_id=${collection_get_it_today_id}`, {
       method: 'GET',
@@ -44,7 +43,6 @@ class FindIssues extends Component {
     .then(resData =>{
       this.setState({git: resData});
       this.setState({load_git: false});
-      console.log("GIT", this.state.git);
     })
   }
 
@@ -53,8 +51,6 @@ class FindIssues extends Component {
     let diff = [];
     diff = this.normalProductIssues().concat(this.gitProductIssues());
     this.setState({hasCompared: true});
-    console.log("GIT Issues: ", this.gitProductIssues())
-    console.log("Diff", diff);
     return diff;
   }
 
@@ -115,7 +111,6 @@ class FindIssues extends Component {
   findNormalDuplicate(name){
     for(let i = 0; i < this.state.all.products.length; i++){
       let product = this.state.all.products[i];
-      console.log("Norm, GIT", product.title+", "+name)
       if ((name) === (product.title+" - Get it Today")){
         return product;
       }
@@ -138,7 +133,6 @@ class FindIssues extends Component {
       &&(this.state.desynced instanceof Array)){
         display_issue.issue = "Unequal parameters";
         display_issue.solution = "The \"Original\" product's info will replace the \"Get it Today\" product's info."
-        console.log("Display Issue", display_issue)
         this.addDesynced(norm, git);
       }
 
@@ -201,7 +195,6 @@ class FindIssues extends Component {
     let isLoading = (this.state.load_git || this.state.load_all);
     if (!isLoading && !this.state.hasCompared) {
       this.state.updates = this.compareUpdates();
-      console.log("Updates", this.state.updates);
     }
     let displayUpdates = this.state.updates.map(update =>
       <DisplayIssue

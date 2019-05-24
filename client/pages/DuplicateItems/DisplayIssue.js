@@ -34,7 +34,6 @@ const cellG = {
 };
 
 function DisplayIssue(props){
-  console.log("Display Issue Props: :", props);
   if (props.parameterIssues.length == 0
     && props.variantIssues.length == 0
     && props.issue == null){
