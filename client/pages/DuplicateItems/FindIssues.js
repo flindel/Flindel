@@ -8,6 +8,7 @@ const collection_all_products_id = "97721974881";
 const collection_get_it_today_id = "97721155681";
 const location_brand_id = "21803171937";
 const location_flindel_id = "21890891873";
+const serveo_name = "ioco";
 
 class FindIssues extends Component {
   constructor(){
@@ -28,19 +29,19 @@ class FindIssues extends Component {
 
   componentDidMount() {
     //Assumption, Brand has less than 250 inventory item/product variations
-    fetch(`https://${shopName}.myshopify.com/admin/api/2019-04/products.json?collection_id=${collection_all_products_id}`, {
+    fetch(`https://${serveo_name}.serveo.net/products?collection_id=${encodeURIComponent(collection_all_products_id)}`, {
       method: 'GET',
-    })
-    .then(response => response.json())
-    .then(resData =>{
+      })
+      .then(response => response.json())
+      .then(resData=> {
       this.setState({all: resData});
       this.setState({load_all: false});
     })
-    fetch(`https://${shopName}.myshopify.com/admin/api/2019-04/products.json?collection_id=${collection_get_it_today_id}`, {
+    fetch(`https://${serveo_name}.serveo.net/products?collection_id=${encodeURIComponent(collection_get_it_today_id)}`, {
       method: 'GET',
-    })
-    .then(response => response.json())
-    .then(resData =>{
+      })
+      .then(response => response.json())
+      .then(resData=> {
       this.setState({git: resData});
       this.setState({load_git: false});
     })
