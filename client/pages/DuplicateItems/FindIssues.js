@@ -1,14 +1,16 @@
 import React, { Component } from 'react';
 import DisplayIssue from './DisplayIssue';
-//import {syncNow} from './FixIssues'
-
+import FixIssues, { setUpdates } from './FixIssues';
 
 const shopName = "ds-test-yash-kini";
 const collection_all_products_id = "97721974881";
 const collection_get_it_today_id = "97721155681";
 const location_brand_id = "21803171937";
 const location_flindel_id = "21890891873";
-const serveo_name = "ioco";
+const serveo_name = "enim";
+
+let key = 1;
+const butterfly_id = "2114548007009";
 
 class FindIssues extends Component {
   constructor(){
@@ -19,46 +21,68 @@ class FindIssues extends Component {
       hasCompared: false,
       all: {},
       git: {},
-      desynced: [],
       updates: [],
       displayUpdates: [],
     }
     this.componentDidMount = this.componentDidMount.bind(this);
-    this.addDesynced = this.addDesynced.bind(this);
+    this.compareUpdates = this.compareUpdates.bind(this);
   }
 
   componentDidMount() {
+    let normProducts = {};
+    let gitProducts = {};
     //Assumption, Brand has less than 250 inventory item/product variations
-    fetch(`https://${serveo_name}.serveo.net/products?collection_id=${encodeURIComponent(collection_all_products_id)}`, {
+    fetch(`https://${serveo_name}.serveo.net/collections?id=${encodeURIComponent(collection_all_products_id)}`, {
       method: 'GET',
       })
       .then(response => response.json())
       .then(resData=> {
       this.setState({all: resData});
       this.setState({load_all: false});
+      this.loaded();
+
     })
-    fetch(`https://${serveo_name}.serveo.net/products?collection_id=${encodeURIComponent(collection_get_it_today_id)}`, {
+    fetch(`https://${serveo_name}.serveo.net/collections?id=${encodeURIComponent(collection_get_it_today_id)}`, {
       method: 'GET',
       })
       .then(response => response.json())
       .then(resData=> {
       this.setState({git: resData});
       this.setState({load_git: false});
+      this.loaded();
     })
+    /*
+    fetch(`https://${serveo_name}.serveo.net/products?id=${encodeURIComponent(butterfly_id)}`, {
+      method: 'PUT',
+      })
+      .then(response => response.json())
+      .then(resData => console.log("Put Response: ", resData))
+    */
   }
 
+  loaded(){
+    if(!this.state.load_git && !this.state.load_all){
+      console.log("Norm Products: ", this.state.all);
+      console.log("Git Products: ", this.state.git);
+      this.compareUpdates();
+    }
+  }
   //Assumption, every product has a unique name
+  //Variants can never swtich names
   compareUpdates(){
     let diff = [];
     diff = this.normalProductIssues().concat(this.gitProductIssues());
     this.setState({hasCompared: true});
-    return diff;
+    this.setState({updates: diff})
   }
 
   normalProductIssues(){
     let diff = []
     for(let i = 0; i < this.state.all.products.length; i++){
       let product = this.state.all.products[i];
+      if(this.normProductParameters(product)) {
+        diff.push(this.normProductParameters(product));
+      }
       let gitProduct = this.findGetItTodayDuplicate(product.title);
       if (gitProduct) {
         let comparison = this.compareProducts(product, gitProduct);
@@ -66,6 +90,8 @@ class FindIssues extends Component {
       } else {
         //GIT version of product does not exist
         diff.push({
+          normId: product.id,
+          gitId: null,
           name: product.title,
           parameterIssues: [],
           variantIssues: [],
@@ -93,9 +119,14 @@ class FindIssues extends Component {
     let diff = []
     for(let i = 0; i < this.state.git.products.length; i++){
       let product = this.state.git.products[i];
+      if (this.gitProductParameters(product)){
+        diff.push(this.gitProductParameters(product));
+      }
       let normProduct = this.findNormalDuplicate(product.title);
       if (normProduct == null) {
         diff.push({
+          normId: null,
+          gitId: product.id,
           name: product.title,
           parameterIssues: [],
           variantIssues: [],
@@ -111,7 +142,7 @@ class FindIssues extends Component {
   //return product duplicate original item if it exists
   findNormalDuplicate(name){
     for(let i = 0; i < this.state.all.products.length; i++){
-      let product = this.state.all.products[i];
+      let product = this.state. all.products[i];
       if ((name) === (product.title+" - Get it Today")){
         return product;
       }
@@ -124,30 +155,23 @@ class FindIssues extends Component {
   //DOES NOT COMPARE IMAGES, IMAGE CHANGES WILL NOT BE FLAGGED
   compareProducts(norm, git){
     let display_issue = {
-      id: norm.id,
+      normId: norm.id,
+      gitId: git.id,
       name: norm.title,
       parameterIssues: this.compareProductParameters(norm, git),
       variantIssues: this.compareVariantParameters(norm, git),
     }
-    if ((display_issue.parameterIssues.length != 0
-      || display_issue.variant_issues.length != 0)
-      &&(this.state.desynced instanceof Array)){
+    if (display_issue.parameterIssues.length != 0
+      || display_issue.variant_issues.length != 0){
         display_issue.issue = "Unequal parameters";
         display_issue.solution = "The \"Original\" product's info will replace the \"Get it Today\" product's info."
-        this.addDesynced(norm, git);
       }
-
     return display_issue;
   }
 
-  addDesynced(norm, git){
-    this.setState(prevState => {
-      return {
-        desynced: prevState.desynced.concat({norm: norm, git: git})
-      }
-    });
-  }
-
+  //norm: product, original item
+  //git: product, duplicate get it today item
+  //Compares all variables that should be the same between the NORM and GIT product
   compareProductParameters(norm, git){
     let productIssues = [];
     //doesn't include variants
@@ -158,20 +182,96 @@ class FindIssues extends Component {
     const git_para = para.map(parameter => "git."+parameter);
     for (let i = 0; i < para.length; i++) {
       if(!(eval(norm_para[i]) === eval(git_para[i]))) {
-        productIssues.push({
-                            parameter: para[i],
-                            norm: eval(norm_para[i]),
-                            git: eval(git_para[i])
-                          });
+        productIssues.push(
+          {
+            parameter: para[i],
+            norm: eval(norm_para[i]),
+            git: eval(git_para[i])
+          });
       }
     }
     return productIssues;
   }
 
+  //git: product, duplicate get it today item
+  //checks if valid flindel
+  gitProductParameters(git){
+    let productIssues = [];
+    const para = {name:["fulfillment_service", "grams", "inventory_management", "weight"],
+                  value:["flindel", 0, "shopify", 0]}
+
+    for (let j = 0; j < git.variants.length; j++){
+      let variant = git.variants[j];
+      for (let i = 0; i < para.name.length; i++){
+        if(eval(`variant.${para.name[i]}`) !== para.value[i]){
+          productIssues.push(
+            {
+              parameter: para.name[i],
+              norm: para.value[i],
+              git: eval("variant."+para.name[i]),
+            });
+          }
+        }
+      }
+    //console.log("productIssues: ", productIssues)
+    if (productIssues.length > 0){
+      return ({
+        normId: null,
+        gitId: git.id,
+        name: git.title,
+        parameterIssues: [],
+        variantIssues: productIssues,
+        issue: "The Get it Today item has incorrect product information",
+        solution: "The parameters will be changed to the correct values."
+      })
+    }else{
+      return null;
+    }
+  }
+
+  //git: product, duplicate get it today item
+  //checks if valid flindel
+  normProductParameters(norm){
+    let productIssues = [];
+    const para = {name:["fulfillment_service", "grams", "weight"],
+                  value:["flindel", 0, 0],
+                  defaultCorrection:["manual", 1000, 1]}
+
+    let solution = "";
+    for (let j = 0; j < norm.variants.length; j++){
+      let variant = norm.variants[j];
+      for (let i = 0; i < para.name.length; i++){
+        if(eval(`variant.${para.name[i]}`) == para.value[i]){
+          solution += `${para.name[i]} will be set to ${para.defaultCorrection[i]}. `
+          productIssues.push(
+            {
+              parameter: para.name[i],
+              norm: para.defaultCorrection[i],
+              git: eval("variant."+para.name[i]),
+            });
+          }
+        }
+      }
+    //console.log("productIssues: ", productIssues)
+    if (productIssues.length > 0){
+      return ({
+        normId: norm.id,
+        gitId: null,
+        name: norm.title,
+        parameterIssues: [],
+        variantIssues: productIssues,
+        issue: "The Original item has information that conflicts with Get it Today",
+        solution: solution,
+      })
+    }else{
+      return null;
+    }
+  }
+
   compareVariantParameters(norm, git){
     let variantIssues = [];
     if (norm.variants.length != git.variants.length) {
-      //GIT does not have the same number of variants as NORM
+      //IF variant are not equal
     }
     const para = ["barcode", "compare_at_price", "image_id", "option1",
      "option2", "option3", "position", "price", "requires_shipping", "taxable",
@@ -181,11 +281,12 @@ class FindIssues extends Component {
         let norm_string = "norm.variants["+i+"]."+para[j];
         let git_string = "git.variants["+i+"]."+para[j];
         if(!(eval(norm_string) === eval(git_string))) {
-          variantIssues.push({
-                              parameter: para[j],
-                              norm: eval(norm_string),
-                              git: eval(git_string),
-                            });
+          variantIssues.push(
+          {
+            parameter: para[j],
+            norm: eval(norm_string),
+            git: eval(git_string),
+          });
         }
       }
     }
@@ -194,25 +295,23 @@ class FindIssues extends Component {
 
   render() {
     let isLoading = (this.state.load_git || this.state.load_all);
-    if (!isLoading && !this.state.hasCompared) {
-      this.state.updates = this.compareUpdates();
-    }
     let displayUpdates = this.state.updates.map(update =>
       <DisplayIssue
-        key = {update.id}
+        key = {key++}
+        id = {update.id}
         name={update.name}
         parameterIssues={update.parameterIssues}
         variantIssues={update.variantIssues}
         issue = {update.issue}
         solution = {update.solution}
       />)
-    let isSync = (this.state.updates.length == 0) && !isLoading;
+    let isSync = displayUpdates.length ==  0;
     return (
       <div>
         <h1>{isLoading? "Loading" : "Get it Today Product Admin"}</h1>
         <h3>{isSync? "Get it Today is syncronized"
         :"Get it Today is not synchronized"}</h3>
-        {!isSync && <button>FIX NOW</button>}
+        <FixIssues updates={this.state.updates}/>
         {!isSync && <h3>Inventory Issues</h3>}
         <div>
           {displayUpdates}

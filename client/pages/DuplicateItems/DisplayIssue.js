@@ -1,5 +1,7 @@
 import React from "react";
 
+let key = 0;
+
 const row = {
   display:'flex',
   flexWrap: 'wrap',
@@ -39,30 +41,47 @@ function DisplayIssue(props){
     && props.issue == null){
     return null;
   } else {
-    const headers = (props.variantIssues.length != 0
-                    && props.parameterIssues.length != 0)
-                    &&
-                    (<div style={row}>
-                      <div style={cell}>Parameter</div>
-                      <div style={cell}>Orignal Value</div>
-                      <div style={cell}>Get it Today Value</div>
-                    </div>)
+    let headers;
+    if (props.issue == "Unequal parameters") {
+      headers =(
+                <div style={row} key={key++}>
+                  <div style={cell}>Parameter</div>
+                  <div style={cell}>Orignal Value</div>
+                  <div style={cell}>Get it Today Value</div>
+                </div>);
+    }
+    if (props.issue == "The Original item has information that conflicts with Get it Today") {
+      headers = (
+                <div style={row} key={key++}>
+                  <div style={cell}>Parameter</div>
+                  <div style={cell}>Correct Value</div>
+                  <div style={cell}>Current Value</div>
+                </div>);
+    }
+    if (props.issue == "The Get it Today item has incorrect product information") {
+      headers = (
+                <div style={row} key={key++}>
+                  <div style={cell}>Parameter</div>
+                  <div style={cell}>Correct Value</div>
+                  <div style={cell}>Current Value</div>
+                </div>);
+    }
+
 
     const parameter_issues_display = props.parameterIssues.map(issue =>
-      <div style={row}>
+      <div style={row} key={key++}>
         <div style={cell}>{issue.parameter}</div>
         <div style={cellG}>{issue.norm}</div>
         <div style={cellR}>{issue.git}</div>
       </div>
     )
     const variant_issues_display = props.variantIssues.map(issue =>
-      <div style={row}>
+      <div style={row} key={key++}>
         <div style={cell}>variant.{issue.parameter}</div>
         <div style={cellG}>{issue.norm}</div>
         <div style={cellR}>{issue.git}</div>
       </div>
     )
-
     return (
       <div>
         <hr />
