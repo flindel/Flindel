@@ -10,15 +10,22 @@ const router = Router({
 router.get('/', async ctx => {
     // Get all orders
     const { shop, accessToken } = getShopHeaders(ctx);
+    //const {name} = ctx.params.orderNum
+    //console.log(ctx.query.orderNum);
+    const name = ctx.query.orderNum;
+    console.log("orderNum:---------"+name)
+    const { cookies } = ctx;
     const option = {
-        url: `https://${shop}/${api_link}/orders.json`,
+        url: `https://${shop}/${api_link}/orders.json?name=${name}&status=any`,
         headers: {
             'X-Shopify-Access-Token': accessToken
         },
         json: true,
     }
+
     try {
         ctx.body = await rp(option);
+        //console.log("body..."+JSON.stringify(ctx.body));
     } catch (err) {
         console.log(err.message);
         if (err instanceof errors.StatusCodeError) {
@@ -29,6 +36,7 @@ router.get('/', async ctx => {
             ctx.message = err.message;
         }
     }
-});
+    });
+
 
 module.exports = router;
