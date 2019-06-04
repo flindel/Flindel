@@ -12,3 +12,24 @@ HTTPS://YOURNGROKADDRESS.io/auth?shop=YOURSHOPIFYSTORE.myshopify.com
 
 ## Adding new server route
 When you need to add a new route for your feature, first check if it should be under a route that already existed, otherwise, create a new file under `routes` which contain a new router and include it in `routes/index.js`.
+
+## Setup a private app for sending request from Postman
+Since Postman does not response well with auth verification (`verifyRequest()`), I opt it out, which mean no more access token in Postman. In order to call Shopify API, you will need to create a private app and generate credentials. See [here](https://help.shopify.com/en/api/getting-started/authentication/private-authentication). 
+
+After you created the API key and password, do the following:
+1. Join the API key and password with a single colon (:).
+2. Encode the resulting string in base64 representation.
+3. Prepend the base64-encoded string with Basic and a space, an example:
+```
+Basic NDQ3OGViN2FjMTM4YTEzNjg1MmJhYmQ4NjE5NTZjMTk6M2U1YTZlZGVjNzFlYWIwMzk0MjJjNjQ0NGQwMjY1OWQ=
+```
+4. Put this key in your request header under `Authorization`. See POST example.
+
+## Setup .env file
+You need have the following environment variables set
+```
+SHOPIFY_API_KEY=[YOUR_STORE_API_KEY]
+SHOPIFY_API_SECRET_KEY=[YOUR_STORE_API_SECRET_KEY]
+SHOP_AUTH=[YOUR_BASIC_PRIVATE_APP_AUTH]
+DEBUG=1
+```

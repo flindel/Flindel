@@ -4,18 +4,24 @@ const errors = require('request-promise/errors');
 const { api_link } = require('../default-shopify-api.json');
 const { getShopHeaders } = require('../util/shop-headers');
 const router = Router({
-    prefix: '/orders'
+    prefix: '/products'
 });
 
-router.get('/', async ctx => {
-    // Get all orders
+router.post('/', async ctx => {
+    // Create a product
     const { shop, accessToken } = getShopHeaders(ctx);
+    const headers = {};
+    if (process.env.DEBUG) {
+        headers['Authorization'] = process.env.SHOP_AUTH;
+    } else {
+        headers['X-Shopify-Access-Token'] = accessToken;
+    }
     const option = {
-        url: `https://${shop}/${api_link}/orders.json`,
-        headers: {
-            'X-Shopify-Access-Token': accessToken
-        },
+        method: 'POST',
+        url: `https://${shop}/${api_link}/products.json`,
+        headers: headers,
         json: true,
+        body: ctx.request.body
     }
     try {
         ctx.body = await rp(option);
