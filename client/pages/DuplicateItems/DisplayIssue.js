@@ -66,8 +66,6 @@ function DisplayIssue(props){
                   <div style={cell}>Current Value</div>
                 </div>);
     }
-
-
     const parameter_issues_display = props.parameterIssues.map(issue =>
       <div style={row} key={key++}>
         <div style={cell}>{issue.parameter}</div>
