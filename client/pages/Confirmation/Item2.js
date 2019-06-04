@@ -58,7 +58,7 @@ class Item extends Component {
 
     componentWillMount(){
         //get img src
-        fetch(`https://campana.serveo.net/products?id=${encodeURIComponent(this.props.item.productID)}`, {
+        fetch(`https://campana.serveo.net/checkProducts?id=${encodeURIComponent(this.props.item.productID)}`, {
             method: 'GET',})
         .then(response => response.json())
         .then(resData=>{
