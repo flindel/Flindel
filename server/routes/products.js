@@ -2,10 +2,10 @@ const Router = require('koa-router');
 const rp = require('request-promise');
 const errors = require('request-promise/errors');
 const { api_link } = require('../default-shopify-api.json');
+const { getShopHeaders } = require('../util/shop-headers');
 const router = Router({
     prefix: '/products'
 });
-
 
 router.get('/', async ctx => {
   // Get product img src
@@ -37,28 +37,34 @@ router.get('/', async ctx => {
 });
 
 
-router.put('/', (ctx, next) => {
-  console.log("CTX", ctx);
-  const productid = ctx.query.id;
-  ctx.body = JSON.stringify({
-    "product":{
-      "id": parseInt(productid),
-      "title":"New Product title"
-    }});
-  console.log("productID:---------"+productid)
-  const { cookies } = ctx;
-  const shop = cookies.get('shop_id');
-  const accessToken = cookies.get('accessToken');
-  const option = {
-      url: `https://${shop}/${api_link}/products/${productid}.json`,
-      headers: {
-          'X-Shopify-Access-Token': accessToken
-      },
-      json: true,
-  }
-  //removed try catch
+router.post('/', async ctx => {
+    // Create a product
+    const { shop, accessToken } = getShopHeaders(ctx);
+    const headers = {};
+    if (process.env.DEBUG) {
+        headers['Authorization'] = process.env.SHOP_AUTH;
+    } else {
+        headers['X-Shopify-Access-Token'] = accessToken;
+    }
+    const option = {
+        method: 'POST',
+        url: `https://${shop}/${api_link}/products.json`,
+        headers: headers,
+        json: true,
+        body: ctx.request.body
+    }
+    try {
+        ctx.body = await rp(option);
+    } catch (err) {
+        console.log(err.message);
+        if (err instanceof errors.StatusCodeError) {
+            ctx.status = err.statusCode;
+            ctx.message = err.message;
+        } else if (err instanceof errors.RequestError) {
+            ctx.status = 500;
+            ctx.message = err.message;
+        }
+    }
 });
-
-
 
 module.exports = router;

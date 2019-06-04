@@ -2,15 +2,14 @@ const Router = require('koa-router');
 const rp = require('request-promise');
 const errors = require('request-promise/errors');
 const { api_link } = require('../default-shopify-api.json');
+const { getShopHeaders } = require('../util/shop-headers');
 const router = Router({
     prefix: '/orders'
 });
 
 router.get('/', async ctx => {
     // Get all orders
-    const { cookies } = ctx;
-    const shop = cookies.get('shop_id');
-    const accessToken = cookies.get('accessToken');
+    const { shop, accessToken } = getShopHeaders(ctx);
     const option = {
         url: `https://${shop}/${api_link}/orders.json`,
         headers: {
