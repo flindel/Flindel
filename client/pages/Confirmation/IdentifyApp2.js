@@ -64,14 +64,9 @@ class IdentifyApp extends Component {
     }
 
     sendEmail(){
-        fetch(`https://campana.serveo.net/send?email=${encodeURIComponent(this.state.email)}&code=${encodeURIComponent(this.state.code)}`, 
+        fetch(`https://campana.serveo.net/send`, 
         {
             method: 'POST',
-          /*  headers: {
-            'Accept': 'application/json',
-            'Content-Type': 'application/json'
-            },*/
-
         }).then(response => {alert('EMAIL SENT*')})
        }
 
