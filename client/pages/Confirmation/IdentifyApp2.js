@@ -5,6 +5,7 @@ import ConfirmationPage from './showConfirmation'
 import CheckPage from './confirmOrder'
 import PickupInfo from './mapDisplay'
 import NB from './navbar.js'
+import PriceDisplay from './priceDisplay.js'
 
 const shopName="getOrderTest";
 
@@ -15,6 +16,7 @@ class IdentifyApp extends Component {
             items:[],
             searchStatus: false,
             checkStatus:false,
+            priceStatus: false,
             submitStatus: false,
             code: '',
             email: '', 
@@ -34,6 +36,8 @@ class IdentifyApp extends Component {
         this.unviewMaps = this.unviewMaps.bind(this)
         this.sendEmail = this.sendEmail.bind(this)
         this.sendToDB = this.sendToDB.bind(this)
+        this.finishPricing = this.finishPricing.bind(this)
+        this.pricingBack = this.pricingBack.bind(this)
     }
 
     generateID(){
@@ -56,15 +60,24 @@ class IdentifyApp extends Component {
         }
     }
 
+    pricingBack(){
+        this.setState({priceStatus:false})
+    }
+
     forward(){
         this.generateID()
+        this.setState({priceStatus: true})
+    }
+
+    finishPricing(){
         this.setState({submitStatus: true})
         this.sendEmail()
         this.sendToDB()
     }
 
     sendEmail(){
-        fetch(`https://campana.serveo.net/send`, 
+        alert(this.state.code)
+        fetch(`https://campana.serveo.net/send?email=${encodeURIComponent(this.state.email)}&code=${encodeURIComponent(this.state.code)}`, 
         {
             method: 'POST',
         }).then(response => {alert('EMAIL SENT*')})
@@ -135,6 +148,7 @@ class IdentifyApp extends Component {
                                 productID: item.product_id,
                                 name: item.name,
                                 quantity: item.quantity,
+                                price: item.price
                                 //returnQuantity: '0'
                             }
                         }),
@@ -189,7 +203,7 @@ class IdentifyApp extends Component {
                items={this.state.items}/> 
                </div>
                ) 
-        } else if (this.state.checkStatus&&!this.state.submitStatus&&!this.state.mapView){
+        } else if (this.state.checkStatus&&!this.state.priceStatus&&!this.state.mapView){
             return(
                 <div>
                 <NB
@@ -209,7 +223,21 @@ class IdentifyApp extends Component {
                 updatehandleChange = {this.handleChange.bind(this,'newEmail')}/>
                 </div>
             )
-        }else if (this.state.submitStatus&&!this.state.mapView&&this.returnItemList.length>0){
+        }
+        else if (this.state.priceStatus&&!this.state.submitStatus&&!this.state.mapView){
+            return(
+                <div>
+                <NB
+                viewMaps ={this.viewMaps.bind(this)}
+                unviewMaps = {this.unviewMaps.bind(this)}
+                shopName = {shopName}/> 
+                <PriceDisplay
+                finishPricing = {this.finishPricing.bind(this)}
+                pricingBack = {this.pricingBack.bind(this)}/>
+                </div>
+            )
+        }
+        else if (this.state.submitStatus&&!this.state.mapView){
             return(
                 <div>
                 <NB

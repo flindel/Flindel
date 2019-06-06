@@ -8,9 +8,12 @@ const router = Router({
 });
 
 router.post('/', async ctx=>{
-    headers['Accept'] = 'application/json'
-    headers['Content-Type'] = 'application/json'
-    headers['Authorization'] = 'Bearer' + process.env.SENDGRID
+    const headers = {}
+    headers['Accept'] = 'application/json';
+    headers['Content-Type'] = 'application/json';
+    headers['Authorization'] = 'Bearer ' + process.env.SENDGRID;
+    const email = ctx.query.email
+    const code = ctx.query.code
     const option = {
         method: 'POST',
         url: 'https://api.sendgrid.com/v3/mail/send',
@@ -21,10 +24,10 @@ router.post('/', async ctx=>{
               {
                 "to": [
                   {
-                    "email": "booleafs17@yahoo.ca",
+                    "email": 'booleafs17@yahoo.ca'
                   }
                 ],
-                "subject": "EMAIL TEST"
+                "subject": "App email test."
               }
             ],
             "from": {
@@ -34,7 +37,7 @@ router.post('/', async ctx=>{
             "content": [
               {
                 "type": "text/plain",
-                "value": "This is an automated email."
+                "value": email + ' your code is ' + code
               }
             ]
           }
