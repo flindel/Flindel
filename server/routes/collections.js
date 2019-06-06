@@ -36,8 +36,5 @@ router.get('/', async ctx => {
     }
     });
 
-  router.post('/', (ctx, next) => {
-      // your post route handling
-    });
 
 module.exports = router;

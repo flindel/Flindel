@@ -54,7 +54,7 @@ function DisplayIssue(props){
       headers = (
                 <div style={row} key={key++}>
                   <div style={cell}>Parameter</div>
-                  <div style={cell}>Correct Value</div>
+                  <div style={cell}>New Value</div>
                   <div style={cell}>Current Value</div>
                 </div>);
     }

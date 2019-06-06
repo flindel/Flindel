@@ -9,49 +9,44 @@ class FixIssues extends Component {
   constructor(props){
     super(props);
     this.state = {
+      hasError: false,
     }
     this.handleClick = this.handleClick.bind(this);
     this.setUpdates = this.setUpdates.bind(this);
   }
 
-  handleClick(updates){
-    console.log("Handle Click");
+  post(body){
+    console.log("POST");
     const options = {
       method: 'post',
       headers: {
         'Accept': 'application/json, text/plain, */*',
         'Content-Type': 'application/json'
       },
-        body: JSON.stringify({ "product": {
-                  "title": "New Product",
-                  "body_html": "<strong>Good snowboard!</strong>",
-                  "vendor": "Burton",
-                  "product_type": "Snowboard",
-                  "tags": "Barnes & Noble, John's Fav, \"Big Air\""
-                }
-              }),
+        body: JSON.stringify(body),
 
     }
     fetch(`https://${serveo_name}.serveo.net/products`, options)
-      .then(function(response) {
-          //return response.json();
-        }).then(function(data) {
-          //console.log('Created Gist:', data.html_url);
-        });
+      .then((response) => {
+        if(response.ok){return response.json()}
+        else{throw Error(response.statusText)}
+      })
+      .then((data) => console.log('Data: ', data))
+      .catch((error) => console.log("error"))
+  }
 
-    /*
-    console.log("Updates", updates);
+  handleClick(updates){
+    console.log("Updates: ", updates);
     for(let i=0; i < updates.length; i++) {
       switch(updates[i].issue){
         case "Unequal parameters":
-          this.fixUnequalParameters(updates[i]);
+          //this.fixUnequalParameters(updates[i]);
         case "\"Get it Today\" version of this product does not exist":
           this.fixGitDne(updates[i]);
         case "\"Original\" version of this \"Get it Today\" product does not exist":
           this.fixNormDne(updates[i]);
       }
     }
-    */
   }
 
 
@@ -77,8 +72,13 @@ class FixIssues extends Component {
   //POST REQUEST
   //Creates GIT product with same parameters as NORM
   fixGitDne(update){
-    console.log("fixGitDne");
-    return null;
+    console.log("fixGitDne", update);
+    let body = { "product": {
+              "title": update.norm.title+" - Get it Today",
+            }
+    }
+    this.post(body);
+
   }
 
   //DEL REQUEST

@@ -5,3 +5,4 @@ node_modules/
 .next/
 .secret/
 pages/DuplicateItems/FixIssues.js
+process.env

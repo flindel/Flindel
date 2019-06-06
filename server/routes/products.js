@@ -7,6 +7,7 @@ const router = Router({
     prefix: '/products'
 });
 
+/*
 router.get('/', async ctx => {
   // Get product img src
   const productid = ctx.query.id;
@@ -35,8 +36,7 @@ router.get('/', async ctx => {
       }
   }
 });
-
-
+*/
 router.post('/', async ctx => {
     // Create a product
     const { shop, accessToken } = getShopHeaders(ctx);

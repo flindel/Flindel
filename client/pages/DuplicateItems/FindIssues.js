@@ -51,13 +51,6 @@ class FindIssues extends Component {
       this.setState({load_git: false});
       this.loaded();
     })
-    /*
-    fetch(`https://${serveo_name}.serveo.net/products?id=${encodeURIComponent(butterfly_id)}`, {
-      method: 'PUT',
-      })
-      .then(response => response.json())
-      .then(resData => console.log("Put Response: ", resData))
-    */
   }
 
   loaded(){
@@ -90,8 +83,8 @@ class FindIssues extends Component {
       } else {
         //GIT version of product does not exist
         diff.push({
-          normId: product.id,
-          gitId: null,
+          norm: product,
+          git: null,
           name: product.title,
           parameterIssues: [],
           variantIssues: [],
@@ -112,6 +105,7 @@ class FindIssues extends Component {
         return product;
       }
     }
+    console.log("GIT DNE: ", name);
     return null;
   }
 
@@ -125,8 +119,8 @@ class FindIssues extends Component {
       let normProduct = this.findNormalDuplicate(product.title);
       if (normProduct == null) {
         diff.push({
-          normId: null,
-          gitId: product.id,
+          norm: null,
+          git: product,
           name: product.title,
           parameterIssues: [],
           variantIssues: [],
@@ -155,8 +149,8 @@ class FindIssues extends Component {
   //DOES NOT COMPARE IMAGES, IMAGE CHANGES WILL NOT BE FLAGGED
   compareProducts(norm, git){
     let display_issue = {
-      normId: norm.id,
-      gitId: git.id,
+      norm: norm,
+      git: git,
       name: norm.title,
       parameterIssues: this.compareProductParameters(norm, git),
       variantIssues: this.compareVariantParameters(norm, git),
@@ -216,8 +210,8 @@ class FindIssues extends Component {
     //console.log("productIssues: ", productIssues)
     if (productIssues.length > 0){
       return ({
-        normId: null,
-        gitId: git.id,
+        norm: null,
+        git: git,
         name: git.title,
         parameterIssues: [],
         variantIssues: productIssues,
@@ -255,8 +249,8 @@ class FindIssues extends Component {
     //console.log("productIssues: ", productIssues)
     if (productIssues.length > 0){
       return ({
-        normId: norm.id,
-        gitId: null,
+        norm: norm,
+        git: null,
         name: norm.title,
         parameterIssues: [],
         variantIssues: productIssues,
