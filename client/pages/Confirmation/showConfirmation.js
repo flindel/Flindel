@@ -1,70 +1,38 @@
 import React from 'react';
-import MP from './mapDisplay.js'
-//import './App.css';
-/*var nodemailer = require ('nodemailer');
 
-//emailsender974@yahoo.com
-//testmail974
-
-var transporter = nodemailer.createTransport({
-    service: 'yahoo',
-    auth: {
-        user: 'emailsender974@yahoo.com',
-        pass: 'testmail974'
-    }
-});
-
-var mailOptions = {
-    from: 'emailsender974@yahoo.com',
-    to: 'w887604@nwytg.net',
-    subject: 'testemail',
-    text: 'That was easy!'
-};*/
-
+/* FINAL PAGE
+Thank you for ordering
+ */
 class finalPage extends React.Component{
     constructor(props){
-        super(props);
-        this.state = {step:1}
-        this.viewMaps = this.viewMaps.bind(this)
+        super(props) ;
+        this.state = {
+            email: this.props.email,
+            code:this.props.code           
+        };
+        this.sendEmail = this.sendEmail.bind(this)
     }
 
-
-    viewMaps(){
-        this.setState({step:2})
+    //resend email if necessary
+    sendEmail(){
+        fetch(`https://exsto.serveo.net/send?email=${encodeURIComponent(this.state.email)}&code=${encodeURIComponent(this.state.code)}`, 
+        {
+            method: 'POST',
+        })
     }
 
+    //display
     render(){
-        /*transporter.sendMail(mailOptions, function(error,info){
-            if(error){
-                console.log(error);
-            }
-            else{
-                console.log('email sent')
-            }
-        })*/
-        if(this.state.step ==1){
-            return(
-                <div>
-              <h2>
-                Thank you!
-              </h2>
-              <h3>
-                Your confirmation code is: {this.props.code}
-                <br></br>
-                </h3>
-                <p>
-                A confirmation email has been sent to {this.props.email}
-                </p>
+        return(
+            <div>
+            <h2>Thank you!</h2>
+            <h3>Your confirmation code is: {this.props.code}</h3>
+            <p>A confirmation email has been sent to {this.props.email}</p>
+            <br/>
+            <button onClick = {this.sendEmail}>Resend email</button>
+            <br></br><br/><br/><br/>
             </div>
         )
-        }
-        else if (this.state.step ==2){
-            return(
-                <div>
-                <MP/>
-                </div>
-            )
-        }
     }
 }
 

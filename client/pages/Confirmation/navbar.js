@@ -1,5 +1,6 @@
 import React, {Component} from 'react';
 
+/* NAVBAR to flip between map view and return portal view. Imported at the top of most pages */
 class universalNavBar extends Component{
     render(){
         return(

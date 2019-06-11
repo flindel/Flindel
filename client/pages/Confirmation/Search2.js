@@ -1,5 +1,9 @@
 import React, { Component } from 'react';
 
+/* SEARCH PAGE
+First page customers sees, prompts them to input order num+other identifier
+*/
+
 class Search extends Component {
     
         constructor(props) {
@@ -13,19 +17,21 @@ class Search extends Component {
             this.handleSearch = this.handleSearch.bind(this);
         }
     
-    
+        //handle input of info
         handleOrderNumChange(e){
             this.setState({
                 orderNum: e.target.value
             });
         }
     
+        //handle input of info
         handleEmailChange(e){
             this.setState({
                 emailAdd: e.target.value
             });
         }
     
+        //handle submit
         handleSearch(e){
             this.props.identifyItems(this.state.orderNum, this.state.emailAdd);
             //event.preventDefault();

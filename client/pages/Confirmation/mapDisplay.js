@@ -1,11 +1,11 @@
 import React from 'react'
 
+/* This page shows the message for return instructions and map */
 class PickupDisplay extends React.Component{
   render(){
     return (
     <div>
       <div>
-          <h3>Powered by FLINDEL</h3>
           <h2>Pickup Instructions:</h2>
           <p>1. Request return on Flindel and receive confirmation code (e.g. A1B2C3)</p>
           <p> 2. Present your code and give your return item(s) to one of the staff at one of the locations on the map</p>

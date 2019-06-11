@@ -6,25 +6,25 @@ import CheckPage from './confirmOrder'
 import PickupInfo from './mapDisplay'
 import NB from './navbar.js'
 import PriceDisplay from './priceDisplay.js'
-
 const shopName="getOrderTest";
 
 class IdentifyApp extends Component {
+    //constructor and binding methods
     constructor(props){
 		super(props);
 		this.state = {
             items:[],
-            searchStatus: false,
-            checkStatus:false,
-            priceStatus: false,
-            submitStatus: false,
+            searchStatus: false, //whether the login was successful (matching order and password)
+            checkStatus:false, //proceed from item select page and show checkover page
+            priceStatus: false, //proceed from checkover page and show pricing page
+            submitStatus: false, //proceed from pricing page and show final page
             code: '',
             email: '', 
             newEmail: '',
-            mapView: 0,
+            mapView: 0, //used to show navbar option
         };
         this.returnItemList= []
-        this.initStatus= true  // combine with searchStatus to control conditions for render
+        this.initStatus= true  // whether a login attempt has been made. Used for conditional render
         this.identifyItems=this.identifyItems.bind(this) 
         this.forward = this.forward.bind(this)
         this.back = this.back.bind(this)
@@ -40,7 +40,9 @@ class IdentifyApp extends Component {
         this.pricingBack = this.pricingBack.bind(this)
     }
 
+    //generate usable unique codes
     generateID(){
+        //alphabet, vowels removed for censoring
         var alphabet = "BCDFGHJKLMNPQRSTVWXZ0123456789";
         var codeLength = 6;
         var index;
@@ -51,59 +53,73 @@ class IdentifyApp extends Component {
             code += alphabet[index]
             //search here instead of manually setting
           }
+          //set state to the new code
           this.setState({code:code})
     }
 
+    //proceed to checkover page from select page if item is selected
     checkOver(){
         if(this.returnItemList.length>0){
             this.setState({checkStatus:true})
         }
     }
 
+    //move back from pricing page to checkover page
     pricingBack(){
         this.setState({priceStatus:false})
     }
 
+    //move forward from checkover page to pricing page
     forward(){
         this.generateID()
         this.setState({priceStatus: true})
     }
 
+    //move forward from pricing page to final page
     finishPricing(){
         this.setState({submitStatus: true})
-        this.sendEmail()
-        this.sendToDB()
+        //this.sendEmail()
+        //this.sendToDB()
     }
 
+    //send email, calls backend function
     sendEmail(){
-        alert(this.state.code)
-        fetch(`https://campana.serveo.net/send?email=${encodeURIComponent(this.state.email)}&code=${encodeURIComponent(this.state.code)}`, 
+        fetch(`https://exsto.serveo.net/send?email=${encodeURIComponent(this.state.email)}&code=${encodeURIComponent(this.state.code)}`, 
         {
             method: 'POST',
-        }).then(response => {alert('EMAIL SENT*')})
+        })
        }
 
+    //send information to firestore db
     sendToDB(){
-        //do something
+        fetch(`https://exsto.serveo.net/db`, {
+            method: 'POST',
+        })
     }
 
+    //set email from a manual entry from the checkover page
     setEmail(){
         var temp = this.state.newEmail
         this.state.email=temp
     }
 
+    //move back from selection page
     back(){
         this.setState({checkStatus: false,searchStatus:true})
         this.initStatus=false
     }
 
+    //on navbar, views the map page
     viewMaps(){
         this.setState({mapView:1})
     }
+
+    //on navbar, goes back from nav page to main flow
     unviewMaps(){
         this.setState({mapView: 0})
     }
 
+    //handle change to state variable
     handleChange(inp) {
         return function (e) {
           var state = {};
@@ -113,14 +129,18 @@ class IdentifyApp extends Component {
         }.bind(this); 
       }
 
+    //edit return list
     setReturnList(newItem){
         this.returnItemList = newItem.slice();
       }
 
+    //process of selecting whether order is valid
 	identifyItems(orderNum, emailAdd){
+        //matching phone number to shopify style
         var phoneNum = '+1';
         phoneNum += emailAdd;
         for (var i = 0;i<phoneNum.length;i++){
+            //ignoring characters that people use to enter their phone number
             if (phoneNum[i]==' ' || phoneNum[i]=='-' || phoneNum[i]=='('||phoneNum[i]==')'){
                 phoneNum = phoneNum.substring(0,i)+phoneNum.substring(i+1)
             }
@@ -128,34 +148,38 @@ class IdentifyApp extends Component {
         this.setState({email:emailAdd})
         const data = {orderNumber: orderNum, emailAddress:emailAdd};
         //get order info
-        fetch(`https://campana.serveo.net/orders?orderNum=${encodeURIComponent(data.orderNumber)}`, {
-                //mode: 'no-cors',
+        fetch(`https://exsto.serveo.net/orders?orderNum=${encodeURIComponent(data.orderNumber)}`, {
                 method: 'GET',
 
             })
+            //get data on the selected order from backenid
             .then(response => response.json())
             .then(resData=>{
-                //check if order name exsits and the email address or phone number match
+                //check if order exists based on its number
                 if(JSON.stringify(resData.orders)!="[]")
                 {
-                if ((resData.orders[0].email.toLowerCase()==emailAdd.toLowerCase()) || (resData.orders[0].phone == phoneNum))  //check email address match or not
+                //check to see whether the email or phone number entered matches the one on record
+                if ((resData.orders[0].email.toLowerCase()==emailAdd.toLowerCase()) || (resData.orders[0].phone == phoneNum))
                 {
+                    //if correct
                     this.initStatus=false;
                     this.setState({
+                        //set the items var to the items in the order
                         items:resData.orders[0].line_items.map(item=>{
                             return {
                                 variantID:item.variant_id,
                                 productID: item.product_id,
                                 name: item.name,
                                 quantity: item.quantity,
-                                price: item.price
-                                //returnQuantity: '0'
+                                price: item.price,
                             }
                         }),
+                        //set searchstatus to true to move forward
                         searchStatus : true
                     })
                 }
                 else {
+                    //show they made an incorrect attempt
                     this.initStatus=false;     
                         this.setState({
                             searchStatus: false
@@ -167,7 +191,10 @@ class IdentifyApp extends Component {
     }
     
 
-
+    /*
+    Conditional render/mainline
+    All steps call a subpage based on the state variables on which page to show
+    */
 	render() {
         if(!this.state.searchStatus&&this.initStatus&&!this.state.checkStatus&&!this.state.mapView){
 		return (
@@ -232,6 +259,7 @@ class IdentifyApp extends Component {
                 unviewMaps = {this.unviewMaps.bind(this)}
                 shopName = {shopName}/> 
                 <PriceDisplay
+                items = {this.returnItemList}
                 finishPricing = {this.finishPricing.bind(this)}
                 pricingBack = {this.pricingBack.bind(this)}/>
                 </div>
@@ -248,6 +276,8 @@ class IdentifyApp extends Component {
                 code = {this.state.code} 
                 email = {this.state.email} 
                 shopName = {shopName}/>
+                <br/><br/><br/>
+                <PickupInfo/>
                 </div>
             )
         }

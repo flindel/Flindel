@@ -1,10 +1,12 @@
 import React, { Component } from 'react';
 
+//image size ould be made variable later
 const imgStyle={
-    height:188
+    height:110
 };
 
 class Item extends Component {
+    //constructor/binding methods
     constructor(props){
         super(props) ;
         this.state = {
@@ -13,59 +15,43 @@ class Item extends Component {
             name: this.props.item.name,
             value: "0",  //the quantity that user wants to return
             src:"", 
-            price: "",
+            price: this.props.item.price,
             returnReason: "",
             quantity: this.props.item.quantity,//the quantity of a item that user total brought
-            //returnReason:"---",
-            //checkToReturn: false,
-            //disableDrop: true
             
         };
         this.setState = this.setState.bind(this)
         this.handleReasonChange = this.handleReasonChange.bind(this);
         this.handleQuantityChange=this.handleQuantityChange.bind(this);
-        //this.handleReasonChange=this.handleReasonChange.bind(this);
-        //this.handleCheckBox=this.handleCheckBox.bind(this);
 
     }
 
+    //handle selecting a change in quantity
     handleQuantityChange(e){
         //use callback to pass select item since setState is asyn
         this.setState({
             value:e.target.value
         },()=>this.props.handleSelect(this.state.productid, this.state.variantid, this.state.name, 
-            this.state.value, this.state.src, this.state.quantity))
+            this.state.value, this.state.src, this.state.quantity, this.state.price))
         
     }
-   
+
+    //handle inputting the reason for return
     handleReasonChange(e){
          this.setState({
                  returnReason:e.target.value
          })
      }
 
-    // handleCheckBox(e){
-    //     this.setState({
-    //         checkToReturn: e.target.checked
-    //     })
-    //     if(e.target.checked==false){
-    //         this.setState({
-    //             value:"0",
-    //             returnReason:"---"
-    //         })
-    //     }
-    // }
-
+     //on mount, get important information including image source to show the display picture
     componentWillMount(){
-        //get img src
-        fetch(`https://campana.serveo.net/checkProducts?id=${encodeURIComponent(this.props.item.productID)}`, {
+        fetch(`https://exsto.serveo.net/products?id=${encodeURIComponent(this.props.item.productID)}`, {
             method: 'GET',})
         .then(response => response.json())
         .then(resData=>{
-            //console.log("img resData="+JSON.stringify(resData));
         if(resData.product){
             this.setState({
-                    src: resData.product.image.src,
+                    src: resData.product.image.src
             })
             
             }
@@ -75,7 +61,8 @@ class Item extends Component {
 
 
     render() {
-        //get totally quantity from state and pass it to return quantity choose dropdown menu
+        //get total quantity from state and pass it to return quantity
+        //conditional render based on which step it's called from so the necessary information can be displayed
         let quantityArr = [];
             for(let i=0; i<=this.state.quantity; i++){
                 quantityArr.push(i);
@@ -118,6 +105,18 @@ class Item extends Component {
                             <option value="Wrong">I didn't order this product. </option>
                         </select>
                     </label>
+                    <br/>
+                    <br/>
+                </div>
+            );
+        }
+        else if (this.props.step == 3){
+            return(
+                <div>               
+                    <img 
+                    style={imgStyle}
+                    src={this.state.src} />  
+                    <p>Price: {this.props.item.price}</p>    
                     <br/>
                     <br/>
                 </div>

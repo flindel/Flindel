@@ -1,14 +1,14 @@
 import React, { Component } from 'react';
 import Item from "./Item2";
 
-//const items = []; //productid  name  quantity  returnQuantity imgSrc
+/*
+SELECTION PAGE
+This is where the customer first selects the items they would like to return
+*/
 
 class ItemList extends Component {
     constructor(props){
         super(props);
-        this.state={
-            view:'selectItem', //"selectReason" "summary"  a state to control render content
-        }
         this.currItem = {
             productID:"",
             variantid:"",
@@ -41,7 +41,6 @@ class ItemList extends Component {
         }
 
         //update return list
-        //console.log(JSON.stringify(this.currItem))
             for (var i = 0;i<this.returnItems.length;i++){
                 var temp = this.returnItems[i];
                 if (temp.variantid == this.currItem.variantid){
