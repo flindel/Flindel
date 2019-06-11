@@ -8,7 +8,6 @@ class DuplicateApp extends Component {
     super();
   }
 
-
   render(){
     return (
       <div>

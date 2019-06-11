@@ -4,5 +4,5 @@ assets/
 node_modules/
 .next/
 .secret/
-pages/DuplicateItems/FixIssues.js
 process.env
+client/pages/DuplicateItems/TestStore.js

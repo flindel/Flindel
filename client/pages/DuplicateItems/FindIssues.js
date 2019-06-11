@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import DisplayIssue from './DisplayIssue';
-import FixIssues, { setUpdates } from './FixIssues';
+import FixIssues from './FixIssues';
 
 const shopName = "ds-test-yash-kini";
 const collection_all_products_id = "97721974881";
@@ -35,22 +35,30 @@ class FindIssues extends Component {
     fetch(`https://${serveo_name}.serveo.net/collections?id=${encodeURIComponent(collection_all_products_id)}`, {
       method: 'GET',
       })
-      .then(response => response.json())
+      .then((response) => {
+        if(response.ok){return response.json()}
+        else{throw Error(response.statusText)}
+      })
       .then(resData=> {
-      this.setState({all: resData});
-      this.setState({load_all: false});
-      this.loaded();
+        this.setState({all: resData});
+        this.setState({load_all: false});
+        this.loaded();
+      })
+      .catch((error) => console.log("error"))
 
-    })
     fetch(`https://${serveo_name}.serveo.net/collections?id=${encodeURIComponent(collection_get_it_today_id)}`, {
       method: 'GET',
       })
-      .then(response => response.json())
+      .then((response) => {
+        if(response.ok){return response.json()}
+        else{throw Error(response.statusText)}
+      })
       .then(resData=> {
-      this.setState({git: resData});
-      this.setState({load_git: false});
-      this.loaded();
-    })
+        this.setState({git: resData});
+        this.setState({load_git: false});
+        this.loaded();
+      })
+      .catch((error) => console.log("error"))
   }
 
   loaded(){
@@ -155,8 +163,9 @@ class FindIssues extends Component {
       parameterIssues: this.compareProductParameters(norm, git),
       variantIssues: this.compareVariantParameters(norm, git),
     }
-    if (display_issue.parameterIssues.length != 0
-      || display_issue.variant_issues.length != 0){
+    let para_len = display_issue.parameterIssues.length;
+    let var_len = display_issue.variantIssues.length;
+    if (!(para_len == 0) || !(var_len == 0)){
         display_issue.issue = "Unequal parameters";
         display_issue.solution = "The \"Original\" product's info will replace the \"Get it Today\" product's info."
       }
@@ -229,7 +238,7 @@ class FindIssues extends Component {
     let productIssues = [];
     const para = {name:["fulfillment_service", "grams", "weight"],
                   value:["flindel", 0, 0],
-                  defaultCorrection:["manual", 1000, 1]}
+                  defaultCorrection:["manual", 100, .1]}
 
     let solution = "";
     for (let j = 0; j < norm.variants.length; j++){
@@ -265,7 +274,7 @@ class FindIssues extends Component {
   compareVariantParameters(norm, git){
     let variantIssues = [];
     if (norm.variants.length != git.variants.length) {
-      //IF variant are not equal
+      return variantIssues;
     }
     const para = ["barcode", "compare_at_price", "image_id", "option1",
      "option2", "option3", "position", "price", "requires_shipping", "taxable",

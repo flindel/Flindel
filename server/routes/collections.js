@@ -36,7 +36,7 @@ router.get('/', async ctx => {
     });
 
 
-/*
+
   router.get('/all/', async ctx => {
       //Gets products all products from a collection
       const collectionid = ctx.query.id;
@@ -66,5 +66,5 @@ router.get('/', async ctx => {
           }
       }
       });
-*/
+
 module.exports = router;
