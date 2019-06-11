@@ -6,3 +6,4 @@ node_modules/
 .secret/
 process.env
 client/pages/DuplicateItems/TestStore.js
+client/pages/DuplicateItems/TestStore.js
