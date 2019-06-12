@@ -26,10 +26,11 @@ Basic NDQ3OGViN2FjMTM4YTEzNjg1MmJhYmQ4NjE5NTZjMTk6M2U1YTZlZGVjNzFlYWIwMzk0MjJjNj
 4. Put this key in your request header under `Authorization`. See [POST example](https://github.com/alcfy/Fldl/blob/master/server/routes/products.js#L10).
 
 ## Setup .env file
-You need have the following environment variables set
+You need to have the following environment variables set
 ```
 SHOPIFY_API_KEY=[YOUR_STORE_API_KEY]
 SHOPIFY_API_SECRET_KEY=[YOUR_STORE_API_SECRET_KEY]
 SHOP_AUTH=[YOUR_BASIC_PRIVATE_APP_AUTH]
+GOOGLE_APPLICATION_CREDENTIALS=[YOUR_PATH_TO_FIREBASE_CREDENTIAL]
 DEBUG=1
 ```

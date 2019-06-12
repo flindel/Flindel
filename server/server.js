@@ -18,12 +18,14 @@ const handle = app.getRequestHandler();
 
 const router = require('./routes/index');
 
-// const admin = require('firebase-admin');
+const admin = require('firebase-admin');
 
-// admin.initializeApp({
-//   credential: admin.credential.applicationDefault(),
-//   databaseURL: 'https://<DATABASE_NAME>.firebaseio.com'
-// });
+admin.initializeApp({
+  credential: admin.credential.applicationDefault(),
+  databaseURL: 'https://flindel-dev.firebaseio.com'
+});
+
+const db = admin.firestore();
 
 const { SHOPIFY_API_SECRET_KEY, SHOPIFY_API_KEY, DEBUG } = process.env;
 
@@ -31,6 +33,10 @@ app.prepare().then(() => {
   const server = new Koa();
   server.use(session(server));
   server.use(bodyParser());
+  server.use(async (ctx, next) => {
+    if (ctx.db === undefined) ctx.db = db;
+    await next();
+  });
   server.keys = [SHOPIFY_API_SECRET_KEY];
   
   server.use(
@@ -38,7 +44,7 @@ app.prepare().then(() => {
       apiKey: SHOPIFY_API_KEY,
       secret: SHOPIFY_API_SECRET_KEY,
       scopes: ['read_products', 'read_orders', 'write_products'],
-      afterAuth(ctx) {
+      async afterAuth(ctx) {
         const { shop, accessToken } = ctx.session;
         // TODO: create the shop in the database and store the accessToken
         console.log('shop.............');
@@ -46,6 +52,12 @@ app.prepare().then(() => {
         console.log(shop);
         ctx.cookies.set('shop_id', shop);
         ctx.cookies.set('accessToken', accessToken);
+        let tokenRef = ctx.db.collection('shop_tokens').doc(shop);
+        try {
+          await tokenRef.set({token: accessToken});
+        } catch (err) {
+          console.log(err);
+        }
         ctx.redirect('/');
       },
     }),
