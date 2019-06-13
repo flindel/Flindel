@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 const shopName = "ds-test-yash-kini";
 
 let updates = [];
+let fixes = 0;
 const butterfly_id = "2114548007009";
 const serveo_name = "enim";
 
@@ -11,17 +12,30 @@ const gitPara = {
                   defaultCorrection:["manual", 100, "shopify", .1]
                 }
 
+
 class FixIssues extends Component {
   constructor(props){
     super(props);
     this.state = {
+      updates: [],
       hasError: false,
     }
     this.handleClick = this.handleClick.bind(this);
   }
 
+  finishedFixing(){
+    fixes += 1
+    console.log("Fixes", fixes)
+    console.log("Updates", this.state.updates)
+    if(fixes == this.state.updates.length){
+      console.log("Finished Fixing")
+      this.state.reloadFunction();
+    }
+  }
 
-  handleClick(updates){
+  handleClick(updates, reloadFunction){
+    this.setState({updates: updates})
+    this.setState({reloadFunction: reloadFunction})
     console.log("Updates: ", updates);
     for(let i=0; i < updates.length; i++) {
       switch(updates[i].issue){
@@ -97,6 +111,8 @@ class FixIssues extends Component {
     let gitBody = update.norm;
     gitBody.title = update.norm.title + " - Get it Today";
     for(let j = 0; j < update.norm.variants.length; j++){
+      gitBody.variants[j].old_inventory_quantity = 0;
+      gitBody.variants[j].inventory_quantity = 0;
       for(let i = 0; i < gitPara.name.length; i++){
         eval("gitBody.variants["+j+"]."+gitPara.name[i]+" = gitPara.value[i]");
       }
@@ -119,7 +135,9 @@ class FixIssues extends Component {
         if(response.ok){return response.json()}
         else{throw Error(response.statusText)}
       })
-      .then((data) => console.log('GET: ', JSON.stringify(data)))
+      .then((data) => {
+        console.log('GET: ', data)
+      })
       .catch((error) => console.log("error"))
   }
 
@@ -131,7 +149,10 @@ class FixIssues extends Component {
         if(response.ok){return response.json()}
         else{throw Error(response.statusText)}
       })
-      .then((data) => console.log('DELETE: ', data))
+      .then((data) => {
+        console.log('DELETE: ', data)
+        this.finishedFixing();
+      })
       .catch((error) => console.log("error"))
   }
 
@@ -149,7 +170,10 @@ class FixIssues extends Component {
         if(response.ok){return response.json()}
         else{throw Error(response.statusText)}
       })
-      .then((data) => console.log('PUT: ', data))
+      .then((data) => {
+        console.log('PUT: ', data)
+        this.finishedFixing();
+      })
       .catch((error) => console.log("error"))
   }
 
@@ -167,14 +191,21 @@ class FixIssues extends Component {
         if(response.ok){return response.json()}
         else{throw Error(response.statusText)}
       })
-      .then((data) => console.log('POST: ', data))
+      .then((data) => {
+        console.log('POST: ', data)
+        this.finishedFixing();
+      })
       .catch((error) => console.log("error"))
   }
 
   render(props){
     return(
       <form>
-        <input type="button" value="Fix Now" onClick={() => this.handleClick(this.props.updates)} />
+        <input
+          type="button"
+          value="Fix Now"
+          onClick={() => this.handleClick(this.props.updates, this.props.reloadFunction)}
+        />
       </form>
     )
   }

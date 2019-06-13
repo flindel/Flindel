@@ -7,7 +7,6 @@ const router = Router({
     prefix: '/products'
 });
 
-
 router.get('/', async ctx => {
   const productid = ctx.query.id;
   console.log("productID:---------"+productid)
@@ -153,6 +152,5 @@ router.delete('/', async ctx => {
       }
   }
 });
-
 
 module.exports = router;

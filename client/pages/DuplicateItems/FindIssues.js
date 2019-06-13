@@ -31,6 +31,15 @@ class FindIssues extends Component {
   componentDidMount() {
     let normProducts = {};
     let gitProducts = {};
+    this.setState({
+      hasCompared: false,
+      load_all: true,
+      load_git: true,
+      all: {},
+      git: {},
+      updates: [],
+      displayUpdates: [],
+    })
     //Assumption, Brand has less than 250 inventory item/product variations
     fetch(`https://${serveo_name}.serveo.net/collections?id=${encodeURIComponent(collection_all_products_id)}`, {
       method: 'GET',
@@ -87,7 +96,7 @@ class FindIssues extends Component {
       let gitProduct = this.findGetItTodayDuplicate(product.title);
       if (gitProduct) {
         let comparison = this.compareProducts(product, gitProduct);
-        diff.push(comparison);
+        if (comparison){diff.push(comparison);}
       } else {
         //GIT version of product does not exist
         diff.push({
@@ -168,8 +177,8 @@ class FindIssues extends Component {
     if (!(para_len == 0) || !(var_len == 0)){
         display_issue.issue = "Unequal parameters";
         display_issue.solution = "The \"Original\" product's info will replace the \"Get it Today\" product's info."
+        return display_issue;
       }
-    return display_issue;
   }
 
   //norm: product, original item
@@ -238,8 +247,8 @@ class FindIssues extends Component {
     let productIssues = [];
     const para = {name:["fulfillment_service", "grams", "weight"],
                   value:["flindel", 0, 0],
-                  defaultCorrection:["manual", 100, .1]}
-
+                  defaultCorrection:["manual", 100, .1]
+                }
     let solution = "";
     for (let j = 0; j < norm.variants.length; j++){
       let variant = norm.variants[j];
@@ -312,9 +321,13 @@ class FindIssues extends Component {
     return (
       <div>
         <h1>{isLoading? "Loading" : "Get it Today Product Admin"}</h1>
-        <h3>{isSync? "Get it Today is syncronized"
-        :"Get it Today is not synchronized"}</h3>
-        <FixIssues updates={this.state.updates}/>
+        {!isLoading&&<h3>{isSync? "Get it Today is syncronized"
+        :"Get it Today is not synchronized"}</h3>}
+        {(!isLoading&&!isSync)&&
+          <FixIssues
+            updates={this.state.updates}
+            reloadFunction={this.componentDidMount.bind(this)}
+          />}
         {!isSync && <h3>Inventory Issues</h3>}
         <div>
           {displayUpdates}

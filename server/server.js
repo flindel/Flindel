@@ -17,14 +17,11 @@ const app = next({
 const handle = app.getRequestHandler();
 
 const router = require('./routes/index');
-
 const admin = require('firebase-admin');
-
 admin.initializeApp({
   credential: admin.credential.applicationDefault(),
   databaseURL: 'https://flindel-dev.firebaseio.com'
 });
-
 const db = admin.firestore();
 
 const { SHOPIFY_API_SECRET_KEY, SHOPIFY_API_KEY, DEBUG } = process.env;
@@ -38,7 +35,7 @@ app.prepare().then(() => {
     await next();
   });
   server.keys = [SHOPIFY_API_SECRET_KEY];
-  
+
   server.use(
     createShopifyAuth({
       apiKey: SHOPIFY_API_KEY,

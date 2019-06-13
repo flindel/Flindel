@@ -5,5 +5,5 @@ node_modules/
 .next/
 .secret/
 process.env
-client/pages/DuplicateItems/TestStore.js
+serviceAccountCredentials.json
 client/pages/DuplicateItems/TestStore.js
