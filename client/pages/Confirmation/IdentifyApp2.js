@@ -79,22 +79,26 @@ class IdentifyApp extends Component {
     finishPricing(){
         this.setState({submitStatus: true})
         //this.sendEmail()
-        //this.sendToDB()
+        this.sendToDB()
     }
 
     //send email, calls backend function
     sendEmail(){
-        fetch(`https://exsto.serveo.net/send?email=${encodeURIComponent(this.state.email)}&code=${encodeURIComponent(this.state.code)}`, 
+        fetch(`https://campana.serveo.net/send?email=${encodeURIComponent(this.state.email)}&code=${encodeURIComponent(this.state.code)}`, 
         {
-            method: 'POST',
+            method: 'post',
         })
        }
 
     //send information to firestore db
-    sendToDB(){
-        fetch(`https://exsto.serveo.net/db`, {
-            method: 'POST',
+    async sendToDB(){
+        var temp
+        //1 for write, 2 for read
+        temp = await fetch(`https://campana.serveo.net/dbcall?method=${encodeURIComponent(3)}&code=${encodeURIComponent('ABC123')}`, {
+            method: 'get',
         })
+        var json = await temp.json()
+        console.log(json.unique)
     }
 
     //set email from a manual entry from the checkover page
@@ -148,7 +152,7 @@ class IdentifyApp extends Component {
         this.setState({email:emailAdd})
         const data = {orderNumber: orderNum, emailAddress:emailAdd};
         //get order info
-        fetch(`https://exsto.serveo.net/orders?orderNum=${encodeURIComponent(data.orderNumber)}`, {
+        fetch(`https://campana.serveo.net/orders?orderNum=${encodeURIComponent(data.orderNumber)}`, {
                 method: 'GET',
 
             })
@@ -234,7 +238,7 @@ class IdentifyApp extends Component {
             return(
                 <div>
                 <NB
-                viewMaps ={this.viewMaps.bind(this)}
+                viewMaps ={this.viewMaps.bind(this)}    
                 unviewMaps = {this.unviewMaps.bind(this)}
                 shopName = {shopName}/> 
                 <CheckPage
