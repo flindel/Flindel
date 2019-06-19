@@ -9,15 +9,24 @@ const router = Router({
 
 router.get('/' , async ctx =>{
     const method = ctx.query.method
-    const testCode = ctx.query.code
+    const code = ctx.query.code
+    const email = ctx.query.email
     //write
     if(method == 1){
         db = ctx.db
+        const rawItems = ctx.query.items
+        let itemsJSON = JSON.parse(rawItems)
         let data = {
-            code: '122099',
-            email: 'tombrady@email.com',
-          };
-          setDoc = db.collection('orders').doc('DUMMY_DATA2').set(data)
+            code: code,
+            email: email,
+            financial_status: 'submitted',
+            items: []
+        };
+        for (var i = 0;i<itemsJSON.length;i++){
+            data.items.push({"name":itemsJSON[i].name, "reason":itemsJSON[i].reason, "var_id":itemsJSON[i].variantid,"status":"submitted"})
+        }
+        
+          setDoc = db.collection('returns').doc().set(data)
           ctx.body = 'success'
     }
     //read single doc
@@ -25,23 +34,20 @@ router.get('/' , async ctx =>{
         db = ctx.db
         myRef = db.collection('orders').doc('DUMMY_DATA');
         getDoc = await myRef.get()
-        console.log(getDoc)
         ctx.body = getDoc
     }
+    //read all documents to see if code is unique (UID check)
     else if (method == 3){
         db = ctx.db
 
         myRef = db.collection('orders')
-        let query = await myRef.where('code','==',testCode).get()
+        let query = await myRef.where('code','==',code).get()
         if (query.empty){
-            console.log('no matching')
             ctx.body = { "unique":true}
         }
         else{
-            console.log('yes matching')
             ctx.body = { "unique":false}
         }
     }
-        
 })
 module.exports = router;

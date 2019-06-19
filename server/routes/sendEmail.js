@@ -24,10 +24,10 @@ router.post('/', async ctx=>{
               {
                 "to": [
                   {
-                    "email": 'booleafs17@yahoo.ca'
+                    "email": 'booleafs17@yahoo.ca' //change to EMAIL once live
                   }
                 ],
-                "subject": "App email test."
+                "subject": "Return Confirmation"
               }
             ],
             "from": {
@@ -37,7 +37,7 @@ router.post('/', async ctx=>{
             "content": [
               {
                 "type": "text/plain",
-                "value": email + ' your code is ' + code
+                "value": 'Thank you for submitting your return. Your confirmation code is: ' + code + ' . Further instructions here...'
               }
             ]
           }

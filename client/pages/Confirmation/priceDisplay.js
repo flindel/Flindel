@@ -37,8 +37,8 @@ class finalPage extends React.Component{
     return(
         <div>
             <h2>Pricing Confirmation</h2>
-             {this.props.items.map((item)=>{
-                    return <Item item={item} step = {3} key={item.variantID}/>
+             {this.props.items.map((item,index)=>{
+                    return <Item item={item} step = {3} key={index}/>
                 })}
             <p>-----------------------------------------------------------------------------------------------</p>
             <p>Total: ${this.state.rawCost}</p>

@@ -1,5 +1,5 @@
 import React from 'react';
-
+const serveoname = 'campana'
 /* FINAL PAGE
 Thank you for ordering
  */
@@ -15,7 +15,7 @@ class finalPage extends React.Component{
 
     //resend email if necessary
     sendEmail(){
-        fetch(`https://exsto.serveo.net/send?email=${encodeURIComponent(this.state.email)}&code=${encodeURIComponent(this.state.code)}`, 
+        fetch(`https://${serveoname}.serveo.net/send?email=${encodeURIComponent(this.state.email)}&code=${encodeURIComponent(this.state.code)}`, 
         {
             method: 'POST',
         })

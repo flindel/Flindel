@@ -11,6 +11,7 @@ class confirmOrder extends React.Component{
       this.set0=this.set0.bind(this)
       this.set1=this.set1.bind(this)
       this.handleForward=this.handleForward.bind(this)
+      this.handleSelect=this.handleSelect.bind(this)
     }
 
     componentWillMount(){
@@ -32,6 +33,10 @@ class confirmOrder extends React.Component{
       this.setState({selectedEmail: 1})
   }
 
+  handleSelect(variantidX,reasonX, oldreasonX){
+    this.props.setReason(variantidX,reasonX,oldreasonX)
+  }
+
   handleForward(){
     //handle submit of form
       if (this.state.selectedEmail==1){
@@ -51,15 +56,14 @@ class confirmOrder extends React.Component{
       }
     }
 
-
     render(){
         return(
             <div>
     <h2>
         RETURN CONFIRMATION
     </h2>
-    {this.props.items.map((item)=>{
-                    return <Item step = {2} item={item} key={item.variantID}/>           
+    {this.props.items.map((item,index)=>{    
+                    return <Item step = {2} item={item} key={index}handleSelect={this.handleSelect.bind(this)}/>    
                 })} {/*show all items*/}
           
 <h3>Email Confirmation:</h3> {/* GET EMAIL INFO*/}

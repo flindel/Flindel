@@ -16,7 +16,8 @@ class ItemList extends Component {
             value:"",
             src: "",
             quantity: "",
-            price:""
+            price:"",
+            reason: ""
         }
         this.returnItems = [];
         this.handleSubmit = this.handleSubmit.bind(this)
@@ -28,7 +29,7 @@ class ItemList extends Component {
     }
 
     //get return items
-    handleSelect(productidX, variantidX, nameX, valueX, srcX, quantityX, priceX){
+    handleSelect(productidX, variantidX, nameX, valueX, srcX, quantityX, priceX, reasonX){
         let findItem=false;
         this.currItem = {
             productID: productidX,
@@ -37,7 +38,8 @@ class ItemList extends Component {
             value: valueX,
             src: srcX,
             quantity: quantityX,
-            price: priceX
+            price: priceX,
+            reason: reasonX
         }
 
         //update return list

@@ -4,6 +4,7 @@ import React, { Component } from 'react';
 const imgStyle={
     height:110
 };
+const serveoname = 'campana'
 
 class Item extends Component {
     //constructor/binding methods
@@ -16,7 +17,7 @@ class Item extends Component {
             value: "0",  //the quantity that user wants to return
             src:"", 
             price: this.props.item.price,
-            returnReason: "",
+            reason: '',
             quantity: this.props.item.quantity,//the quantity of a item that user total brought
             
         };
@@ -32,20 +33,21 @@ class Item extends Component {
         this.setState({
             value:e.target.value
         },()=>this.props.handleSelect(this.state.productid, this.state.variantid, this.state.name, 
-            this.state.value, this.state.src, this.state.quantity, this.state.price))
+            this.state.value, this.state.src, this.state.quantity, this.state.price, this.state.reason))
         
     }
 
     //handle inputting the reason for return
     handleReasonChange(e){
+        let old = this.state.reason
          this.setState({
-                 returnReason:e.target.value
-         })
+                 reason:e.target.value
+         },()=> this.props.handleSelect(this.props.item.variantid, this.state.reason, old))
      }
 
      //on mount, get important information including image source to show the display picture
     componentWillMount(){
-        fetch(`https://exsto.serveo.net/products?id=${encodeURIComponent(this.props.item.productID)}`, {
+        fetch(`https://${serveoname}.serveo.net/products?id=${encodeURIComponent(this.props.item.productID)}`, {
             method: 'GET',})
         .then(response => response.json())
         .then(resData=>{
@@ -56,7 +58,6 @@ class Item extends Component {
             
             }
         });
-        
     }
 
 
@@ -98,7 +99,7 @@ class Item extends Component {
                     <p>{this.props.item.name}</p>     
                     {/* dropdown menu to choose return reason */}
                      <label className="dropdown">Reason for return:
-                        <select value={this.state.returnReason} onChange={this.handleReasonChange}>
+                        <select value={this.state.reason} onChange={this.handleReasonChange}>
                             <option value="---">---</option>
                             <option value="Unhappy">I'm unhappy with this product.</option>
                             <option value="Broken">This product is damaged or broken.</option>
@@ -116,7 +117,8 @@ class Item extends Component {
                     <img 
                     style={imgStyle}
                     src={this.state.src} />  
-                    <p>Price: {this.props.item.price}</p>    
+                    <p>Price: {this.props.item.price}</p>  
+                    <p>Reason: {this.props.item.reason}</p>  
                     <br/>
                     <br/>
                 </div>
