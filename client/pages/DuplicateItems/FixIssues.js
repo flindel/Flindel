@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
-import {serveo_name} from '../config'
+import {serveo_name} from '../config';
+import {post, put, get, del} from './Shopify';
 
 let updates = [];
 let fixes = 0;
@@ -74,7 +75,7 @@ class FixIssues extends Component {
     }
     */
     let body = {product: gitBody};
-    this.put(update.git.id, body);
+    put(update.git.id, body, fixUnequalParameters);
   }
 
 
@@ -86,7 +87,7 @@ class FixIssues extends Component {
       }
     }
     let body = {product: gitBody};
-    this.put(update.git.id, body);
+    put(update.git.id, body, this.finishedFixing);
   }
 
   fixNormDefaultPara(update){
@@ -99,7 +100,7 @@ class FixIssues extends Component {
       }
     }
     let body = {product: normBody};
-    this.put(update.norm.id, body);
+    put(update.norm.id, body, this.finishedFixing);
   }
 
   //POST REQUEST
@@ -118,92 +119,26 @@ class FixIssues extends Component {
       }
     }
     let body = {product: gitBody};
-    this.post(body);
+    post(body, this.finishedFixing);
   }
 
   //DEL REQUEST
   //Deletes GIT version of product
   fixNormDne(update){
-    this.delete(update.git.id);
+    del(update.git.id, this.finishedFixing);
   }
 
-  get(product_id){
-    fetch(`https://${serveo_name}.serveo.net/products?id=${encodeURIComponent(product_id)}`, {
-      method: 'get',
-      })
-      .then((response) => {
-        if(response.ok){return response.json()}
-        else{throw Error(response.statusText)}
-      })
-      .then((data) => {
-        console.log('GET: ', data)
-      })
-      .catch((error) => console.log("error"))
+  print(data){
+    console.log(data);
   }
 
-  delete(product_id){
-    fetch(`https://${serveo_name}.serveo.net/products?id=${encodeURIComponent(product_id)}`, {
-      method: 'delete',
-      })
-      .then((response) => {
-        if(response.ok){return response.json()}
-        else{throw Error(response.statusText)}
-      })
-      .then((data) => {
-        console.log('DELETE: ', data)
-        this.finishedFixing();
-      })
-      .catch((error) => console.log("error"))
-  }
-
-  put(product_id, body){
-    const options = {
-      method: 'put',
-      headers: {
-        'Accept': 'application/json, text/plain, */*',
-        'Content-Type': 'application/json'
-      },
-        body: JSON.stringify(body),
-    }
-    fetch(`https://${serveo_name}.serveo.net/products?id=${encodeURIComponent(product_id)}`, options)
-      .then((response) => {
-        if(response.ok){return response.json()}
-        else{throw Error(response.statusText)}
-      })
-      .then((data) => {
-        console.log('PUT: ', data)
-        this.finishedFixing();
-      })
-      .catch((error) => console.log("error"))
-  }
-
-  post(body){
-    const options = {
-      method: 'post',
-      headers: {
-        'Accept': 'application/json, text/plain, */*',
-        'Content-Type': 'application/json'
-      },
-        body: JSON.stringify(body),
-    }
-    fetch(`https://${serveo_name}.serveo.net/products`, options)
-      .then((response) => {
-        if(response.ok){return response.json()}
-        else{throw Error(response.statusText)}
-      })
-      .then((data) => {
-        console.log('POST: ', data)
-        this.finishedFixing();
-      })
-      .catch((error) => console.log("error"))
-  }
 
   render(props){
     return(
       <form>
         <input
           type="button"
-          value="Fix Now"
+          value="Update"
           onClick={() => this.handleClick(this.props.updates, this.props.reloadFunction)}
         />
       </form>
