@@ -1,13 +1,13 @@
 import React, { Component } from 'react';
 import DisplayIssue from './DisplayIssue';
 import FixIssues from './FixIssues';
+import {serveo_name} from '../config'
 
-const shopName = "ds-test-yash-kini";
+
 const collection_all_products_id = "97721974881";
 const collection_get_it_today_id = "97721155681";
 const location_brand_id = "21803171937";
 const location_flindel_id = "21890891873";
-const serveo_name = "enim";
 
 let key = 1;
 const butterfly_id = "2114548007009";
@@ -77,6 +77,7 @@ class FindIssues extends Component {
       this.compareUpdates();
     }
   }
+
   //Assumption, every product has a unique name
   //Variants can never swtich names
   compareUpdates(){

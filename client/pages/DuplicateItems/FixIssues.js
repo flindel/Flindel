@@ -1,10 +1,9 @@
 import React, { Component } from 'react';
-const shopName = "ds-test-yash-kini";
+import {serveo_name} from '../config'
 
 let updates = [];
 let fixes = 0;
 const butterfly_id = "2114548007009";
-const serveo_name = "enim";
 
 const gitPara = {
                   name:["fulfillment_service", "grams", "inventory_management", "weight"],
@@ -106,6 +105,7 @@ class FixIssues extends Component {
   //POST REQUEST
   //Creates GIT product with same parameters as NORM
   //DOES NOT SETUP CORRECT INVENTORY
+  //NEEDS TO ADD IDS TO FIRESTORE
   fixGitDne(update){
     console.log("fixGitDne", update);
     let gitBody = update.norm;

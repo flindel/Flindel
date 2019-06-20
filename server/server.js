@@ -17,6 +17,7 @@ const app = next({
 const handle = app.getRequestHandler();
 
 const router = require('./routes/index');
+
 const admin = require('firebase-admin');
 admin.initializeApp({
   credential: admin.credential.applicationDefault(),
