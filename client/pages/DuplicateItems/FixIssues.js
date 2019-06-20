@@ -12,7 +12,6 @@ const gitPara = {
                   defaultCorrection:["manual", 100, "shopify", .1]
                 }
 
-
 class FixIssues extends Component {
   constructor(props){
     super(props);
