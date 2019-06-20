@@ -40,3 +40,5 @@ DEBUG=1
 - `./server/` - directory that contain all backend server code
   - `./server/routes` - all routers should go here
 - `./client` - directory that contain all frontend code
+## Merge
+Whenever you finish a task, merge it in `testing` branch.
