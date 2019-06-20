@@ -34,3 +34,9 @@ SHOP_AUTH=[YOUR_BASIC_PRIVATE_APP_AUTH]
 GOOGLE_APPLICATION_CREDENTIALS=[YOUR_PATH_TO_FIREBASE_CREDENTIAL]
 DEBUG=1
 ```
+## Structure standard
+- `./.env` - contain all environment variables (git ignored)
+- `./.secret/` - directory that contain secret files such as Firebase admin key (git ignored)
+- `./server/` - directory that contain all backend server code
+  - `./server/routes` - all routers should go here
+- `./client` - directory that contain all frontend code
