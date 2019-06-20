@@ -84,7 +84,7 @@ function DisplayIssue(props){
       <div>
         <hr />
         <h4>{props.name}: {props.issue}</h4>
-        <p>Fix: {props.solution}</p>
+        <p>Update: {props.solution}</p>
         <center>
           {headers}
           {parameter_issues_display}

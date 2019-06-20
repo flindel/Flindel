@@ -329,7 +329,7 @@ class FindIssues extends Component {
             updates={this.state.updates}
             reloadFunction={this.componentDidMount.bind(this)}
           />}
-        {!isSync && <h3>Inventory Issues</h3>}
+        {!isSync && <h3>Inventory Updates</h3>}
         <div>
           {displayUpdates}
         </div>

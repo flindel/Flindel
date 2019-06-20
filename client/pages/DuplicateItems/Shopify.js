@@ -1,6 +1,5 @@
 import {serveo_name} from '../config'
 
-
 export function get(product_id){
   fetch(`https://${serveo_name}.serveo.net/products?id=${encodeURIComponent(product_id)}`, {
     method: 'get',

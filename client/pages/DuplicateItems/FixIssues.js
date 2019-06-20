@@ -75,7 +75,7 @@ class FixIssues extends Component {
     }
     */
     let body = {product: gitBody};
-    put(update.git.id, body, fixUnequalParameters);
+    put(update.git.id, body, this.finishedFixing);
   }
 
 
@@ -138,7 +138,7 @@ class FixIssues extends Component {
       <form>
         <input
           type="button"
-          value="Update"
+          value="Update All"
           onClick={() => this.handleClick(this.props.updates, this.props.reloadFunction)}
         />
       </form>
