@@ -17,13 +17,15 @@ class Item extends Component {
             value: "0",  //the quantity that user wants to return
             src:"", 
             price: this.props.item.price,
-            reason: '',
+            reason: this.props.item.reason,
             quantity: this.props.item.quantity,//the quantity of a item that user total brought
+            status: this.props.item.status
             
         };
         this.setState = this.setState.bind(this)
         this.handleReasonChange = this.handleReasonChange.bind(this);
         this.handleQuantityChange=this.handleQuantityChange.bind(this);
+        this.handleStatusChange=this.handleStatusChange.bind(this)
 
     }
 
@@ -45,9 +47,17 @@ class Item extends Component {
          },()=> this.props.handleSelect(this.props.item.variantid, this.state.reason, old))
      }
 
+     handleStatusChange(e){
+         let old = this.state.status
+         this.setState({
+            status:e.target.value
+        },()=> this.props.handleSelect(this.props.item.variantid, this.state.status, old))
+     }
+
      //on mount, get important information including image source to show the display picture
     componentWillMount(){
-        fetch(`https://${serveoname}.serveo.net/products?id=${encodeURIComponent(this.props.item.productID)}`, {
+        if(this.props.step !=4){
+            fetch(`https://${serveoname}.serveo.net/products?id=${encodeURIComponent(this.props.item.productID)}`, {
             method: 'GET',})
         .then(response => response.json())
         .then(resData=>{
@@ -58,6 +68,8 @@ class Item extends Component {
             
             }
         });
+        }
+        
     }
 
 
@@ -78,7 +90,7 @@ class Item extends Component {
                 <img 
                 style={imgStyle}
                 src={this.state.src} />
-                <p>{this.props.item.name}</p>                
+                <p>{this.props.item.name}: ${this.props.item.price}</p>               
                 {/* dropdown menu to choose return quantity */}
                 <label className="dropdown">Quantity for Return: 
                     <select value={this.state.value} onChange={this.handleQuantityChange}>
@@ -118,11 +130,25 @@ class Item extends Component {
                     style={imgStyle}
                     src={this.state.src} />  
                     <p>Price: {this.props.item.price}</p>  
-                    <p>Reason: {this.props.item.reason}</p>  
                     <br/>
                     <br/>
                 </div>
             );
+        }
+        else if (this.props.step == 4){
+            return(
+                <div>
+                    <p>{this.props.item.name} --- {this.props.item.variantid} --- {this.props.item.reason}</p>
+                    <label className="dropdown">Reason for return:
+                        <select value={this.state.status} onChange={this.handleStatusChange}>
+                        <option value="submitted">Submitted</option>
+                            <option value="received">Received</option>
+                            <option value="accepted">Accepted</option>
+                            <option value="rejected">Rejected</option>
+                        </select>
+                    </label>
+                </div>
+            )
         }
     }
 }

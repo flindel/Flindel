@@ -1,12 +1,13 @@
 import React, {Component} from 'react';
 import IdentifyApp from "./Confirmation/IdentifyApp2";
+import SC from "./Confirmation/sortingCentre"
 
 class Index extends React.Component{
   render(){
     return (
     <div>
       <div>
-          <IdentifyApp />
+          <IdentifyApp/>
       </div>
     </div>
     );
