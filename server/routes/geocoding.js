@@ -6,19 +6,19 @@ const { getShopHeaders } = require('../util/shop-headers');
 const router = Router({
     prefix: '/addValidation'
 });
+const turf = require('@turf/turf')
+const warehoue = turf.point([-79.3802531703975,43.6566807319543])
+
+//Delivery radius in km
+const deliveryDis = 10
 
 router.get('/', async ctx => {
-    // Get all orders
-    //const { shop, accessToken } = getShopHeaders(ctx);
-    //const {name} = ctx.params.orderNum
-    //console.log(ctx.query.orderNum);
     ctx.set('Access-Control-Allow-Origin', '*');
     ctx.set('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept');
     ctx.set('Access-Control-Allow-Methods', 'POST, GET, PUT, DELETE, OPTIONS');
-    //await next();
+    
     const postalCode = ctx.query.postalCode;
     console.log("postal code:---------"+postalCode)
-    // const { cookies } = ctx;
      const option = {
          url: `http://nominatim.openstreetmap.org/search?q=${encodeURI(postalCode)}&format=json`,
      }
@@ -29,8 +29,21 @@ router.get('/', async ctx => {
         //console.log("resp+++++++++"+typeof(resp))
         //console.log("res[0]----"+resp[0])
         
-        let valid = true
+        let valid = false
         //do lat and long check
+        if(resp[0]==undefined){
+            console.log('no such postal code')
+            ctx.body = valid
+        }else{
+            // let lon = resp[0].lon
+            // let lat = resp[0].lat
+            let destination = turf.point([resp[0].lon, resp[0].lat])
+            let distance = turf.distance(warehoue, destination)
+            console.log("distance="+distance)
+            if(distance<=deliveryDis){
+                valid = true
+            }
+        }
         ctx.body = valid
         
         console.log("ctx-------"+ctx.body)

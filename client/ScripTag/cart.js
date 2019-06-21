@@ -56,23 +56,24 @@ $(document).ready(function(){
     function checkPostalCode(input){
         $("p .zipCheckInfo").empty()
         let validGIT = false; //flag for postal code within certain area
-        let validPost = false; //flag for a valid Canada postal code 
+        //let validPost = false; //flag for a valid Canada postal code 
         //reformat postal code
         input = input.toUpperCase().replace(/\W/g,'').replace(/(...)/,'$1 ')
         console.log("reformat input="+input);
-        var regex = new RegExp(/^[ABCEGHJKLMNPRSTVXY]\d[ABCEGHJKLMNPRSTVWXYZ]( )?\d[ABCEGHJKLMNPRSTVWXYZ]\d$/i);
-        if(regex.test(input)){
+        // var regex = new RegExp(/^[ABCEGHJKLMNPRSTVXY]\d[ABCEGHJKLMNPRSTVWXYZ]( )?\d[ABCEGHJKLMNPRSTVWXYZ]\d$/i);
+        // if(regex.test(input)){
             fetch(`https://${serveoname}.serveo.net/addValidation?postalCode=${encodeURIComponent(input)}`, {
                 method: 'GET',
             }).then(res=>res.json()).then(jsonresp=>{
                 console.log("fetch res----"+JSON.stringify(jsonresp))
+                validGIT = jsonresp
             })
-        }
+        //}
     
         //call backend server for validation
 
 
-        if(input == "M2K 03C"){
+        if(validGIT){
             //show message for valid result
             //$("p .zipCheckInfo").empty()
             $validPostal = $('<p id="GITpostalCheckResult">Get It Today items are available in your area! You can checkout now!</p>')
