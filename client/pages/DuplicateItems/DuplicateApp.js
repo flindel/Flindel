@@ -1,17 +1,17 @@
 import React, { Component } from 'react';
 import FindIssues from './FindIssues'
 import TestStore from './TestStore'
-import {getProduct, postProduct} from './Firestore'
-import {serveo_name} from '../config'
+import {getProduct, postProduct, delProduct} from './Firestore'
 
 const testControls = true;
 class DuplicateApp extends Component {
   constructor(props){
     super(props);
     this.state = {
-      product: getProduct("1234", this.loaded),
+      //product: getProduct("1234", this.loaded),
     }
-    postProduct({git_id: "1234", original_id: "5678", variants:[{gitVar: "9123", origVar: "4567"},{gitVar: "8912", origVar: "3456"}]});
+    //postProduct({git_id: "9991", orig_id: "1111", variants:[{git_var: "9123", orig_var: "4567"},{git_var: "8912", orig_var: "3456"}]});
+    //delProduct("1234");
   }
 
   loaded(json){

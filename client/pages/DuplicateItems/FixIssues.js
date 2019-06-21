@@ -1,8 +1,9 @@
 import React, { Component } from 'react';
 import {serveo_name} from '../config';
-import {post, put, get, del} from './Shopify';
+import {post, put, get, del, postGIT} from './Shopify';
 
 let updates = [];
+let reloadFunction;
 let fixes = 0;
 const butterfly_id = "2114548007009";
 
@@ -16,25 +17,24 @@ class FixIssues extends Component {
   constructor(props){
     super(props);
     this.state = {
-      updates: [],
       hasError: false,
     }
     this.handleClick = this.handleClick.bind(this);
   }
 
-  finishedFixing(){
+  finishedFixing(data){
     fixes += 1
     console.log("Fixes", fixes)
-    console.log("Updates", this.state.updates)
-    if(fixes == this.state.updates.length){
+    console.log("Updates", updates)
+    if(fixes == updates.length){
       console.log("Finished Fixing")
-      this.state.reloadFunction();
+      reloadFunction();
     }
   }
 
-  handleClick(updates, reloadFunction){
-    this.setState({updates: updates})
-    this.setState({reloadFunction: reloadFunction})
+  handleClick(updates1, reloadFunction1){
+    updates = updates1;
+    reloadFunction = reloadFunction1;
     console.log("Updates: ", updates);
     for(let i=0; i < updates.length; i++) {
       switch(updates[i].issue){
@@ -61,7 +61,7 @@ class FixIssues extends Component {
   //Copies the parameters from normal product to GIT product
   //Does not account for shifting vairants
   fixUnequalParameters(update){
-    console.log("fixGitDne", update);
+    console.log("fixUnequalParameters", update);
     let gitBody = update.norm;
     gitBody.title = update.norm.title + " - Get it Today";
     /*
@@ -118,7 +118,7 @@ class FixIssues extends Component {
       }
     }
     let body = {product: gitBody};
-    post(body, this.finishedFixing);
+    postGIT(body, {product: update.norm}, this.finishedFixing);
   }
 
   //DEL REQUEST
@@ -130,7 +130,6 @@ class FixIssues extends Component {
   print(data){
     console.log(data);
   }
-
 
   render(props){
     return(

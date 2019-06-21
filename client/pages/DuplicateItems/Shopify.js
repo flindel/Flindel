@@ -1,7 +1,8 @@
 import {serveo_name} from '../config'
+import {postProduct, delProduct} from './Firestore'
 
 export function get(product_id){
-  fetch(`https://${serveo_name}.serveo.net/products?id=${encodeURIComponent(product_id)}`, {
+  fetch(`${serveo_name}/products?id=${encodeURIComponent(product_id)}`, {
     method: 'get',
     })
     .then((response) => {
@@ -11,11 +12,11 @@ export function get(product_id){
     .then((data) => {
       console.log('GET: ', data)
     })
-    .catch((error) => console.log("error"))
+    .catch((error) => console.log(error))
 }
 
-export function del(product_id, callback){
-  fetch(`https://${serveo_name}.serveo.net/products?id=${encodeURIComponent(product_id)}`, {
+export function del(product_id, callback = doNothing){
+  fetch(`${serveo_name}/products?id=${encodeURIComponent(product_id)}`, {
     method: 'delete',
     })
     .then((response) => {
@@ -24,12 +25,13 @@ export function del(product_id, callback){
     })
     .then((data) => {
       console.log('DELETE: ', data)
+      delProduct(""+product_id); //removes from FIRESTORE
       callback(data);
     })
-    .catch((error) => console.log("error"))
+    .catch((error) => console.log(error))
 }
 
-export function put(product_id, body, callback){
+export function put(product_id, body, callback = doNothing){
   const options = {
     method: 'put',
     headers: {
@@ -38,7 +40,7 @@ export function put(product_id, body, callback){
     },
       body: JSON.stringify(body),
   }
-  fetch(`https://${serveo_name}.serveo.net/products?id=${encodeURIComponent(product_id)}`, options)
+  fetch(`${serveo_name}/products?id=${encodeURIComponent(product_id)}`, options)
     .then((response) => {
       if(response.ok){return response.json()}
       else{throw Error(response.statusText)}
@@ -47,10 +49,10 @@ export function put(product_id, body, callback){
       console.log('PUT: ', data)
       callback(data);
     })
-    .catch((error) => console.log("error"))
+    .catch((error) => console.log(error))
 }
 
-export function post(body, callback){
+export function post(body, callback = doNothing){
   const options = {
     method: 'post',
     headers: {
@@ -59,7 +61,7 @@ export function post(body, callback){
     },
       body: JSON.stringify(body),
   }
-  fetch(`https://${serveo_name}.serveo.net/products`, options)
+  fetch(`${serveo_name}/products`, options)
     .then((response) => {
       if(response.ok){return response.json()}
       else{throw Error(response.statusText)}
@@ -68,5 +70,39 @@ export function post(body, callback){
       console.log('POST: ', data)
       callback(data);
     })
-    .catch((error) => console.log("error"))
+    .catch((error) => console.log(error))
+}
+
+export function postGIT(body, orig, callback = doNothing){
+  const options = {
+    method: 'post',
+    headers: {
+      'Accept': 'application/json, text/plain, */*',
+      'Content-Type': 'application/json'
+    },
+      body: JSON.stringify(body),
+  }
+  fetch(`${serveo_name}/products`, options)
+    .then((response) => {
+      if(response.ok){return response.json()}
+      else{throw Error(response.statusText)}
+    })
+    .then((data) => {
+      console.log('POST: ', data);
+      console.log("ORIG: ", orig);
+      let out = {
+        git_id: ""+data.product.id,
+        orig_id: ""+orig.product.id,
+        title: data.product.title.substring(0, data.product.title.length-" - Get it Today".length),
+        vendor: orig.product.vendor,
+      }
+      console.log("OUT: ", out);
+      postProduct(out);
+      callback(data);
+    })
+    .catch((error) => console.log(error))
+}
+
+function doNothing(data){
+  return;
 }

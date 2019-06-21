@@ -22,4 +22,12 @@ router.get('/product/', async ctx => {
   ctx.body = getDoc;
 })
 
+router.delete('/product/', async ctx => {
+  let gitID = ctx.query.gitID;
+  db = ctx.db
+  myRef = db.collection('products').doc(gitID).delete();
+  ctx.body = 'sucess';
+})
+
+
 module.exports = router;

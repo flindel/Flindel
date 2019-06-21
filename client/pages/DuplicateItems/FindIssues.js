@@ -41,7 +41,7 @@ class FindIssues extends Component {
       displayUpdates: [],
     })
     //Assumption, Brand has less than 250 inventory item/product variations
-    fetch(`https://${serveo_name}.serveo.net/collections?id=${encodeURIComponent(collection_all_products_id)}`, {
+    fetch(`${serveo_name}/collections?id=${encodeURIComponent(collection_all_products_id)}`, {
       method: 'GET',
       })
       .then((response) => {
@@ -55,7 +55,7 @@ class FindIssues extends Component {
       })
       .catch((error) => console.log("error"))
 
-    fetch(`https://${serveo_name}.serveo.net/collections?id=${encodeURIComponent(collection_get_it_today_id)}`, {
+    fetch(`${serveo_name}/collections?id=${encodeURIComponent(collection_get_it_today_id)}`, {
       method: 'GET',
       })
       .then((response) => {
