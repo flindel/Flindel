@@ -2,26 +2,34 @@ import {serveo_name} from '../config'
 
 export async function postProduct(data){
   var temp;
-  data.new_value2 = "ABCD";
-  temp = await fetch(`${serveo_name}/dbcall/product/?body=${encodeURIComponent(JSON.stringify(data))}`, {
+  temp = await fetch(`${serveo_name}/dbcall/product/git/?body=${encodeURIComponent(JSON.stringify(data))}`, {
     method: 'post',
   })
 }
 
-export async function getProduct(gitID, callback = doNothing){
+export async function getGitProduct(gitID, callback = doNothing){
   var temp;
-  temp = await fetch(`${serveo_name}/dbcall/product/?gitID=${encodeURIComponent(gitID)}`, {
+  temp = await fetch(`${serveo_name}/dbcall/product/git/?gitID=${encodeURIComponent(gitID)}`, {
     method: 'get',
   })
-  var json  = await temp.json();
+  var json  = await JSON.parse(temp);
   callback(formatJSON(json._fieldsProto))
 }
 
 export async function delProduct(gitID){
   var temp;
-  temp = await fetch(`${serveo_name}/dbcall/product/?gitID=${encodeURIComponent(gitID)}`, {
+  temp = await fetch(`${serveo_name}/dbcall/product/git/?gitID=${encodeURIComponent(gitID)}`, {
     method: 'delete',
   })
+}
+
+export async function getOrigProduct(orig_id, callback=doNothing){
+ var temp;
+ temp = await fetch(`${serveo_name}/dbcall/product/orig/?origID=${encodeURIComponent(orig_id)}`, {
+   method: 'get',
+ })
+ var json  = await temp.json();
+ callback(formatJSON(json._fieldsProto));
 }
 
 function doNothing(data){console.log("doNothingFirestore")}
