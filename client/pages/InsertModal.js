@@ -41,7 +41,8 @@ class InsertModal extends React.Component {
       data:<IdentifyApp />
     });
   }
-
+  
+  //this does not work so far
   previousPage() {
     console.log('Hello World');
   }
