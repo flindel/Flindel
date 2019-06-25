@@ -15,6 +15,10 @@ router.post('/product/git/', async ctx =>{
 })
 
 router.get('/product/git/', async ctx => {
+  ctx.set('Access-Control-Allow-Origin', '*');
+  ctx.set('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept');
+  ctx.set('Access-Control-Allow-Methods', 'POST, GET, PUT, DELETE, OPTIONS');
+
   let gitID = ctx.query.gitID;
   db = ctx.db
   let myRef = db.collection('products').doc(gitID);
