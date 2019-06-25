@@ -4,6 +4,7 @@ const orderRouter = require('./orders');
 const collectionRouter = require('./collections');
 const productRouter = require('./products');
 const dbRouter = require('./databaseAction');
+const geoCodingRouter = require('./geocoding');
 
 router = combineRouters(
     rootRouter,
@@ -11,6 +12,7 @@ router = combineRouters(
     collectionRouter,
     productRouter,
     dbRouter,
+    geoCodingRouter
 )
 
 module.exports = router;
