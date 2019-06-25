@@ -33,10 +33,8 @@ router.get('/', async ctx => {
         //do lat and long check
         if(resp[0]==undefined){
             console.log('no such postal code')
-            ctx.body = valid
+            ctx.body = {"valid":false}
         }else{
-            // let lon = resp[0].lon
-            // let lat = resp[0].lat
             let destination = turf.point([resp[0].lon, resp[0].lat])
             let distance = turf.distance(warehoue, destination)
             console.log("distance="+distance)
@@ -44,9 +42,9 @@ router.get('/', async ctx => {
                 valid = true
             }
         }
-        ctx.body = valid
+        ctx.body = {"valid":valid}
         
-        console.log("ctx-------"+ctx.body)
+        console.log("ctx-------"+JSON.stringify(ctx.body))
     } catch (err) {
         console.log(err.message);
         if (err instanceof errors.StatusCodeError) {
