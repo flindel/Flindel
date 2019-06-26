@@ -15,6 +15,7 @@ router.get('/' , async ctx =>{
     if(method == 1){
         db = ctx.db
         const rawItems = ctx.query.items
+        const loco = ctx.query.location
         let itemsJSON = JSON.parse(rawItems)
         let data = {
             code: code,
@@ -23,10 +24,22 @@ router.get('/' , async ctx =>{
             items: []
         };
         for (var i = 0;i<itemsJSON.length;i++){
-            data.items.push({"name":itemsJSON[i].name, "reason":itemsJSON[i].reason, "variantid":itemsJSON[i].variantid.toString(),"status":"submitted"})
+            if (loco == 'pending'){
+                var myStatus = itemsJSON[i].status
+            }
+            else if (loco == 'returns'){
+                var myStatus = 'submitted'
+            }
+            data.items.push({"name":itemsJSON[i].name, "reason":itemsJSON[i].reason, "variantid":itemsJSON[i].variantid.toString(),"status": myStatus})
         }
-        
-          setDoc = db.collection('returns').doc(code).set(data)
+        if(loco == 'returns'){
+            setDoc = db.collection(loco).doc(code).set(data)
+        }
+        else if (loco == 'pending'){
+            data.order_status = 'pending'
+            setDoc = db.collection(loco).doc().set(data)
+        }
+          
           ctx.body = 'success'
     }
     //read single doc
@@ -58,7 +71,7 @@ router.get('/' , async ctx =>{
         }
         else{
             await query.forEach(doc => {
-                ctx.body = {"res":doc._fieldsProto.items,"valid":true}
+                ctx.body = {"res":doc._fieldsProto,"valid":true}
             })
         }
     }
@@ -68,6 +81,11 @@ router.get('/' , async ctx =>{
         let itemsJSON = await JSON.parse(rawItems)
         myRef = db.collection('returns').doc(code)
         updateFields = myRef.update({items:itemsJSON})
+        ctx.body = {"success":true}
+    }
+    else if (method == 7){
+        db = ctx.db
+        let deleteDoc = db.collection('returns').doc(code).delete();
         ctx.body = {"success":true}
     }
 

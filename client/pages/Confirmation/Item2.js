@@ -4,7 +4,6 @@ import React, { Component } from 'react';
 const imgStyle={
     height:110
 };
-const serveoname = 'campana'
 
 class Item extends Component {
     //constructor/binding methods
@@ -57,7 +56,7 @@ class Item extends Component {
      //on mount, get important information including image source to show the display picture
     componentWillMount(){
         if(this.props.step !=4){
-            fetch(`https://${serveoname}.serveo.net/products?id=${encodeURIComponent(this.props.item.productID)}`, {
+            fetch(`https://${this.props.serveoname}/products?id=${encodeURIComponent(this.props.item.productID)}`, {
             method: 'GET',})
         .then(response => response.json())
         .then(resData=>{
@@ -115,7 +114,7 @@ class Item extends Component {
                             <option value="---">---</option>
                             <option value="Unhappy">I'm unhappy with this product.</option>
                             <option value="Broken">This product is damaged or broken.</option>
-                            <option value="Wrong">I didn't order this product. </option>
+                            <option value="Wrong">I received the wrong product (wrong size, color, etc).</option>
                         </select>
                     </label>
                     <br/>
