@@ -8,6 +8,10 @@ const router = Router({
 });
 
 router.post('/product/git/', async ctx =>{
+  ctx.set('Access-Control-Allow-Origin', '*');
+  ctx.set('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept');
+  ctx.set('Access-Control-Allow-Methods', 'POST, GET, PUT, DELETE, OPTIONS');
+
   let body = JSON.parse(ctx.query.body);
   db = ctx.db
   setDoc = db.collection('products').doc(body.git_id).set(body);
@@ -27,6 +31,10 @@ router.get('/product/git/', async ctx => {
 })
 
 router.get('/product/orig/', async ctx => {
+  ctx.set('Access-Control-Allow-Origin', '*');
+  ctx.set('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept');
+  ctx.set('Access-Control-Allow-Methods', 'POST, GET, PUT, DELETE, OPTIONS');
+
   let origID = ctx.query.origID;
   db = ctx.db
   myRef = db.collection('products')
@@ -41,8 +49,11 @@ router.get('/product/orig/', async ctx => {
   }
 })
 
-
 router.delete('/product/git/', async ctx => {
+  ctx.set('Access-Control-Allow-Origin', '*');
+  ctx.set('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept');
+  ctx.set('Access-Control-Allow-Methods', 'POST, GET, PUT, DELETE, OPTIONS');
+
   let gitID = ctx.query.gitID;
   db = ctx.db
   myRef = db.collection('products').doc(gitID).delete();
