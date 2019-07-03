@@ -6,6 +6,7 @@ const { getShopHeaders } = require('../util/shop-headers');
 const router = Router({
     prefix: '/addValidation'
 });
+const geocodingKey = process.env.GOOGLE_GEOCODING_KEY
 const turf = require('@turf/turf')
 const warehoue = turf.point([-79.3802531703975,43.6566807319543])
 
@@ -20,7 +21,7 @@ router.get('/', async ctx => {
     const postalCode = ctx.query.postalCode;
     console.log("postal code:---------"+postalCode)
      const option = {
-         url: `http://nominatim.openstreetmap.org/search?q=${encodeURI(postalCode)}&format=json`,
+         url: `https://maps.googleapis.com/maps/api/geocode/json?address=${encodeURI(postalCode)}&key=${geocodingKey}&format=json`,
      }
 
     try {
@@ -31,16 +32,19 @@ router.get('/', async ctx => {
         
         let valid = false
         //do lat and long check
-        if(resp[0]==undefined){
+        if(resp.status=="ZERO_RESULTS"){
             console.log('no such postal code')
             ctx.body = {"valid":false}
-        }else{
-            let destination = turf.point([resp[0].lon, resp[0].lat])
+        }else if(resp.status=="OK"){
+            let destination = turf.point([resp.results[0].geometry.location.lng, resp.results[0].geometry.location.lat])
             let distance = turf.distance(warehoue, destination)
             console.log("distance="+distance)
             if(distance<=deliveryDis){
                 valid = true
             }
+        }else{
+            console.log(resp)
+            valid = "bad request"
         }
         ctx.body = {"valid":valid}
         
