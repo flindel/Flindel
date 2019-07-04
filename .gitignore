@@ -4,3 +4,6 @@ assets/
 node_modules/
 .next/
 .secret/
+process.env
+serviceAccountCredentials.json
+client/pages/DuplicateItems/TestStore.js
