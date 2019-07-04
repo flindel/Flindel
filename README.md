@@ -45,7 +45,7 @@ DEBUG=1
 ## Merge
 Whenever you finish a task, merge it in `testing` branch.
 
-##Setup Serveo
+## Setup Serveo
 In client/pages/config.js, add the name of your serveo link.
 ```
 export const serveo_name = [YOUR_SERVEO_NAME];
