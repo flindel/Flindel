@@ -34,20 +34,19 @@ SHOP_AUTH=[YOUR_BASIC_PRIVATE_APP_AUTH]
 GOOGLE_APPLICATION_CREDENTIALS=[YOUR_PATH_TO_FIREBASE_CREDENTIAL]
 DEBUG=1
 ```
-<<<<<<< HEAD
+
 ## Structure standard
 - `./.env` - contain all environment variables (git ignored)
 - `./.secret/` - directory that contain secret files such as Firebase admin key (git ignored)
 - `./server/` - directory that contain all backend server code
-  - `./server/routes` - all routers should go here
+- `./server/routes` - all routers should go here
 - `./client` - directory that contain all frontend code
+
 ## Merge
 Whenever you finish a task, merge it in `testing` branch.
-=======
 
-## Setup serveo
+##Setup Serveo
 In client/pages/config.js, add the name of your serveo link.
 ```
 export const serveo_name = [YOUR_SERVEO_NAME];
 ```
->>>>>>> Get-It-Today
