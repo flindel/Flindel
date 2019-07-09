@@ -13,8 +13,8 @@ const backdropStyle = {
 const modalStyle = {
   backgroundColor: '#fff',
   borderRadius: 5,
-  maxWidth: 350,
-  minHeight: 350,
+  maxWidth: 450,
+  minHeight: 300,
   margin: '0 auto',
   marginTop: 100,
   position: 'relative',
