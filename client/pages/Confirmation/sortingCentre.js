@@ -1,6 +1,6 @@
 import React, {Component} from 'react';
 import Item from './Item2'
-const serveoname = 'optimu.serveo.net'
+const serveoname = '7a626a2f.ngrok.io'
 
 /* NAVBAR to flip between map view and return portal view. Imported at the top of most pages */
 class sortingCentre extends Component{
@@ -33,8 +33,8 @@ class sortingCentre extends Component{
     }
 
     async sendEmail(){
-        var rejectList = []
-        var acceptList = []
+        let rejectList = []
+        let acceptList = []
         for (var i = 0;i<this.state.itemList.length;i++){
             let temp = this.state.itemList[i]
             if(temp.status == 'accepted'){
@@ -65,8 +65,8 @@ class sortingCentre extends Component{
     }
 
     finalCheck(){
-        var found = false
-        var count = 0
+        let found = false
+        let count = 0
         while(count<this.state.itemList.length && found == false){
             let temp = this.state.itemList[count]
             if (temp.status == 'received' || temp.status == 'submitted'){
@@ -84,9 +84,9 @@ class sortingCentre extends Component{
     }
 
     async handleReasonChange(varID, status, oldstatus){
-        var count = 0
-        var found = false
-        var tempList = this.state.itemList
+        let count = 0
+        let found = false
+        let tempList = this.state.itemList
         while (count < tempList.length && found == false){
             let temp = tempList[count]
             if (varID == temp.variantid && temp.status==oldstatus&&found == false){
@@ -110,19 +110,20 @@ class sortingCentre extends Component{
 
 
     async handleSubmit(){
-        var temp = await fetch(`https://${serveoname}/dbcall?method=${encodeURIComponent(5)}&code=${encodeURIComponent(this.state.orderNum)}`, {
+        let temp = await fetch(`https://${serveoname}/dbcall?method=${encodeURIComponent(5)}&code=${encodeURIComponent(this.state.orderNum)}`, {
             method: 'get',
         })
-        var t2 = await temp.json()
+        let t2 = await temp.json()
         this.setState({email:t2.res.email.stringValue})
-        var tempList = []
+        let tempList = []
         if(t2.valid == true){
             for (var i = 0;i<t2.res.items.arrayValue.values.length;i++){
-            var tempItem = {
+            let tempItem = {
                 name: t2.res.items.arrayValue.values[i].mapValue.fields.name.stringValue,
                 variantid: t2.res.items.arrayValue.values[i].mapValue.fields.variantid.stringValue,
                 reason: t2.res.items.arrayValue.values[i].mapValue.fields.reason.stringValue,
-                status:t2.res.items.arrayValue.values[i].mapValue.fields.status.stringValue
+                status:t2.res.items.arrayValue.values[i].mapValue.fields.status.stringValue,
+                price:t2.res.items.arrayValue.values[i].mapValue.fields.price.stringValue
             }
             tempList.push(tempItem)
         }

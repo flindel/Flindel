@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import Item from "./Item2";
+import './universal.css'
 
 /*
 SELECTION PAGE
@@ -19,13 +20,21 @@ class ItemList extends Component {
             price:"",
             reason: ""
         }
+        this.state = {
+            errorMessage:''
+        }
         this.returnItems = [];
         this.handleSubmit = this.handleSubmit.bind(this)
     }
 
     handleSubmit(){
-        this.props.setReturnList(this.returnItems)
-        this.props.handleSubmit()
+        if (this.returnItems.length == 0){
+            this.setState({errorMessage: '*ERROR: Please select one or more items to return in order to continue*'})
+        }
+        else {
+            this.props.setReturnList(this.returnItems)
+            this.props.handleSubmit()
+        }
     }
 
     //get return items
@@ -44,7 +53,7 @@ class ItemList extends Component {
 
         //update return list
             for (var i = 0;i<this.returnItems.length;i++){
-                var temp = this.returnItems[i];
+                let temp = this.returnItems[i];
                 if (temp.variantid == this.currItem.variantid){
                     this.returnItems.splice(i,1)
                 }
@@ -57,10 +66,15 @@ class ItemList extends Component {
     render() { 
         return (
             <div className="ItemList">
+                <p className = 'errorMessage2'>{this.state.errorMessage}</p>
+                <fieldset className = 'page2'>
+                    <p className = 'orderHeader'>Order Number: {this.props.orderNum}</p>
                 {this.props.items.map((item)=>{
-                    return <Item item={item} step = {1} key={item.variantID} handleSelect={this.handleSelect.bind(this)}/>
+                    return <Item item={item} serveoname={this.props.serveoname} step = {1} key={item.variantID} handleSelect={this.handleSelect.bind(this)}/>
                 })}
-                <button onClick={this.handleSubmit}>CONFIRM</button>
+                </fieldset>  
+                <br/>
+                <button className = 'Submit2' onClick={this.handleSubmit}>CONTINUE</button>            
             </div>
          );  
     }

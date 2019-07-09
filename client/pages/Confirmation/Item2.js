@@ -1,9 +1,5 @@
 import React, { Component } from 'react';
-
-//image size ould be made variable later
-const imgStyle={
-    height:110
-};
+import './universal.css'
 
 class Item extends Component {
     //constructor/binding methods
@@ -85,51 +81,51 @@ class Item extends Component {
         if (this.props.step == 1)
         {
         return (
-            <div>     
+            <div>
+                <hr className = 'hl4'></hr>  
                 <img 
-                style={imgStyle}
+                className = 'item2'
                 src={this.state.src} />
-                <p>{this.props.item.name}: ${this.props.item.price}</p>               
                 {/* dropdown menu to choose return quantity */}
-                <label className="dropdown">Quantity for Return: 
+                <span><label className="dropdown2">Quantity for Return: 
                     <select value={this.state.value} onChange={this.handleQuantityChange}>
                       {quantityOption}
                     </select>
-                </label>
-                <br/>
+                </label></span>
+                <span><p className = 'item2'>{this.props.item.name}: ${this.props.item.price}</p> </span>              
                 <br/>
             </div>
         );
         }
         else if (this.props.step == 2){
             return (
-                <div>               
+                <div>   
+                    <hr className = 'hl4'></hr>             
                     <img 
-                    style={imgStyle}
+                    className = 'item3'
                     src={this.state.src} />  
-                    <p>{this.props.item.name}</p>     
                     {/* dropdown menu to choose return reason */}
-                     <label className="dropdown">Reason for return:
+                    <span><label className="dropdown3">Reason for return:
                         <select value={this.state.reason} onChange={this.handleReasonChange}>
                             <option value="---">---</option>
                             <option value="Unhappy">I'm unhappy with this product.</option>
                             <option value="Broken">This product is damaged or broken.</option>
-                            <option value="Wrong">I received the wrong product (wrong size, color, etc).</option>
+                            <option value="Wrong">Product is wrong (size, color, etc).</option>
                         </select>
-                    </label>
-                    <br/>
-                    <br/>
+                    </label></span>
+                    <span><p className = 'item3'>{this.props.item.name}</p> </span>   
+                    
                 </div>
             );
         }
         else if (this.props.step == 3){
             return(
-                <div>               
-                    <img 
-                    style={imgStyle}
-                    src={this.state.src} />  
-                    <p>Price: {this.props.item.price}</p>  
-                    <br/>
+                <div>  
+                    <hr className = 'hl4'></hr>             
+                    <img  className = 'item4'
+                    src={this.state.src} /> 
+                    <p className = 'item4price'>Reason: {this.props.item.reason}</p>
+                    <p className = 'item4'>{this.props.item.name}</p> 
                     <br/>
                 </div>
             );
@@ -137,7 +133,7 @@ class Item extends Component {
         else if (this.props.step == 4){
             return(
                 <div>
-                    <p>{this.props.item.name} --- {this.props.item.variantid} --- {this.props.item.reason}</p>
+                    <p className = 'item' >{this.props.item.name} --- {this.props.item.variantid} --- {this.props.item.reason}</p>
                     <label className="dropdown">Reason for return:
                         <select value={this.state.status} onChange={this.handleStatusChange}>
                         <option value="submitted">Submitted</option>

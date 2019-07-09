@@ -1,11 +1,11 @@
 import React, { Component } from 'react';
+import './universal.css'
 
 /* SEARCH PAGE
 First page customers sees, prompts them to input order num+other identifier
 */
 
 class Search extends Component {
-    
         constructor(props) {
             super(props);
             this.state = {
@@ -16,6 +16,7 @@ class Search extends Component {
             this.handleOrderNumChange = this.handleOrderNumChange.bind(this);
             this.handleSearch = this.handleSearch.bind(this);
         }
+        
     
         //handle input of info
         handleOrderNumChange(e){
@@ -41,18 +42,23 @@ class Search extends Component {
             return (
                 <div className="Search">
                     <div className="Search-fields">
-                        <div className="Seach-block">
-                            <label>Order Number:</label>
-                              <input type="text" className="order-number" placeholder="1234567" onChange={this.handleOrderNumChange} />
+                        <fieldset className = 'page1'>
+                        <div className="Search-block">
+                        <p className = 'label'>Order Number:  </p>
+                              <input type="text" className="order-number" placeholder="1234" onChange={this.handleOrderNumChange} />
                           </div>
+                          <br></br>
                           <div className="Search-block">
-                              <label>Email Address or Phone number:</label>
-                              <input type="text" className="email-add" placeholder="Sarah@example.com" onChange={this.handleEmailChange} />
+                              <p className = 'label'>Email Address or Phone Number:  </p>
+                              <input type="text" className="email-add" placeholder="your.email@example.com" onChange={this.handleEmailChange} />
                           </div>
+                          
+                          <br/><br/>
+                          <div className="Search-submit">
+                          <button className = "Submit" type="submit" onClick={this.handleSearch}>CONTINUE</button>
                     </div>
-                       <div className="Search-submit">
-                          <button type="submit" onClick={this.handleSearch}>NEXT</button>
-                    </div>
+                    </fieldset> 
+                    </div>                
                   </div>
                 );
         } 

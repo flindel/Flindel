@@ -1,5 +1,4 @@
 import React from 'react';
-const serveoname = 'campana'
 /* FINAL PAGE
 Thank you for ordering
  */
@@ -15,20 +14,21 @@ class finalPage extends React.Component{
 
     //resend email if necessary
     sendEmail(){
-        fetch(`https://${serveoname}.serveo.net/send?email=${encodeURIComponent(this.state.email)}&code=${encodeURIComponent(this.state.code)}`, 
+        fetch(`https://${this.props.serveoname}/send?method=${encodeURIComponent(3)}&email=${encodeURIComponent(this.state.email)}&code=${encodeURIComponent(this.state.code)}`, 
         {
-            method: 'POST',
+            method: 'POST',     
         })
     }
 
     //display
     render(){
         return(
-            <div>
+            <div className='centre'>
             <h2>Thank you!</h2>
-            <h3>Your confirmation code is: {this.props.code}</h3>
-            <p>A confirmation email has been sent to {this.props.email}</p>
             <br/>
+            <h3>Your confirmation code is: {this.props.code}</h3>
+            <br/>
+            <p>A confirmation email has been sent to {this.props.email}</p>
             <button onClick = {this.sendEmail}>Resend email</button>
             <br></br><br/><br/><br/>
             </div>
