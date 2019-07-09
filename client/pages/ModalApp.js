@@ -13,23 +13,21 @@ const backdropStyle = {
 const modalStyle = {
   backgroundColor: '#fff',
   borderRadius: 5,
-  maxWidth: 500,
-  minHeight: 300,
+  maxWidth: 350,
+  minHeight: 350,
   margin: '0 auto',
-  padding: 30,
-  position: 'relative'
+  marginTop: 100,
+  position: 'relative',
+  display: 'block',
+  textAlign: 'center',
+  boxShadow: '0 3px 6px rgba(0,0,0,0.16), 0 3px 6px rgba(0,0,0,0.23)'
 };
 
 const imageStyle = {
-  maxWidth: 300,
-  minHeight: 150,
-  margin: '0 auto',
-  padding: 10,
+  maxWidth: 280,
+  minHeight: 160,
+  padding: 20
 };
-
-const mainStyle = {
-  align: 'left'
-}
 
 class Modal extends React.Component {
   onClose = (e) => {
@@ -43,7 +41,9 @@ class Modal extends React.Component {
       <div style={backdropStyle}>
         <div style={modalStyle}>
           <img style={imageStyle} src='https://staticmapmaker.com/img/google@2x.png' />
-          {this.props.children}
+          <div>
+            {this.props.children}
+          </div>
         </div>
       </div>
     );
