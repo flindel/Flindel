@@ -7,7 +7,7 @@ import PickupInfo from './mapDisplay'
 import NB from './navbar.js'
 import PriceDisplay from './finalConfirmation.js'
 import {Card, AppProvider, Button, ProgressBar} from '@shopify/polaris';
-const serveoname = 'ba625fe9.ngrok.io';
+const serveoname = 'e2ae721e.ngrok.io';
 var shopName = ''
 var myStyle = {
     color: 'red',
@@ -19,6 +19,7 @@ class IdentifyApp extends Component {
 		super(props);
 		this.state = {
             items:[],
+            checkReturn:false, //check db to see if a return is existed or not
             searchStatus: false, //whether the login was successful (matching order and password)
             checkStatus:false, //proceed from item select page and show checkover page
             priceStatus: false, //proceed from checkover page and show pricing page
@@ -47,6 +48,8 @@ class IdentifyApp extends Component {
         this.pricingBack = this.pricingBack.bind(this)
         this.setReason = this.setReason.bind(this)
         this.restart = this.restart.bind(this)
+        this.viewMaps = this.viewMaps.bind(this)
+        this.unviewMaps = this.unviewMaps.bind(this)
     }
 
     async componentWillMount(){
@@ -76,6 +79,13 @@ class IdentifyApp extends Component {
           if(unique == false){
               this.generateID() 
           }
+    }
+
+    viewMaps(){
+
+    }
+    unviewMaps(){
+        
     }
 
     /* This sets the reason for items return. the data only passes correctly if both lists are used */
@@ -138,6 +148,7 @@ class IdentifyApp extends Component {
 
     restart(){
         this.setState({items:[],
+            checkReturn:false,
             searchStatus: false, //whether the login was successful (matching order and password)
             checkStatus:false, //proceed from item select page and show checkover page
             priceStatus: false, //proceed from checkover page and show pricing page
@@ -232,6 +243,8 @@ class IdentifyApp extends Component {
         }
         this.setState({email:emailAdd.toLowerCase()})
         const data = {orderNumber: orderNum, emailAddress:emailAdd};
+
+        
         //get order info
         fetch(`https://${serveoname}/orders?orderNum=${encodeURIComponent(data.orderNumber)}`, {
                 method: 'GET',
@@ -253,7 +266,7 @@ class IdentifyApp extends Component {
                 const date1 = new Date(currentDate)
                 const diffTime = Math.abs(date2.getTime() - date1.getTime());
                 const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)); 
-                if (diffDays<=2){////////////////////////////////////////////////////IMPORT SOME STUFF HERE
+                if (diffDays<=200){////////////////////////////////////////////////////IMPORT SOME STUFF HERE
                     //check to see whether the email or phone number entered matches the one on record
                     if ((resData.orders[0].email.toLowerCase()==emailAdd.toLowerCase()) || (resData.orders[0].phone == phoneNum))
                     {
