@@ -153,13 +153,12 @@ router.get('/' , async ctx =>{
     else if (method == 8){
         db = ctx.db
 
-        db.collection('returns').doc(code).update({
+        myRef = db.collection('returns').doc(code)
+        let query = await myRef.update({
             order_status: 'replaced'
-        }).then(()=>{
-            ctx.body = {"sucess": true}
-        }).catch((err)=>{
-            console.err("Error changing return order_status: ", err)
         })
+        ctx.body = {'success':true}
+
     }
 })
 
