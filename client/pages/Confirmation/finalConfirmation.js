@@ -47,8 +47,7 @@ class finalPage extends React.Component{
                 })}
             </fieldset>
             <br/>
-            <button className = 'Back4' onClick = {this.props.pricingBack}>BACK</button>
-            <button className = 'Submit4' onClick = {this.props.finishPricing}>SUBMIT</button>
+            <button className = 'Submit2' onClick = {this.props.finishPricing}>SUBMIT</button>
         </div>
     )}
 }

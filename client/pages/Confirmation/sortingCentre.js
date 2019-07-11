@@ -1,19 +1,20 @@
 import React, {Component} from 'react';
 import Item from './Item2'
-const serveoname = '7a626a2f.ngrok.io'
+const serveoname = 'optimu.serveo.net'
 
 /* NAVBAR to flip between map view and return portal view. Imported at the top of most pages */
 class sortingCentre extends Component{
     constructor(props){
         super(props);
         this.state={
-            orderNum:'',
+            cCode:'',
             step: 1,
             itemList: [],
-            email: ''
+            email: '',
+            orderNum:''
         }
         this.handleSubmit = this.handleSubmit.bind(this)
-        this.handleOrderNum = this.handleOrderNum.bind(this)
+        this.handlecCode = this.handlecCode.bind(this)
         this.handleReasonChange = this.handleReasonChange.bind(this)
         this.handleSubmit2 = this.handleSubmit2.bind(this)
         this.resetAll = this.resetAll.bind(this)
@@ -22,22 +23,25 @@ class sortingCentre extends Component{
         this.sendToDB = this.sendToDB.bind(this)
     }
 
-    handleOrderNum(e){
-        this.setState({orderNum:e.target.value})
+    //accept initial input
+    handlecCode(e){
+        this.setState({cCode:e.target.value})
     }
 
+    //start from beginning
     resetAll(){
-        this.setState({orderNum:'',
+        this.setState({cCode:'',
         step: 1,
         itemList: []})
     }
 
+    //send email
     async sendEmail(){
         let rejectList = []
         let acceptList = []
         for (var i = 0;i<this.state.itemList.length;i++){
             let temp = this.state.itemList[i]
-            if(temp.status == 'accepted'){
+            if(temp.status == 'accepted' || temp.status == 'returning'){
                 acceptList.push(temp)
             }
             else if (temp.status == 'rejected'){
@@ -46,38 +50,35 @@ class sortingCentre extends Component{
         }
         let RL = await JSON.stringify(rejectList)
         let AL = await JSON.stringify(acceptList)
-        fetch(`https://${serveoname}/send?rejectList=${encodeURIComponent(RL)}&acceptList=${encodeURIComponent(AL)}&method=${encodeURIComponent(2)}&email=${encodeURIComponent(this.state.email)}&code=${encodeURIComponent(this.state.orderNum)}`, 
+        fetch(`https://${serveoname}/send?rejectList=${encodeURIComponent(RL)}&acceptList=${encodeURIComponent(AL)}&method=${encodeURIComponent(2)}&email=${encodeURIComponent(this.state.email)}&code=${encodeURIComponent(this.state.cCode)}`, 
         {
             method: 'post',
         })
     }
     
-    sendToDB(){
-        //write to shopify
+    //write to db
+    async sendToDB(){
         let items = JSON.stringify(this.state.itemList)
-        //1 for write, 2 for read
-        fetch(`https://${serveoname}/dbcall?location=${encodeURIComponent('pending')}&method=${encodeURIComponent(1)}&code=${encodeURIComponent(this.state.orderNum)}&email=${encodeURIComponent(this.state.email)}&items=${encodeURIComponent(items)}`, {
+        await fetch(`https://${serveoname}/dbcall?location=${encodeURIComponent('pending')}&method=${encodeURIComponent(1)}&orderNum=${encodeURIComponent(this.state.orderNum)}&code=${encodeURIComponent(this.state.cCode)}&email=${encodeURIComponent(this.state.email)}&items=${encodeURIComponent(items)}`, {
             method: 'get',
         })
-        fetch(`https://${serveoname}/dbcall?&method=${encodeURIComponent(7)}&code=${encodeURIComponent(this.state.orderNum)}`, {
+        await fetch(`https://${serveoname}/dbcall?&method=${encodeURIComponent(7)}&code=${encodeURIComponent(this.state.cCode)}`, {
             method: 'get',
         })
     }
-
+    //send see if anything has been changed, make sure all items have been dealt with before moving
     finalCheck(){
         let found = false
         let count = 0
         while(count<this.state.itemList.length && found == false){
             let temp = this.state.itemList[count]
-            if (temp.status == 'received' || temp.status == 'submitted'){
+            if (temp.status == 'submitted'){
                 found = true
             }
             count ++
         }
-        if (found == true){
-            //do nothing
-        }
-        else{
+        //make sure all items in order have been dealt with
+        if (!found){
             this.sendEmail()
             this.sendToDB()
         }
@@ -102,7 +103,8 @@ class sortingCentre extends Component{
 
     async handleSubmit2(){
         let items = await JSON.stringify(this.state.itemList)
-        fetch(`https://${serveoname}/dbcall?method=${encodeURIComponent(6)}&code=${encodeURIComponent(this.state.orderNum)}&items=${encodeURIComponent(items)}`, {
+        //update new reasons
+        fetch(`https://${serveoname}/dbcall?method=${encodeURIComponent(6)}&code=${encodeURIComponent(this.state.cCode)}&items=${encodeURIComponent(items)}`, {
             method: 'get',
         })
         this.setState({step:4})
@@ -110,11 +112,11 @@ class sortingCentre extends Component{
 
 
     async handleSubmit(){
-        let temp = await fetch(`https://${serveoname}/dbcall?method=${encodeURIComponent(5)}&code=${encodeURIComponent(this.state.orderNum)}`, {
+        let temp = await fetch(`https://${serveoname}/dbcall?method=${encodeURIComponent(5)}&code=${encodeURIComponent(this.state.cCode)}`, {
             method: 'get',
         })
         let t2 = await temp.json()
-        this.setState({email:t2.res.email.stringValue})
+        this.setState({email:t2.res.email.stringValue,orderNum:t2.res.order.stringValue})
         let tempList = []
         if(t2.valid == true){
             for (var i = 0;i<t2.res.items.arrayValue.values.length;i++){
@@ -141,7 +143,7 @@ class sortingCentre extends Component{
                     <h1>SORTING CENTRE APP</h1>
                     <p>Enter return code below:</p>
                     <label>     
-                    <input type="orderNum" value={this.state.orderNum} onChange={this.handleOrderNum} />
+                    <input type="cCode" value={this.state.cCode} onChange={this.handlecCode} />
                     </label>
                     <button onClick = {this.handleSubmit}>SUBMIT</button>
                 </div>
@@ -153,7 +155,7 @@ class sortingCentre extends Component{
                     <h1>SORTING CENTRE APP</h1>
                     <p>Enter return code below:</p>
                     <label>     
-                    <input type="orderNum" value={this.state.orderNum} onChange={this.handleOrderNum} />
+                    <input type="cCode" value={this.state.cCode} onChange={this.handlecCode} />
                     </label>
                     <button onClick = {this.handleSubmit}>SUBMIT</button>
                     <br/>
@@ -165,7 +167,7 @@ class sortingCentre extends Component{
             return(
                 <div>
                     <h1>SORTING CENTRE APP</h1>
-                    <h3>Order Code: {this.state.orderNum}</h3>
+                    <h3>Order Code: {this.state.cCode}</h3>
                     {this.state.itemList.map((item)=>{
                     return <Item item={item} step = {4} key={item.variantid} handleSelect={this.handleReasonChange.bind(this)}/>
                 })}

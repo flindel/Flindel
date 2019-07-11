@@ -34,7 +34,7 @@ router.post('/', async ctx=>{
             ],
             "from": {
                 "name": "Auto-Confirmation",
-              "email": "no-reply@sender.com"
+              "email": "no-reply@sender.com" //retailer@flindel.com
             },
             "content": [
               {
@@ -58,8 +58,8 @@ router.post('/', async ctx=>{
     }
     }
     else if (method == 2){
-      var acceptedList = await JSON.parse(ctx.query.acceptList)
-      var rejectedList = await JSON.parse(ctx.query.rejectList)
+      let acceptedList = await JSON.parse(ctx.query.acceptList)
+      let rejectedList = await JSON.parse(ctx.query.rejectList)
       let message = ''
       message += 'Thank you for submitting your return. Your order has been processed. '
       if (acceptedList.length>0){
@@ -122,6 +122,65 @@ router.post('/', async ctx=>{
     }
     }
      
+});
+
+router.post('/report', async ctx=>{
+  let itemList = await JSON.parse(ctx.query.list)
+  console.log(itemList)
+  const headers = {}
+  headers['Accept'] = 'application/json';
+  headers['Content-Type'] = 'application/json';
+  headers['Authorization'] = 'Bearer ' + process.env.SENDGRID;
+  message = ""
+  if (itemList.length>0){
+    message += 'The following return items have been accepted in the last 12 hours'
+    message +='\n\n'
+    for (var i = 0;i<itemList.length;i++){
+    message += (i+1) + ': '+ itemList[i].name + ' - ' + itemList[i].variantid + ' ... Quantity: ' + itemList[i].quantity
+    message += '\n\n'
+    }
+  }
+    const option = {
+      method: 'POST',
+      url: 'https://api.sendgrid.com/v3/mail/send',
+      headers: headers,
+      json: true,
+      body: {
+        "personalizations": [
+          {
+            "to": [
+              {
+                "email": 'booleafs17@yahoo.ca' //change to EMAIL once live
+              }
+            ],
+            "subject": "Daily Report"
+          }
+        ],
+        "from": {
+            "name": "Daily Report",
+          "email": "no-reply@sender.com"
+        },
+        "content": [
+          {
+            "type": "text/plain",
+            "value": message
+          }
+        ]
+      }
+  }
+  try {
+      ctx.body = await rp(option);
+  } catch (err) {
+      console.log(err.message);
+      if (err instanceof errors.StatusCodeError) {
+          ctx.status = err.statusCode;
+          ctx.message = err.message;
+      } else if (err instanceof errors.RequestError) {
+          ctx.status = 500;
+          ctx.message = err.message;
+      }
+  }
+   
 });
 
 module.exports = router;

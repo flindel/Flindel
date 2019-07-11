@@ -8,6 +8,7 @@ const router = Router({
 });
 
 router.get('/' , async ctx =>{
+    const { shop, accessToken } = getShopHeaders(ctx);
     const method = ctx.query.method
     const code = ctx.query.code
     const email = ctx.query.email
@@ -18,10 +19,18 @@ router.get('/' , async ctx =>{
         db = ctx.db
         const rawItems = ctx.query.items
         const loco = ctx.query.location
-        let itemsJSON = JSON.parse(rawItems)
+        const orderNum = ctx.query.orderNum
+        let date = ctx.query.date
+        if (loco == 'pending'){
+            date = ''
+        }
+        let itemsJSON = await JSON.parse(rawItems)
         let data = {
+            date:date,
             code: code,
             email: email,
+            shop: shop,
+            order: orderNum,
             order_status: 'submitted',
             items: []
         };
@@ -32,7 +41,7 @@ router.get('/' , async ctx =>{
             else if (loco == 'returns'){
                 var myStatus = 'submitted'
             }
-            data.items.push({"name":itemsJSON[i].name, "reason":itemsJSON[i].reason, "variantid":itemsJSON[i].variantid.toString(),"status": myStatus})
+            data.items.push({"name":itemsJSON[i].name, "price":itemsJSON[i].price, "reason":itemsJSON[i].reason, "variantid":itemsJSON[i].variantid.toString(),"status": myStatus})
         }
         if(loco == 'returns'){
             setDoc = db.collection(loco).doc(code).set(data)
@@ -115,6 +124,28 @@ router.get('/' , async ctx =>{
     }
     else if (method == 7){
         db = ctx.db
+        doc = await db.collection('returns').doc(code).get()
+        data = {
+            code: doc._fieldsProto.code.stringValue,
+            email: doc._fieldsProto.email.stringValue,
+            shop: doc._fieldsProto.shop.stringValue,
+            items: [],
+            order_status: 'complete',
+            order: doc._fieldsProto.order.stringValue,
+            date:doc._fieldsProto.date.stringValue,
+        }
+        for (var i = 0;i<doc._fieldsProto.items.arrayValue.values.length;i++){
+            let temp = doc._fieldsProto.items.arrayValue.values[i]
+            tempItem = {
+                price: temp.mapValue.fields.price.stringValue,
+                name: temp.mapValue.fields.name.stringValue,
+                variantid: temp.mapValue.fields.variantid.stringValue,
+                reason: temp.mapValue.fields.reason.stringValue,
+                status: temp.mapValue.fields.status.stringValue
+            }
+        }
+        data.items.push(tempItem)
+        let set = db.collection('history').doc().set(data)
         let deleteDoc = db.collection('returns').doc(code).delete();
         ctx.body = {"success":true}
     }
@@ -122,7 +153,7 @@ router.get('/' , async ctx =>{
     else if (method == 8){
         db = ctx.db
 
-        db.collection('returns').doc(code).set({
+        db.collection('returns').doc(code).update({
             order_status: 'replaced'
         }).then(()=>{
             ctx.body = {"sucess": true}
@@ -130,6 +161,151 @@ router.get('/' , async ctx =>{
             console.err("Error changing return order_status: ", err)
         })
     }
+})
+
+router.get('/report' , async ctx =>{
+    let EMS = []
+    db = ctx.db
+    myRef = db.collection('pending')
+    let query = await myRef.get()
+    await query.forEach(async doc => {
+        let items = doc._fieldsProto.items.arrayValue.values
+        for (var i = 0;i<items.length;i++){
+            let tempItem = items[i].mapValue.fields
+            tempItem.store = doc._fieldsProto.shop.stringValue
+            EMS.push(tempItem)
+        }
+    });
+    ctx.body = {'res': EMS}
+})
+
+router.get('/copy' , async ctx =>{
+    db = ctx.db
+    pending = db.collection('pending')
+    let query = await pending.get()
+    query.forEach(async doc =>{
+        data = {
+            code: doc._fieldsProto.code.stringValue,
+            email: doc._fieldsProto.email.stringValue,
+            shop: doc._fieldsProto.shop.stringValue,
+            items: [],
+            order_status: 'complete',
+            order: order,
+            date:date
+        }
+        for (var i = 0;i<doc._fieldsProto.items.arrayValue.values.length;i++){
+            let temp = doc._fieldsProto.items.arrayValue.values[i]
+            tempItem = {
+                price: temp.mapValue.fields.price.stringValue,
+                name: temp.mapValue.fields.name.stringValue,
+                variantid: temp.mapValue.fields.variantid.stringValue,
+                reason: temp.mapValue.fields.reason.stringValue,
+                status: temp.mapValue.fields.status.stringValue
+            }
+        }
+        data.items.push(tempItem)
+        let set = db.collection('history').doc().set(data)
+    })
+
+    let myRef2 = db.collection('pending').listDocuments().then(val => {
+        val.map((val) => {
+            val.delete()
+        })
+    })
+      
+})
+
+router.get('/expired', async ctx =>{
+    let currentDate = ''
+    currentDate += (new Date().getMonth()+1)+'/'+ new Date().getDate() + '/'+  new Date().getFullYear()
+    db = ctx.db
+    myRef = db.collection('returns')
+    let query = await myRef.get()
+    await query.forEach(async doc => {
+        let orderDate = doc._fieldsProto.date.stringValue
+        const date2 = new Date(orderDate)
+        const date1 = new Date(currentDate)
+        const diffTime = Math.abs(date2.getTime() - date1.getTime());
+        const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)); 
+        if (diffDays >= 7){
+            data = {
+                code: doc._fieldsProto.code.stringValue,
+                email: doc._fieldsProto.email.stringValue,
+                shop: doc._fieldsProto.shop.stringValue,
+                items: [],
+                order_status: 'expired',
+                order: doc._fieldsProto.order.stringValue,
+                date:doc._fieldsProto.date.stringValue,
+            }
+            for (var i = 0;i<doc._fieldsProto.items.arrayValue.values.length;i++){
+                let temp = doc._fieldsProto.items.arrayValue.values[i]
+                tempItem = {
+                    price: temp.mapValue.fields.price.stringValue,
+                    name: temp.mapValue.fields.name.stringValue,
+                    variantid: temp.mapValue.fields.variantid.stringValue,
+                    reason: temp.mapValue.fields.reason.stringValue,
+                    status: temp.mapValue.fields.status.stringValue
+                }
+            }
+            data.items.push(tempItem)
+            let set = db.collection('history').doc().set(data)
+            doc.ref.delete()
+        }
+    });
+    ctx.body = {'res': 'hi'}
+})
+
+router.get('/clear' , async ctx =>{
+    db = ctx.db
+    let myRef = db.collection('pending').listDocuments().then(val => {
+        val.map((val) => {
+            val.delete()
+        })
+    })    
+})
+router.get('/checkblacklist' , async ctx =>{
+    db = ctx.db
+    id = ctx.query.id
+    myRef = db.collection('blacklist')
+    let query = await myRef.where('variantid','==',id).get()
+    if (query.empty){
+        ctx.body = { "blacklist":false}
+    }
+    else{
+        ctx.body = { "blacklist":true}
+    }   
+})
+
+router.get('/additem' , async ctx =>{
+    const item = ctx.query.item
+    const status = ctx.query.status
+    let currentDate = ''
+    currentDate += (new Date().getMonth()+1)+'/'+ new Date().getDate() + '/'+  new Date().getFullYear()
+    db = ctx.db
+    let itemJSON = await JSON.parse(item)
+        let data = {
+            name: itemJSON.name,
+            variantid: itemJSON.variantid,
+            store: itemJSON.store,
+            status: status,
+            date:currentDate,
+
+        };
+        for (var i = 0;i<itemJSON.quantity;i++){
+            setDoc = db.collection('items').doc().set(data)
+        }
+          
+        ctx.body = 'success'
 
 })
+router.get('/getToken' , async ctx =>{
+    db = ctx.db
+    storename = ctx.query.name
+    myRef = db.collection('shop_tokens').doc(storename);
+    getDoc = await myRef.get()
+    ctx.body = {"token" : getDoc._fieldsProto.token.stringValue}  
+})
+
+
+
 module.exports = router;
