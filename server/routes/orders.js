@@ -14,7 +14,7 @@ router.get('/', async ctx => {
     //console.log(ctx.query.orderNum);
     const name = ctx.query.orderNum;
     console.log("orderNum:---------"+name)
-    console.log(`shop----${shop}====api link----${api_link}`)
+    //console.log(`shop----${shop}====api link----${api_link}`)
     const { cookies } = ctx;
     const option = {
         url: `https://${shop}/${api_link}/orders.json?name=${name}&status=any`,
