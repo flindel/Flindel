@@ -42,6 +42,8 @@ class IdentifyApp extends Component {
         this.pricingBack = this.pricingBack.bind(this)
         this.setReason = this.setReason.bind(this)
         this.restart = this.restart.bind(this)
+        this.viewMaps = this.viewMaps.bind(this)
+        this.unviewMaps = this.unviewMaps.bind(this)
     }
 
     //generate usable unique codes
@@ -62,6 +64,13 @@ class IdentifyApp extends Component {
           if(unique == false){
               this.generateID() 
           }
+    }
+
+    viewMaps(){
+
+    }
+    unviewMaps(){
+        
     }
 
     /* This sets the reason for items return. the data only passes correctly if both lists are used */
@@ -124,6 +133,7 @@ class IdentifyApp extends Component {
 
     restart(){
         this.setState({items:[],
+            checkReturn:false,
             searchStatus: false, //whether the login was successful (matching order and password)
             checkStatus:false, //proceed from item select page and show checkover page
             priceStatus: false, //proceed from checkover page and show pricing page
@@ -219,6 +229,8 @@ class IdentifyApp extends Component {
         }
         this.setState({email:emailAdd.toLowerCase()})
         const data = {orderNumber: orderNum, emailAddress:emailAdd};
+
+        
         //get order info
         fetch(`https://${serveoname}/orders?orderNum=${encodeURIComponent(data.orderNumber)}`, {
                 method: 'GET',
