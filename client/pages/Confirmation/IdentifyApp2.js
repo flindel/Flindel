@@ -241,7 +241,7 @@ class IdentifyApp extends Component {
             method: 'get',
         })
         let json = await temp.json()
-        console.log("checkDB jSON"+JSON.stringify(json))
+        //console.log("checkDB jSON"+JSON.stringify(json))
         if(json.exsit){
             this.setState({
                 'code':json.code,
@@ -250,7 +250,6 @@ class IdentifyApp extends Component {
                 'existReturn': true
             })
         }else{
-            console.log("go to else")
             await this.identifyItems(data.orderNumber, data.emailAddress)
             //console.log("satet===="+JSON.stringify(this.state))
         }
@@ -263,14 +262,14 @@ class IdentifyApp extends Component {
             method: 'get',
         })
         let json = await temp.json()
-        console.log("change status----"+json)
-        if(json.success)
-        this.setState({
-            existReturn: false
-        })
+        if(json.success){
+            //restart return process
+            await this.identifyItems(orderNum, emailAdd)
+            this.setState({
+                existReturn:false
+            })
             
-        //restart return process
-        await this.identifyItems(orderNum, emailAdd)
+        }
 
     }
     
@@ -296,7 +295,6 @@ class IdentifyApp extends Component {
             //get data on the selected order from backenid
             .then(response => response.json())
             .then(resData=>{
-                    console.log("log api fetching result"+JSON.stringify(resData))
                     if(JSON.stringify(resData.orders)!="[]")
                 {
                 //get date difference:
@@ -373,7 +371,7 @@ class IdentifyApp extends Component {
             <NB
             shopName = {this.state.shopName}/>
             <p style = {myStyle}>{this.state.errorMessage}</p>
-	  			<Search identifyCustomerID={this.identifyCustomerID} identifyItems={this.identifyItems} />
+	  			<Search identifyCustomerID={this.identifyCustomerID} identifyItems={this.checkReturnsFromDB} />
 			</div>
         );
         }else if (!this.state.existReturn && this.state.step==2) {
