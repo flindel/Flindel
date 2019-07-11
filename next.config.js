@@ -1,5 +1,6 @@
 const withCSS = require('@zeit/next-css');
 const webpack = require('webpack');
+const isProd = process.env.NODE_ENV === 'production'
 
 const apiKey = JSON.stringify(process.env.SHOPIFY_API_KEY);
 
@@ -19,7 +20,7 @@ function HACK_removeMinimizeOptionFromCssLoaders(config) {
 }
 
 module.exports = withCSS({
-  assetPrefix: '/_next',
+  assetPrefix: isProd ? '' : 'http://localhost:3000/',
   webpack(config) {
     HACK_removeMinimizeOptionFromCssLoaders(config);
     const env = { API_KEY: apiKey };
