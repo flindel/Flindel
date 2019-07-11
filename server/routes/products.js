@@ -9,14 +9,11 @@ const router = Router({
 
 router.get('/', async ctx => {
     // Get product img src
-
     const productid = ctx.query.id;
-    console.log("productID:---------"+productid)
     const { cookies } = ctx;
     const shop = cookies.get('shop_id');
     const accessToken = cookies.get('accessToken');
     const option = {
-        //`https://getordertest.myshopify.com/admin/api/2019-04/products/${this.props.item.productID}.json?fields=image`
         url: `https://${shop}/${api_link}/products/${productid}.json`,
         headers: {
             'X-Shopify-Access-Token': accessToken
