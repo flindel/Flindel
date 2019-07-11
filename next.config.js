@@ -19,9 +19,11 @@ function HACK_removeMinimizeOptionFromCssLoaders(config) {
 }
 
 module.exports = withCSS({
+  assetPrefix: '/_next',
   webpack(config) {
     HACK_removeMinimizeOptionFromCssLoaders(config);
     const env = { API_KEY: apiKey };
+    config.output.publicPath = '_next${config.output.publicPath}';
     config.plugins.push(new webpack.DefinePlugin(env));
 
     return config;
