@@ -21,7 +21,8 @@ class ItemList extends Component {
             reason: ""
         }
         this.state = {
-            errorMessage:''
+            errorMessage:'',
+            style:'Blackout2',
         }
         this.returnItems = [];
         this.handleSubmit = this.handleSubmit.bind(this)
@@ -38,7 +39,7 @@ class ItemList extends Component {
     }
 
     //get return items
-    handleSelect(productidX, variantidX, nameX, valueX, srcX, quantityX, priceX, reasonX){
+    async handleSelect(productidX, variantidX, nameX, valueX, srcX, quantityX, priceX, reasonX){
         let findItem=false;
         this.currItem = {
             productID: productidX,
@@ -50,16 +51,21 @@ class ItemList extends Component {
             price: priceX,
             reason: reasonX
         }
-
         //update return list
             for (var i = 0;i<this.returnItems.length;i++){
                 let temp = this.returnItems[i];
                 if (temp.variantid == this.currItem.variantid){
-                    this.returnItems.splice(i,1)
+                    await this.returnItems.splice(i,1)
                 }
             }
             for (var i = 0;i<this.currItem.value;i++){
-                this.returnItems.push(this.currItem)
+                await this.returnItems.push(this.currItem)
+            }
+            if (this.returnItems.length > 0){
+                this.setState({style:'Submit2'})
+            }
+            else{
+                this.setState({style:'Blackout2'})
             }
 
     }
@@ -74,7 +80,7 @@ class ItemList extends Component {
                 })}
                 </fieldset>  
                 <br/>
-                <button className = 'Submit2' onClick={this.handleSubmit}>CONTINUE</button>            
+                <button className = {this.state.style} onClick={this.handleSubmit}>CONTINUE</button>            
             </div>
          );  
     }

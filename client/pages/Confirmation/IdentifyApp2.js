@@ -7,9 +7,9 @@ import PickupInfo from './mapDisplay'
 import NB from './navbar.js'
 import PriceDisplay from './finalConfirmation.js'
 import {Card, AppProvider, Button, ProgressBar} from '@shopify/polaris';
-const serveoname = 'ba625fe9.ngrok.io';
-var shopName = ''
-var myStyle = {
+const serveoname = 'optimu.serveo.net';
+let shopName = ''
+const myStyle = {
     color: 'red',
     textAlign: 'center'
 }
@@ -19,21 +19,16 @@ class IdentifyApp extends Component {
 		super(props);
 		this.state = {
             items:[],
-            searchStatus: false, //whether the login was successful (matching order and password)
-            checkStatus:false, //proceed from item select page and show checkover page
-            priceStatus: false, //proceed from checkover page and show pricing page
-            submitStatus: false, //proceed from pricing page and show final page
+            step: 1,
             code: '',
             email: '', 
             newEmail: '',
-            mapView: 0, //used to show navbar option
             returnlist: [],
             shopName:'',
             orderNum:'',
             errorMessage:'',
         };
         this.returnItemList= []
-        this.initStatus= true  // whether a login attempt has been made. Used for conditional render
         this.identifyItems=this.identifyItems.bind(this) 
         this.forward = this.forward.bind(this)
         this.back = this.back.bind(this)
@@ -47,15 +42,6 @@ class IdentifyApp extends Component {
         this.pricingBack = this.pricingBack.bind(this)
         this.setReason = this.setReason.bind(this)
         this.restart = this.restart.bind(this)
-    }
-
-    async componentWillMount(){
-       /* let temp = await fetch(`https://${serveoname}/shopName`, {
-            method: 'get',
-        })
-        let json = await temp.json()
-        let indexdot = json.shopName.indexOf('.mysho')
-        this.setState({shopName:json.shopName.substring(0,indexdot)})*/
     }
 
     //generate usable unique codes
@@ -108,7 +94,7 @@ class IdentifyApp extends Component {
     //proceed to checkover page from select page if item is selected
     checkOver(){
         if(this.returnItemList.length>0){
-            this.setState({checkStatus:true})
+            this.setState({step:3})
         }
     }
 
@@ -117,7 +103,7 @@ class IdentifyApp extends Component {
         for (var i =0;i<this.returnItemList.length;i++){
             this.returnItemList[i].reason = '---'
         }
-        this.setState({priceStatus:false})
+        this.setState({step:3})
     }
 
     //move forward from checkover page to pricing page
@@ -125,7 +111,7 @@ class IdentifyApp extends Component {
         for (var i =0;i<this.returnItemList.length;i++){
             this.returnItemList[i].reason = ''
         }
-        this.setState({priceStatus: true})
+        this.setState({step:4})
     }
 
     //move forward from pricing page to final page
@@ -133,7 +119,7 @@ class IdentifyApp extends Component {
         await this.generateID()
         await this.sendToDB()
         //this.sendEmail()
-        this.setState({submitStatus: true})
+        this.setState({step:5})
     }
 
     restart(){
@@ -172,9 +158,11 @@ class IdentifyApp extends Component {
 
     //send information to firestore db
     sendToDB(){
+        let currentDate = ''
+        currentDate += (new Date().getMonth()+1)+'/'+ new Date().getDate() + '/'+  new Date().getFullYear()
         let items = JSON.stringify(this.state.returnlist)
         //1 for write, 2 for read
-        fetch(`https://${serveoname}/dbcall?location=${encodeURIComponent('returns')}&method=${encodeURIComponent(1)}&code=${encodeURIComponent(this.state.code)}&email=${encodeURIComponent(this.state.email)}&items=${encodeURIComponent(items)}`, {
+        fetch(`https://${serveoname}/dbcall?location=${encodeURIComponent('returns')}&method=${encodeURIComponent(1)}&date=${encodeURIComponent(currentDate)}&code=${encodeURIComponent(this.state.code)}&orderNum=${encodeURIComponent(this.state.orderNum)}&email=${encodeURIComponent(this.state.email)}&items=${encodeURIComponent(items)}`, {
             method: 'get',
         })
     }
@@ -187,8 +175,7 @@ class IdentifyApp extends Component {
 
     //move back from selection page
     back(){
-        this.setState({checkStatus: false,searchStatus:true})
-        this.initStatus=false
+        this.setState({step:2})
     }
 
     //handle change to state variable
@@ -240,25 +227,23 @@ class IdentifyApp extends Component {
             //get data on the selected order from backenid
             .then(response => response.json())
             .then(resData=>{
-                    if(JSON.stringify(resData.orders)!="[]")
+                if(JSON.stringify(resData.orders)!="[]")
                 {
                 //get date difference:
-                console.log(resData.orders[0].processed_at)
                 let dateString = resData.orders[0].processed_at
-                var orderDate =  ''
+                let orderDate =  ''
                 orderDate+= dateString.substring(5,7)+'/'+dateString.substring(8,10)+'/'+dateString.substring(0,4)
-                var currentDate = ''
+                let currentDate = ''
                 currentDate += (new Date().getMonth()+1)+'/'+ new Date().getDate() + '/'+  new Date().getFullYear()
                 const date2 = new Date(dateString)
                 const date1 = new Date(currentDate)
                 const diffTime = Math.abs(date2.getTime() - date1.getTime());
                 const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)); 
-                if (diffDays<=2){////////////////////////////////////////////////////IMPORT SOME STUFF HERE
+                if (diffDays<=100){////////////////////////////////////////////////////IMPORT SOME STUFF HERE
                     //check to see whether the email or phone number entered matches the one on record
                     if ((resData.orders[0].email.toLowerCase()==emailAdd.toLowerCase()) || (resData.orders[0].phone == phoneNum))
                     {
                         //if correct
-                        this.initStatus=false;
                         this.setState({
                             //set the items var to the items in the order
                             items:resData.orders[0].line_items.map(item=>{
@@ -271,28 +256,29 @@ class IdentifyApp extends Component {
                                 }
                             }),
                             //set searchstatus to true to move forward
-                            searchStatus : true,
+                            step:2,
                             orderNum: orderNum
                         })
                     }
                     else {
-                        //show they made an incorrect attempt
-                        this.initStatus=false;     
+                        //show they made an incorrect attempt  
                             this.setState({
-                                searchStatus: false,
                                 errorMessage:"The order number, email, or phone number you entered didn't match our records."
                             })      
                     }
                     }
                 else{
-                    this.initStatus = false;
                     this.setState({
-                        searchStatus: false,
                         errorMessage: "Your order is past store return policy and is no longer eligible for return."
                     }) 
                 }
                 }
-            }) 	
+                else{   
+                    this.setState({
+                    errorMessage:"The order number, email, or phone number you entered didn't match our records."
+                    })
+                }
+            }) 
     }
 
     
@@ -301,39 +287,20 @@ class IdentifyApp extends Component {
     All steps call a subpage based on the state variables on which page to show
     */
 	render() {
-        if(!this.state.searchStatus&&this.initStatus&&!this.state.checkStatus&&!this.state.mapView){
+        if(this.state.step == 1){
 		return (
 			<div>
             <NB
-            viewMaps ={this.viewMaps.bind(this)}
-            unviewMaps = {this.unviewMaps.bind(this)} 
             shopName = {this.state.shopName}/>
+            <p style = {myStyle}>{this.state.errorMessage}</p>
 	  			<Search identifyCustomerID={this.identifyCustomerID} identifyItems={this.identifyItems} />
 			</div>
         );
-        }else if(!this.initStatus&&!this.state.searchStatus&&!this.state.checkStatus&&!this.state.mapView){
-            return (
-                <div>
-                <NB
-                viewMaps ={this.viewMaps.bind(this)}
-                unviewMaps = {this.unviewMaps.bind(this)}
-                shopName = {this.state.shopName}/> 
-                <p style = {myStyle}>{this.state.errorMessage}</p>
-                      <Search identifyCustomerID={this.identifyCustomerID} identifyItems={this.identifyItems} />
-                </div>
-            );
-        }else if (this.state.searchStatus&&!this.initStatus&&!this.state.checkStatus&&!this.state.mapView) {
+        }else if (this.state.step==2) {
            return (
                <div>
                 <NB
-                viewMaps ={this.viewMaps.bind(this)}
-                unviewMaps = {this.unviewMaps.bind(this)}
                 shopName = {this.state.shopName}/> 
-                <div className = 'c'>
-                <AppProvider>
-                    <ProgressBar progress = {25}/>
-                </AppProvider>
-                </div>
                <ItemList 
                serveoname = {serveoname}
                orderNum = {this.state.orderNum}
@@ -342,18 +309,11 @@ class IdentifyApp extends Component {
                items={this.state.items}/> 
                </div>
                ) 
-        } else if (this.state.checkStatus&&!this.state.priceStatus&&!this.state.mapView){
+        } else if (this.state.step==3){
             return(
                 <div>
                 <NB
-                viewMaps ={this.viewMaps.bind(this)}    
-                unviewMaps = {this.unviewMaps.bind(this)}
                 shopName = {this.state.shopName}/> 
-                <div className = 'c'>
-                <AppProvider>
-                    <ProgressBar progress = {50}/>
-                </AppProvider>
-                </div>
                 <CheckPage
                 serveoname = {serveoname}
                 setReason = {this.setReason.bind(this)}
@@ -370,18 +330,11 @@ class IdentifyApp extends Component {
                 </div>
             )
         }
-        else if (this.state.priceStatus&&!this.state.submitStatus&&!this.state.mapView){
+        else if (this.state.step==4){
             return(
                 <div>
                 <NB
-                viewMaps ={this.viewMaps.bind(this)}
-                unviewMaps = {this.unviewMaps.bind(this)}
                 shopName = {this.state.shopName}/> 
-                <div className = 'c'>
-                <AppProvider>
-                    <ProgressBar progress = {75}/>
-                </AppProvider>
-                </div>
                 <PriceDisplay
                 serveoname={serveoname}
                 items = {this.state.returnlist}
@@ -391,18 +344,11 @@ class IdentifyApp extends Component {
                 </div>
             )
         }
-        else if (this.state.submitStatus&&!this.state.mapView){
+        else if (this.state.step==5){
             return(
                 <div>
                 <NB
-                viewMaps ={this.viewMaps.bind(this)}
-                unviewMaps = {this.unviewMaps.bind(this)}
                 shopName = {this.state.shopName}/> 
-                <div className = 'c'>
-                <AppProvider>
-                    <ProgressBar progress = {100}/>
-                </AppProvider>
-                </div>
                 <ConfirmationPage
                 serveoname = {serveoname}
                 code = {this.state.code} 
@@ -411,17 +357,6 @@ class IdentifyApp extends Component {
                 <br/><br/><br/>
                 <PickupInfo/>
                 </div>
-            )
-        }
-        else if (this.state.mapView){
-            return(
-            <div>
-            <NB
-            shopName = {this.state.shopName}
-            viewMaps ={this.viewMaps.bind(this)}
-            unviewMaps = {this.unviewMaps.bind(this)}/>     
-            <PickupInfo/>
-            </div>
             )
         }
 	}

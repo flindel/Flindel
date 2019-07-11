@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import './universal.css'
 
+
 /* SEARCH PAGE
 First page customers sees, prompts them to input order num+other identifier
 */
@@ -10,11 +11,13 @@ class Search extends Component {
             super(props);
             this.state = {
                 emailAdd: '',
-                orderNum: '',   
+                orderNum: '',  
+                style:'Blackout1'
             };
             this.handleEmailChange = this.handleEmailChange.bind(this);
             this.handleOrderNumChange = this.handleOrderNumChange.bind(this);
             this.handleSearch = this.handleSearch.bind(this);
+            this.checkButton=this.checkButton.bind(this)
         }
         
     
@@ -23,6 +26,7 @@ class Search extends Component {
             this.setState({
                 orderNum: e.target.value
             });
+            this.checkButton()
         }
     
         //handle input of info
@@ -30,6 +34,17 @@ class Search extends Component {
             this.setState({
                 emailAdd: e.target.value
             });
+            this.checkButton()
+        }
+
+        checkButton(){
+            alert
+            if (this.state.emailAdd !='' && this.state.orderNum!=''){
+                this.setState({style:'Submit1'})
+            }
+            else{
+                this.setState({style:'Blackout1'})
+            }
         }
     
         //handle submit
@@ -55,7 +70,7 @@ class Search extends Component {
                           
                           <br/><br/>
                           <div className="Search-submit">
-                          <button className = "Submit" type="submit" onClick={this.handleSearch}>CONTINUE</button>
+                          <button className = {this.state.style} type="submit" onClick={this.handleSearch}>CONTINUE</button>
                     </div>
                     </fieldset> 
                     </div>                

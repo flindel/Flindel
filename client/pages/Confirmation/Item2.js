@@ -92,7 +92,7 @@ class Item extends Component {
                       {quantityOption}
                     </select>
                 </label></span>
-                <span><p className = 'item2'>{this.props.item.name}: ${this.props.item.price}</p> </span>              
+                <span><p className = 'item2'>{this.props.item.name}</p> </span>              
                 <br/>
             </div>
         );
@@ -137,8 +137,8 @@ class Item extends Component {
                     <label className="dropdown">Reason for return:
                         <select value={this.state.status} onChange={this.handleStatusChange}>
                         <option value="submitted">Submitted</option>
-                            <option value="received">Received</option>
-                            <option value="accepted">Accepted</option>
+                            <option value="accepted">Accepted - Resell</option>
+                            <option value="returning">Accepted - No Resell</option>
                             <option value="rejected">Rejected</option>
                         </select>
                     </label>
