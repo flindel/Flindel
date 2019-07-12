@@ -7,12 +7,9 @@ import PickupInfo from './mapDisplay'
 import NB from './navbar.js'
 import PriceDisplay from './finalConfirmation.js'
 import {Card, AppProvider, Button, ProgressBar} from '@shopify/polaris';
-const serveoname = 'optimu.serveo.net';
+const serveoname = 'optimo.serveo.net';
 let shopName = ''
-const myStyle = {
-    color: 'red',
-    textAlign: 'center'
-}
+
 class IdentifyApp extends Component {
     //constructor and binding methods
     constructor(props){
@@ -31,7 +28,6 @@ class IdentifyApp extends Component {
         this.returnItemList= []
         this.identifyItems=this.identifyItems.bind(this) 
         this.forward = this.forward.bind(this)
-        this.back = this.back.bind(this)
         this.setState = this.setState.bind(this)
         this.handleChange = this.handleChange.bind(this)
         this.checkOver = this.checkOver.bind(this)
@@ -39,11 +35,11 @@ class IdentifyApp extends Component {
         this.sendEmail = this.sendEmail.bind(this)
         this.sendToDB = this.sendToDB.bind(this)
         this.finishPricing = this.finishPricing.bind(this)
-        this.pricingBack = this.pricingBack.bind(this)
         this.setReason = this.setReason.bind(this)
         this.restart = this.restart.bind(this)
-        this.viewMaps = this.viewMaps.bind(this)
-        this.unviewMaps = this.unviewMaps.bind(this)
+        this.viewPage2 = this.viewPage2.bind(this)
+        this.viewPage3 = this.viewPage3.bind(this)
+        this.viewPage4 = this.viewPage4.bind(this)
     }
 
     //generate usable unique codes
@@ -65,12 +61,17 @@ class IdentifyApp extends Component {
               this.generateID() 
           }
     }
-
-    viewMaps(){
-
+    viewPage2(){
+        this.setState({step:2})
     }
-    unviewMaps(){
-        
+    viewPage3(){
+        for (var i =0;i<this.returnItemList.length;i++){
+            this.returnItemList[i].reason = '---'
+        }
+        this.setState({step:3})
+    }
+    viewPage4(){
+        this.setState({step:4})
     }
 
     /* This sets the reason for items return. the data only passes correctly if both lists are used */
@@ -107,14 +108,6 @@ class IdentifyApp extends Component {
         }
     }
 
-    //move back from pricing page to checkover page
-    pricingBack(){
-        for (var i =0;i<this.returnItemList.length;i++){
-            this.returnItemList[i].reason = '---'
-        }
-        this.setState({step:3})
-    }
-
     //move forward from checkover page to pricing page
     forward(){
         for (var i =0;i<this.returnItemList.length;i++){
@@ -125,6 +118,19 @@ class IdentifyApp extends Component {
 
     //move forward from pricing page to final page
     async finishPricing(){
+        
+        let tempList = this.state.returnlist
+        for (var i = 0;i<tempList.length;i++){
+            let curr = tempList[i]
+            if(curr.value > 1){
+                let temp = curr.value
+                tempList[i].value = 1
+                for (var j = 0;j<(temp-1);j++){
+                    tempList.push(tempList[i])
+                }
+            }
+        }
+        await this.setState({returnlist:tempList})
         await this.generateID()
         await this.sendToDB()
         //this.sendEmail()
@@ -181,11 +187,6 @@ class IdentifyApp extends Component {
     setEmail(){
         let temp = this.state.newEmail.toLowerCase()
         this.state.email=temp
-    }
-
-    //move back from selection page
-    back(){
-        this.setState({step:2})
     }
 
     //handle change to state variable
@@ -303,8 +304,12 @@ class IdentifyApp extends Component {
 		return (
 			<div>
             <NB
+            step1={'active'}
+            step2={''}
+            step3={''}
+            show = {false}
             shopName = {this.state.shopName}/>
-            <p style = {myStyle}>{this.state.errorMessage}</p>
+            <p className = 'errorMessage'>{this.state.errorMessage}</p>
 	  			<Search identifyCustomerID={this.identifyCustomerID} identifyItems={this.identifyItems} />
 			</div>
         );
@@ -312,6 +317,10 @@ class IdentifyApp extends Component {
            return (
                <div>
                 <NB
+                step1={'active'}
+                step2={''}
+                step3={''}
+                show = {true}
                 shopName = {this.state.shopName}/> 
                <ItemList 
                serveoname = {serveoname}
@@ -325,6 +334,11 @@ class IdentifyApp extends Component {
             return(
                 <div>
                 <NB
+                step1={'active'}
+                step2={'active'}
+                step3={''}
+                show = {true}
+                viewPage2 = {this.viewPage2.bind(this)}
                 shopName = {this.state.shopName}/> 
                 <CheckPage
                 serveoname = {serveoname}
@@ -337,7 +351,6 @@ class IdentifyApp extends Component {
                 orderNum = {this.state.orderNum}
                 updateforward={this.forward.bind(this)}
                 updateEmail = {this.setEmail.bind(this)}
-                updateback = {this.back.bind(this)}
                 updatehandleChange = {this.handleChange.bind(this)}/>
                 </div>
             )
@@ -346,13 +359,18 @@ class IdentifyApp extends Component {
             return(
                 <div>
                 <NB
+                step1={'active'}
+                step2={'active'}
+                step3={'active'}
+                show = {true}
+                viewPage2 = {this.viewPage2.bind(this)}
+                viewPage3 = {this.viewPage3.bind(this)}
                 shopName = {this.state.shopName}/> 
                 <PriceDisplay
                 serveoname={serveoname}
                 items = {this.state.returnlist}
                 orderNum = {this.state.orderNum}
-                finishPricing = {this.finishPricing.bind(this)}
-                pricingBack = {this.pricingBack.bind(this)}/>
+                finishPricing = {this.finishPricing.bind(this)}/>
                 </div>
             )
         }
@@ -360,6 +378,10 @@ class IdentifyApp extends Component {
             return(
                 <div>
                 <NB
+                step1={'active'}
+                step2={''}
+                step3={''}
+                show = {false}
                 shopName = {this.state.shopName}/> 
                 <ConfirmationPage
                 serveoname = {serveoname}

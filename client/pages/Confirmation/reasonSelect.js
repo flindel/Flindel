@@ -13,6 +13,11 @@ class confirmOrder extends React.Component{
                     errorMessage:'', 
                     emailToPrint: this.props.email,
                     style: 'Blackout2',
+                    existingStyle: 'l3On',
+                    newStyle: 'l3Off',
+                    hiddenStyle:' l3Hidden',
+                    existingStyleText: 'l3On',
+                    newStyleText: 'l3Off',
                     emailCopy:''
                   }
 
@@ -33,13 +38,13 @@ class confirmOrder extends React.Component{
     set0(){
       //setting state from radio button (either old or new email)
       if (this.state.emailToPrint!=''){
-        this.setState({selectedEmail: 0})
+        this.setState({selectedEmail: 0,existingStyle:'l3On',newStyle:'l3Off', hiddenStyle:'l3Hidden', newStyleText:'l3Off',existingStyleText:'l3On'})
       }
   }
 
   set1(){
     //setting state from radio button (either old or new email)
-      this.setState({selectedEmail: 1})
+      this.setState({selectedEmail: 1,existingStyle:'l3Off', newStyle:'l3On',hiddenStyle:'l3On', existingStyleText:'l3Off',newStyleText:'l3On'})
   }
 
   updateEmailCopy(e){
@@ -79,8 +84,13 @@ class confirmOrder extends React.Component{
         }
         else{
           //change state in IdentifyApp to render new page
-          this.props.updateEmail()
-          this.props.updateforward()
+          if(this.props.newEmail == this.state.emailCopy){
+            this.props.updateEmail()
+            this.props.updateforward()
+          }
+          else{
+            this.setState({errorMessage: 'The emails you entered do not match.'})
+          }
         }
       }
       else{
@@ -107,9 +117,7 @@ class confirmOrder extends React.Component{
               <h3 className = 'pageTitle3'>
                Return Confirmation
               </h3>
-              <p className = 'description3'> - Please ensure that these are the items you wish to return, and select your reasons for return.</p>
-              <br/><br/>
-              <p className = 'errorMessage3'>{this.state.itemErrorMessage}</p>
+              <p className = 'errorMessage'>{this.state.itemErrorMessage}</p>
               <br/>
               <fieldset className = 'page3'>
                 <p className = 'orderHeader'>Order Number: {this.props.orderNum}</p>
@@ -118,25 +126,22 @@ class confirmOrder extends React.Component{
                     })} {/*show all items*/}
               </fieldset>
               <h3 className = 'emailHead'>Email Confirmation:</h3> {/* GET EMAIL INFO*/}
-              <p className = 'errorMessage3'>{this.state.errorMessage}</p>
+              <p className = 'errorMessage'>{this.state.errorMessage}</p>
               <form>
                 <div className="radio">
-                  <label className = 'l3'>
-                      <input type="radio" value='original' checked={this.state.selectedEmail === 0 } onChange = {this.set0} />
-                      Use existing email: {this.state.emailToPrint}
+                  <label className = {this.state.existingStyle}>
+                    Use existing email:
+                      <input className = {this.state.existingStyleText} type="email" value={this.state.emailToPrint} onClick = {this.set0} />
                   </label>
                   <br/>
-                  <label className = 'l3'>
-                    <input type="radio" value='new' checked = {this.state.selectedEmail === 1 } onChange = {this.set1} />
-                    Select new email:
-                  </label>
-                  <label>     
-                    <input type="email" value={this.props.newEmail} onChange={this.props.updatehandleChange('newEmail')} />
+                  <label className = {this.state.newStyle}> 
+                    Enter new email:    
+                    <input className = {this.state.newStyleText} type="email" value={this.props.newEmail} onClick = {this.set1} onChange={this.props.updatehandleChange('newEmail')} />
                   </label>
                   <br/>
-                  <label className = 'l3X'>
-                    Re-enter email:
-                    <input type="email" value = {this.state.emailCopy} onChange = {this.updateEmailCopy}/>
+                  <label className = {this.state.hiddenStyle}>
+                    Re- enter email:
+                    <input className = 'l3On' type="email" value = {this.state.emailCopy} onChange = {this.updateEmailCopy}/>
                   </label>
                 </div>
               </form>

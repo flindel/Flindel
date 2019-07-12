@@ -113,7 +113,7 @@ class Item extends Component {
                             <option value="Wrong">Product is wrong (size, color, etc).</option>
                         </select>
                     </label></span>
-                    <span><p className = 'item3'>{this.props.item.name}</p> </span>   
+                    <span><p className = 'item3'>{this.props.item.name}, QTY: {this.props.item.value}</p> </span>   
                     
                 </div>
             );
@@ -125,7 +125,7 @@ class Item extends Component {
                     <img  className = 'item4'
                     src={this.state.src} /> 
                     <p className = 'item4price'>Reason: {this.props.item.reason}</p>
-                    <p className = 'item4'>{this.props.item.name}</p> 
+                    <p className = 'item4'>{this.props.item.name}, QTY: {this.props.item.value}</p> 
                     <br/>
                 </div>
             );
