@@ -6,16 +6,21 @@ import CheckPage from './reasonSelect'
 import PickupInfo from './mapDisplay'
 import NB from './navbar.js'
 import PriceDisplay from './finalConfirmation.js'
+import Review from './reviewRestart'
 import {Card, AppProvider, Button, ProgressBar} from '@shopify/polaris';
-const serveoname = 'optimo.serveo.net';
-let shopName = ''
-
+//const serveoname = 'optimo.serveo.net';
+const serveoname = 'facilis.serveo.net';
 class IdentifyApp extends Component {
     //constructor and binding methods
     constructor(props){
 		super(props);
 		this.state = {
             items:[],
+            existReturn:false, //check db to see if a return is existed or not
+            searchStatus: false, //whether the login was successful (matching order and password)
+            checkStatus:false, //proceed from item select page and show checkover page
+            priceStatus: false, //proceed from checkover page and show pricing page
+            submitStatus: false, //proceed from pricing page and show final page
             step: 1,
             code: '',
             email: '', 
@@ -40,6 +45,8 @@ class IdentifyApp extends Component {
         this.viewPage2 = this.viewPage2.bind(this)
         this.viewPage3 = this.viewPage3.bind(this)
         this.viewPage4 = this.viewPage4.bind(this)
+        this.checkReturnsFromDB = this.checkReturnsFromDB.bind(this)
+        this.restartReturn = this.restartReturn.bind(this)
     }
 
     //generate usable unique codes
@@ -139,7 +146,7 @@ class IdentifyApp extends Component {
 
     restart(){
         this.setState({items:[],
-            checkReturn:false,
+            existReturn:false, //whether the return is existed in database
             searchStatus: false, //whether the login was successful (matching order and password)
             checkStatus:false, //proceed from item select page and show checkover page
             priceStatus: false, //proceed from checkover page and show pricing page
@@ -217,8 +224,42 @@ class IdentifyApp extends Component {
         }
       }
 
+
+    async checkReturnsFromDB(orderNum,emailAdd){
+        let temp = await fetch(`https://${serveoname}/dbcall?method=${encodeURIComponent(4)}&orderNum=${encodeURIComponent(orderNum)}&emailAdd=${encodeURIComponent(emailAdd)}`, {
+            method: 'get',
+        })
+        let json = await temp.json()
+        console.log("checkDB jSON"+JSON.stringify(json))
+        if(json.exist){
+            const returnInfo = {'code':json.code,
+                                'email': emailAdd,
+                                'orderNum': orderNum,}
+            return returnInfo
+         }
+         else{ return false }
+    }
+
+    async restartReturn(orderNum, emailAdd, code){
+        
+        // call database change order_status
+        let temp = await fetch(`https://${serveoname}/dbcall?method=${encodeURIComponent(8)}&code=${encodeURIComponent(this.state.code)}`, {
+            method: 'get',
+        })
+        let json = await temp.json()
+        console.log('check DB: '+json)
+        if(json.success){
+            //restart return process
+            await this.identifyItems(orderNum, emailAdd)
+            this.setState({
+                existReturn:false
+            })
+        }
+    
+    }
+    
     //process of selecting whether order is valid
-	identifyItems(orderNum, emailAdd){
+    async identifyItems(orderNum, emailAdd){
         //matching phone number to shopify style
         let phoneNum = '+1';
         phoneNum += emailAdd;
@@ -230,19 +271,17 @@ class IdentifyApp extends Component {
         }
         this.setState({email:emailAdd.toLowerCase()})
         const data = {orderNumber: orderNum, emailAddress:emailAdd};
+        let temp = await fetch(`https://${serveoname}/orders?orderNum=${encodeURIComponent(data.orderNumber)}`, {
+            method: 'GET',
 
-        
-        //get order info
-        fetch(`https://${serveoname}/orders?orderNum=${encodeURIComponent(data.orderNumber)}`, {
-                method: 'GET',
-
-            })
-            //get data on the selected order from backenid
-            .then(response => response.json())
-            .then(resData=>{
-                if(JSON.stringify(resData.orders)!="[]")
+        })
+        let resData = await temp.json()
+        if(JSON.stringify(resData.orders)!="[]")
                 {
                 //get date difference:
+                
+                console.log("get data from shopify----"+JSON.stringify(resData.orders))
+
                 let dateString = resData.orders[0].processed_at
                 let orderDate =  ''
                 orderDate+= dateString.substring(5,7)+'/'+dateString.substring(8,10)+'/'+dateString.substring(0,4)
@@ -252,11 +291,23 @@ class IdentifyApp extends Component {
                 const date1 = new Date(currentDate)
                 const diffTime = Math.abs(date2.getTime() - date1.getTime());
                 const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)); 
-                if (diffDays<=100){////////////////////////////////////////////////////IMPORT SOME STUFF HERE
+                if (diffDays<=100){////////////////////////////////////////////////////IMPORT SOME STUFF HERE ///////check all restrictions here!!!!
+                    console.log("Within valid return day---------")
                     //check to see whether the email or phone number entered matches the one on record
                     if ((resData.orders[0].email.toLowerCase()==emailAdd.toLowerCase()) || (resData.orders[0].phone == phoneNum))
                     {
+                        console.log("order number and phone match---------")
                         //if correct
+                        //if pass checkDB
+                        let returnInfo = await this.checkReturnsFromDB(data.orderNumber, data.emailAddress)
+                        if(returnInfo){
+                            this.setState({
+                                'code':returnInfo.code,
+                                'email': returnInfo.email,
+                                'orderNum': returnInfo.orderNum,
+                                'existReturn': true
+                            })
+                        }else{
                         this.setState({
                             //set the items var to the items in the order
                             items:resData.orders[0].line_items.map(item=>{
@@ -272,6 +323,7 @@ class IdentifyApp extends Component {
                             step:2,
                             orderNum: orderNum
                         })
+                        }
                     }
                     else {
                         //show they made an incorrect attempt  
@@ -286,14 +338,7 @@ class IdentifyApp extends Component {
                     }) 
                 }
                 }
-                else{   
-                    this.setState({
-                    errorMessage:"The order number, email, or phone number you entered didn't match our records."
-                    })
-                }
-            }) 
     }
-
     
     /*
     Conditional render/mainline
@@ -301,6 +346,18 @@ class IdentifyApp extends Component {
     */
 	render() {
         if(this.state.step == 1){
+            if(this.state.existReturn){
+                return (
+                    <div>
+                       <NB
+                       viewMaps ={this.viewMaps.bind(this)}
+                       unviewMaps = {this.unviewMaps.bind(this)} 
+                       shopName = {this.state.shopName}/>
+                       <Review code={this.state.code} email = {this.state.email} orderNum = {this.state.orderNum} restartReturn = {this.restartReturn}/>
+                       <p>{JSON.stringify(this.state)}</p>
+                   </div>
+                )
+               }
 		return (
 			<div>
             <NB
@@ -313,7 +370,7 @@ class IdentifyApp extends Component {
 	  			<Search identifyCustomerID={this.identifyCustomerID} identifyItems={this.identifyItems} />
 			</div>
         );
-        }else if (this.state.step==2) {
+        }else if (!this.state.existReturn && this.state.step==2) {
            return (
                <div>
                 <NB

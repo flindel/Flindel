@@ -12,6 +12,8 @@ router.get('/' , async ctx =>{
     const method = ctx.query.method
     const code = ctx.query.code
     const email = ctx.query.email
+    const order = ctx.query.orderNum
+    const customerEmail = ctx.query.emailAdd
     //write
     if(method == 1){
         db = ctx.db
@@ -71,6 +73,24 @@ router.get('/' , async ctx =>{
             ctx.body = { "unique":false}
         }
     }
+    //read all documents to see if the return exisited based on email and orderNum
+    else if (method ==4){
+        //console.log(order)
+        //console.log(customerEmail)
+        
+        //check if exist by orderID and email
+        db = ctx.db
+        myRef = db.collection('returns')
+        ctx.body = {
+            'code':'none',
+            'exsit':false
+        }
+        let querySnapshot = await myRef.where('order','==',order).where('email','==',customerEmail).get()
+        if (!querySnapshot.empty){
+            //console.log("Snapshot-----"+JSON.stringify(querySnapshot.docs.id))
+            ctx.body = {"exist":true, 'code':querySnapshot.docs[0].id}
+         }
+    }
     else if (method == 5){
         db = ctx.db
         myRef = db.collection('returns')
@@ -118,6 +138,17 @@ router.get('/' , async ctx =>{
         let set = db.collection('history').doc().set(data)
         let deleteDoc = db.collection('returns').doc(code).delete();
         ctx.body = {"success":true}
+    }
+    //changing return order_status from "submitted" to "replaced" if customer restart an exsiting order
+    else if (method == 8){
+        db = ctx.db
+
+        myRef = db.collection('returns').doc(code)
+        let query = await myRef.update({
+            order_status: 'replaced'
+        })
+        ctx.body = {'success':true}
+
     }
 })
 
