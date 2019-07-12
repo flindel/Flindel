@@ -8,7 +8,7 @@ import NB from './navbar.js'
 import PriceDisplay from './finalConfirmation.js'
 import Review from './reviewRestart'
 import {Card, AppProvider, Button, ProgressBar} from '@shopify/polaris';
-const serveoname = 'feritas.serveo.net';
+const serveoname = 'facilis.serveo.net';
 var shopName = ''
 var myStyle = {
     color: 'red',
@@ -241,8 +241,8 @@ class IdentifyApp extends Component {
             method: 'get',
         })
         let json = await temp.json()
-        //console.log("checkDB jSON"+JSON.stringify(json))
-        if(json.exsit){
+        console.log("checkDB jSON"+JSON.stringify(json))
+        if(json.exist){
             this.setState({
                 'code':json.code,
                 'email': data.emailAddress,
@@ -262,6 +262,7 @@ class IdentifyApp extends Component {
             method: 'get',
         })
         let json = await temp.json()
+        console.log('check DB: '+json)
         if(json.success){
             //restart return process
             await this.identifyItems(orderNum, emailAdd)

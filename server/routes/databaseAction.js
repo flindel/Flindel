@@ -77,29 +77,31 @@ router.get('/' , async ctx =>{
     else if (method ==4){
         console.log(order)
         console.log(customerEmail)
-        db = ctx.db
-        myRef = db.collection('returns')
-        let query = await myRef.get()
-         ctx.body = {'code':'none',
-                     'exist': false}
-        await query.forEach(async doc=>{
-            //console.log(doc._fieldsProto)
-            if (doc._fieldsProto.order.stringValue == order && doc._fieldsProto.email.stringValue == customerEmail && doc._fieldsProto.order_status.stringValue == 'submitted'){
-                ctx.body = {'code':doc._fieldsProto.code.stringValue,
-                            'exsit':true}
-            }
-        })
-        
-        //check if exist by orderID and email
         // db = ctx.db
         // myRef = db.collection('returns')
-        // let query = await myRef.where('order','==',order).where('email','==',customerEmail).get()
-        // if (query.empty){
-        //     ctx.body = {"exist":false}
-        // }else {
-        //     ctx.body = {"exist":true}
-        //     console.log("query===="+JSON.stringify(query))
-        // }
+        // let query = await myRef.get()
+        //  ctx.body = {'code':'none',
+        //              'exist': false}
+        // await query.forEach(async doc=>{
+        //     //console.log(doc._fieldsProto)
+        //     if (doc._fieldsProto.order.stringValue == order && doc._fieldsProto.email.stringValue == customerEmail && doc._fieldsProto.order_status.stringValue == 'submitted'){
+        //         ctx.body = {'code':doc._fieldsProto.code.stringValue,
+        //                     'exsit':true}
+        //     }
+        // })
+        
+        //check if exist by orderID and email
+        db = ctx.db
+        myRef = db.collection('returns')
+        ctx.body = {
+            'code':'none',
+            'exsit':false
+        }
+        let querySnapshot = await myRef.where('order','==',order).where('email','==',customerEmail).get()
+        if (!querySnapshot.empty){
+            //console.log("Snapshot-----"+JSON.stringify(querySnapshot.docs.id))
+            ctx.body = {"exist":true, 'code':querySnapshot.docs[0].id}
+         }
     }
     else if (method == 5){
         db = ctx.db
