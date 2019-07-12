@@ -49,7 +49,7 @@ class Search extends Component {
     
         //handle submit
         handleSearch(e){
-            this.props.identifyItems(this.state.orderNum, this.state.emailAdd);
+            this.props.identifyItems(this.state.orderNum, this.state.emailAdd, true);//true means function will call Database check if this return exist
             //event.preventDefault();
         }
     

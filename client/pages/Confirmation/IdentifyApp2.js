@@ -8,7 +8,7 @@ import NB from './navbar.js'
 import PriceDisplay from './finalConfirmation.js'
 import Review from './reviewRestart'
 import {Card, AppProvider, Button, ProgressBar} from '@shopify/polaris';
-const serveoname = 'facilis.serveo.net';
+const serveoname = 'feritas.serveo.net';
 var shopName = ''
 var myStyle = {
     color: 'red',
@@ -250,16 +250,17 @@ class IdentifyApp extends Component {
         console.log('check DB: '+json)
         if(json.success){
             //restart return process
-            await this.identifyItems(orderNum, emailAdd)
             this.setState({
                 existReturn:false
             })
+            await this.identifyItems(orderNum, emailAdd, false)//false means function will not check database, but directly show itemlist
+            
         }
     
     }
     
     //process of selecting whether order is valid
-    async identifyItems(orderNum, emailAdd){
+    async identifyItems(orderNum, emailAdd, checkDB){
         //matching phone number to shopify style
         let phoneNum = '+1';
         phoneNum += emailAdd;
@@ -299,31 +300,35 @@ class IdentifyApp extends Component {
                         console.log("order number and phone match---------")
                         //if correct
                         //if pass checkDB
-                        let returnInfo = await this.checkReturnsFromDB(data.orderNumber, data.emailAddress)
-                        if(returnInfo){
-                            this.setState({
-                                'code':returnInfo.code,
-                                'email': returnInfo.email,
-                                'orderNum': returnInfo.orderNum,
-                                'existReturn': true
-                            })
-                        }else{
-                        this.setState({
-                            //set the items var to the items in the order
-                            items:resData.orders[0].line_items.map(item=>{
-                                return {
-                                    variantID:item.variant_id,
-                                    productID: item.product_id,
-                                    name: item.name,
-                                    quantity: item.quantity,
-                                    price: item.price,
-                                }
-                            }),
-                            //set searchstatus to true to move forward
-                            step:2,
-                            orderNum: orderNum
-                        })
+                        let returnInfo = false
+                        if(checkDB){
+                          returnInfo = await this.checkReturnsFromDB(data.orderNumber, data.emailAddress)
                         }
+                            if(returnInfo){
+                                this.setState({
+                                    'code':returnInfo.code,
+                                    'email': returnInfo.email,
+                                    'orderNum': returnInfo.orderNum,
+                                    'existReturn': true
+                                })
+                            }else{
+                            this.setState({
+                                //set the items var to the items in the order
+                                items:resData.orders[0].line_items.map(item=>{
+                                    return {
+                                        variantID:item.variant_id,
+                                        productID: item.product_id,
+                                        name: item.name,
+                                        quantity: item.quantity,
+                                        price: item.price,
+                                    }
+                                }),
+                                //set searchstatus to true to move forward
+                                step:2,
+                                orderNum: orderNum
+                            })
+                            }
+                        
                     }
                     else {
                         //show they made an incorrect attempt  
