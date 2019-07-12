@@ -59,7 +59,7 @@ class Search extends Component {
                     <div className="Search-fields">
                         <fieldset className = 'page1'>
                         <div className="Search-block">
-                        <p className = 'label'>Order Number:  </p>
+                        <p className = 'label'>Order Number: </p>
                               <input type="text" className="order-number" placeholder="1234" onChange={this.handleOrderNumChange} />
                           </div>
                           <br></br>

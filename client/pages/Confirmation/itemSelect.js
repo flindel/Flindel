@@ -58,9 +58,14 @@ class ItemList extends Component {
                     await this.returnItems.splice(i,1)
                 }
             }
-            for (var i = 0;i<this.currItem.value;i++){
+            /*for (var i = 0;i<this.currItem.value;i++){ //multiple of same item
                 await this.returnItems.push(this.currItem)
+            }*/
+            if (this.currItem.value > 0){
+                await this.returnItems.push(this.currItem) 
             }
+ 
+            //change the button to allow submit or not
             if (this.returnItems.length > 0){
                 this.setState({style:'Submit2'})
             }
@@ -72,7 +77,7 @@ class ItemList extends Component {
     render() { 
         return (
             <div className="ItemList">
-                <p className = 'errorMessage2'>{this.state.errorMessage}</p>
+                <p className = 'errorMessage'>{this.state.errorMessage}</p>
                 <fieldset className = 'page2'>
                     <p className = 'orderHeader'>Order Number: {this.props.orderNum}</p>
                 {this.props.items.map((item)=>{

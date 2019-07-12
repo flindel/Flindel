@@ -1,4 +1,4 @@
-const serveoname = 'optimu.serveo.net'
+const serveoname = 'optimo.serveo.net'
 const rp = require('request-promise');
 const { api_link } = require('../default-shopify-api.json');
 const live = 0
