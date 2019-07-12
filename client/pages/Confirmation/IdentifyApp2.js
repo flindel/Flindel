@@ -224,35 +224,20 @@ class IdentifyApp extends Component {
         }
       }
 
+
     async checkReturnsFromDB(orderNum,emailAdd){
-        let phoneNum = '+1';
-        phoneNum += emailAdd;
-        for (var i = 0;i<phoneNum.length;i++){
-            //ignoring characters that people use to enter their phone number
-            if (phoneNum[i]==' ' || phoneNum[i]=='-' || phoneNum[i]=='('||phoneNum[i]==')'){
-                phoneNum = phoneNum.substring(0,i)+phoneNum.substring(i+1)
-            }
-        }
-        this.setState({email:emailAdd.toLowerCase(),
-                       orderNum: orderNum})
-        //this.setState({order})
-        const data = {orderNumber: orderNum, emailAddress:emailAdd};
-        let temp = await fetch(`https://${serveoname}/dbcall?method=${encodeURIComponent(4)}&orderNum=${encodeURIComponent(data.orderNumber)}&emailAdd=${encodeURIComponent(data.emailAddress)}`, {
+        let temp = await fetch(`https://${serveoname}/dbcall?method=${encodeURIComponent(4)}&orderNum=${encodeURIComponent(orderNum)}&emailAdd=${encodeURIComponent(emailAdd)}`, {
             method: 'get',
         })
         let json = await temp.json()
         console.log("checkDB jSON"+JSON.stringify(json))
         if(json.exist){
-            this.setState({
-                'code':json.code,
-                'email': data.emailAddress,
-                'orderNum': data.orderNumber,
-                'existReturn': true
-            })
-        }else{
-            await this.identifyItems(data.orderNumber, data.emailAddress)
-            //console.log("satet===="+JSON.stringify(this.state))
-        }
+            const returnInfo = {'code':json.code,
+                                'email': emailAdd,
+                                'orderNum': orderNum,}
+            return returnInfo
+         }
+         else{ return false }
     }
 
     async restartReturn(orderNum, emailAdd, code){
@@ -269,13 +254,12 @@ class IdentifyApp extends Component {
             this.setState({
                 existReturn:false
             })
-            
         }
-
+    
     }
     
     //process of selecting whether order is valid
-    identifyItems(orderNum, emailAdd){
+    async identifyItems(orderNum, emailAdd){
         //matching phone number to shopify style
         let phoneNum = '+1';
         phoneNum += emailAdd;
@@ -287,18 +271,17 @@ class IdentifyApp extends Component {
         }
         this.setState({email:emailAdd.toLowerCase()})
         const data = {orderNumber: orderNum, emailAddress:emailAdd};
+        let temp = await fetch(`https://${serveoname}/orders?orderNum=${encodeURIComponent(data.orderNumber)}`, {
+            method: 'GET',
 
-        //get order info
-        fetch(`https://${serveoname}/orders?orderNum=${encodeURIComponent(data.orderNumber)}`, {
-                method: 'GET',
-
-            })
-            //get data on the selected order from backenid
-            .then(response => response.json())
-            .then(resData=>{
-                    if(JSON.stringify(resData.orders)!="[]")
+        })
+        let resData = await temp.json()
+        if(JSON.stringify(resData.orders)!="[]")
                 {
                 //get date difference:
+                
+                console.log("get data from shopify----"+JSON.stringify(resData.orders))
+
                 let dateString = resData.orders[0].processed_at
                 let orderDate =  ''
                 orderDate+= dateString.substring(5,7)+'/'+dateString.substring(8,10)+'/'+dateString.substring(0,4)
@@ -308,11 +291,23 @@ class IdentifyApp extends Component {
                 const date1 = new Date(currentDate)
                 const diffTime = Math.abs(date2.getTime() - date1.getTime());
                 const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)); 
-                if (diffDays<=100){////////////////////////////////////////////////////IMPORT SOME STUFF HERE
+                if (diffDays<=100){////////////////////////////////////////////////////IMPORT SOME STUFF HERE ///////check all restrictions here!!!!
+                    console.log("Within valid return day---------")
                     //check to see whether the email or phone number entered matches the one on record
                     if ((resData.orders[0].email.toLowerCase()==emailAdd.toLowerCase()) || (resData.orders[0].phone == phoneNum))
                     {
+                        console.log("order number and phone match---------")
                         //if correct
+                        //if pass checkDB
+                        let returnInfo = await this.checkReturnsFromDB(data.orderNumber, data.emailAddress)
+                        if(returnInfo){
+                            this.setState({
+                                'code':returnInfo.code,
+                                'email': returnInfo.email,
+                                'orderNum': returnInfo.orderNum,
+                                'existReturn': true
+                            })
+                        }else{
                         this.setState({
                             //set the items var to the items in the order
                             items:resData.orders[0].line_items.map(item=>{
@@ -328,6 +323,7 @@ class IdentifyApp extends Component {
                             step:2,
                             orderNum: orderNum
                         })
+                        }
                     }
                     else {
                         //show they made an incorrect attempt  
@@ -342,12 +338,7 @@ class IdentifyApp extends Component {
                     }) 
                 }
                 }
-            }) 	
-        }
-
-        
-    //}
-
+    }
     
     /*
     Conditional render/mainline
@@ -372,7 +363,7 @@ class IdentifyApp extends Component {
             <NB
             shopName = {this.state.shopName}/>
             <p style = {myStyle}>{this.state.errorMessage}</p>
-	  			<Search identifyCustomerID={this.identifyCustomerID} identifyItems={this.checkReturnsFromDB} />
+	  			<Search identifyCustomerID={this.identifyCustomerID} identifyItems={this.identifyItems} />
 			</div>
         );
         }else if (!this.state.existReturn && this.state.step==2) {
