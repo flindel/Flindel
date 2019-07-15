@@ -8,8 +8,8 @@ import NB from './navbar.js'
 import PriceDisplay from './finalConfirmation.js'
 import Review from './reviewRestart'
 import {Card, AppProvider, Button, ProgressBar} from '@shopify/polaris';
-//const serveoname = 'optimo.serveo.net';
-const serveoname = 'facilis.serveo.net';
+const serveoname = 'optimo.serveo.net';
+//const serveoname = 'facilis.serveo.net';
 class IdentifyApp extends Component {
     //constructor and binding methods
     constructor(props){
