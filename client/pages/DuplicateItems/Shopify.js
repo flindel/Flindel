@@ -1,7 +1,7 @@
 import {serveo_name} from '../config'
 import {postProduct, delProduct} from './Firestore'
 
-export function get(product_id){
+export function get(product_id, callback = doNothing){
   fetch(`${serveo_name}/products?id=${encodeURIComponent(product_id)}`, {
     method: 'get',
     })
@@ -10,7 +10,8 @@ export function get(product_id){
       else{throw Error(response.statusText)}
     })
     .then((data) => {
-      console.log('GET: ', data)
+      console.log('GET: ', data);
+      callback(data);
     })
     .catch((error) => console.log(error))
 }
@@ -28,7 +29,7 @@ export function del(product_id, callback = doNothing){
       delProduct(""+product_id); //removes from FIRESTORE
       callback(data);
     })
-    .catch((error) => console.log(error))
+    .catch((error) => console.log(error));
 }
 
 export function put(product_id, body, callback = doNothing){
@@ -73,6 +74,87 @@ export function post(body, callback = doNothing){
     .catch((error) => console.log(error))
 }
 
+export function postCollection(body, callback = doNothing){
+  const options = {
+    method: 'post',
+    headers: {
+      'Accept': 'application/json, text/plain, */*',
+      'Content-Type': 'application/json'
+    },
+      body: JSON.stringify(body),
+  }
+  fetch(`${serveo_name}/collections/`, options)
+    .then((response) => {
+      if(response.ok){return response.json()}
+      else{throw Error(response.statusText)}
+    })
+    .then((data) => {
+      console.log('POST Collection: ', data)
+      callback(data);
+    })
+    .catch((error) => console.log(error))
+}
+
+export function getSmartCollections(callback = doNothing){
+  fetch(`${serveo_name}/collections/all/`, {
+    method: 'get',
+    })
+    .then((response) => {
+      if(response.ok){return response.json()}
+      else{throw Error(response.statusText)}
+    })
+    .then((data) => {
+      console.log('GET Collection: ', data);
+      callback(data);
+    })
+    .catch((error) => console.log(error))
+}
+
+export function postGitVariant(product_id, variants, update, callback = doNothing){
+  console.log("Product ID: ", product_id);
+  console.log("Variants: ", variants);
+  console.log("Update: ", update);
+  let body = null;
+  let orig = update.norm;
+  let git = update.git;
+  for (let i = 0; i < variants.length; i++){
+    if (variants[i].id == null){
+      body = variants[i];
+    }
+  }
+  body = {variant: body}
+  const options = {
+    method: 'post',
+    headers: {
+      'Accept': 'application/json, text/plain, */*',
+      'Content-Type': 'application/json'
+    },
+      body: JSON.stringify(body),
+  }
+  fetch(`${serveo_name}/products/variant?id=${encodeURIComponent(product_id)}`, options)
+    .then((response) => {
+      if(response.ok){return response.json()}
+      else{throw Error(response.statusText)}
+    })
+    .then((data) => {
+      console.log('POST Var: ', data);
+      console.log("Git1: ", git)
+      callback(data);
+      for (let i = 0; i < variants.length; i++){
+        if (variants[i].id == null){
+          variants[i].id = data.variant.id;
+        }
+      }
+
+      git.variants = variants;
+      console.log("Git2: ", git);
+      const out = postData({product: git}, {product: orig});
+      postProduct(out);
+    })
+    .catch((error) => console.log(error))
+}
+
+//Adds product to shopify and adds original and GIT IDs to FIRESTORE
 export function postGIT(body, orig, callback = doNothing){
   const options = {
     method: 'post',
@@ -89,18 +171,60 @@ export function postGIT(body, orig, callback = doNothing){
     })
     .then((data) => {
       console.log('POST: ', data);
-      console.log("ORIG: ", orig);
-      let out = {
-        git_id: ""+data.product.id,
-        orig_id: ""+orig.product.id,
-        title: data.product.title.substring(0, data.product.title.length-" - Get it Today".length),
-        vendor: orig.product.vendor,
-      }
-      console.log("OUT: ", out);
+      //variants
+      const out = postData(data, orig);
       postProduct(out);
       callback(data);
     })
     .catch((error) => console.log(error))
+}
+
+function postData(git, orig){
+  console.log("POST DATA: ", git, orig);
+  let out = {};
+  if (JSON.stringify(orig) !== "{}"){
+    let variants = [];
+    const maxVariants = Math.max(
+      git.product.variants.length,
+      orig.product.variants.length
+    )
+    for (let i = 0; i < maxVariants; i++){
+      let varIssue = {};
+      if (git.product.variants[i] !== undefined){
+        varIssue.git_var = git.product.variants[i].id;
+        varIssue.git_var_sku = git.product.variants[i].sku;
+      }
+      if (orig.product.variants[i] !== undefined){
+          varIssue.orig_var = orig.product.variants[i].id;
+          varIssue.title = orig.product.variants[i].title
+      }
+      variants.push(varIssue);
+
+    }
+    out = {
+      git_id: ""+git.product.id,
+      orig_id: ""+orig.product.id,
+      title: git.product.title.substring(0, git.product.title.length-" - Get it Today".length),
+      vendor: orig.product.vendor,
+      variants: variants,
+    }
+  }else{
+    let variants = [];
+    for (let i = 0; i < git.product.variants.length; i++){
+      variants.push({
+                    git_var: git.product.variants[i].id,
+                    title: git.product.variants[i].title,
+                  })
+    }
+    out = {
+      git_id: ""+git.product.id,
+      orig_id: "",
+      title: git.product.title.substring(0, git.product.title.length-" - Get it Today".length),
+      vendor: git.product.vendor,
+      variants: variants,
+    }
+  }
+  return out;
 }
 
 function doNothing(data){

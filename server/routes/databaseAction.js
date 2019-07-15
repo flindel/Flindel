@@ -13,8 +13,10 @@ router.post('/product/git/', async ctx =>{
   ctx.set('Access-Control-Allow-Methods', 'POST, GET, PUT, DELETE, OPTIONS');
 
   let body = JSON.parse(ctx.query.body);
+  console.log("POST BODY:", body);
+  console.log("gitid: ", body.git_id);
   db = ctx.db
-  setDoc = db.collection('products').doc(body.git_id).set(body);
+  setDoc = db.collection('products').doc(body.git_id+"").set(body);
   ctx.body = 'success'
 })
 

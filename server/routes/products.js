@@ -93,6 +93,67 @@ router.post('/', async ctx => {
     }
 });
 
+router.post('/variant/', async ctx => {
+    const product_id = ctx.query.id;
+    // Create a product
+    const { shop, accessToken } = getShopHeaders(ctx);
+    const headers = {};
+    if (process.env.DEBUG) {
+        headers['Authorization'] = process.env.SHOP_AUTH;
+    } else {
+        headers['X-Shopify-Access-Token'] = accessToken;
+    }
+    const option = {
+        method: 'POST',
+        url: `https://${shop}/${api_link}/products/${product_id}/variants.json`,
+        headers: headers,
+        json: true,
+        body: ctx.request.body
+    }
+    try {
+        ctx.body = await rp(option);
+    } catch (err) {
+        console.log(err.message);
+        if (err instanceof errors.StatusCodeError) {
+            ctx.status = err.statusCode;
+            ctx.message = err.message;
+        } else if (err instanceof errors.RequestError) {
+            ctx.status = 500;
+            ctx.message = err.message;
+        }
+    }
+});
+
+router.delete('/variant/', async ctx => {
+  const product_id = ctx.query.id;
+  const variant_id = ctx.quert.variant_id
+  console.log("productID:---------"+product_id)
+  const { cookies } = ctx;
+  const shop = cookies.get('shop_id');
+  const accessToken = cookies.get('accessToken');
+  const option = {
+      method: 'delete',
+      url: `https://${shop}/${api_link}/products/${product_id}/variants/${variant_id}.json`,
+      headers: {
+          'X-Shopify-Access-Token': accessToken
+      },
+      json: true,
+  }
+  try {
+      ctx.body = await rp(option);
+      //console.log("body..."+JSON.stringify(ctx.body));
+  } catch (err) {
+      console.log(err.message);
+      if (err instanceof errors.StatusCodeError) {
+          ctx.status = err.statusCode;
+          ctx.message = err.message;
+      } else if (err instanceof errors.RequestError) {
+          ctx.status = 500;
+          ctx.message = err.message;
+      }
+  }
+});
+
 router.put('/', async ctx => {
     const productid = ctx.query.id;
     console.log("productID:---------"+productid)
@@ -111,7 +172,8 @@ router.put('/', async ctx => {
         body: ctx.request.body
     }
     try {
-        ctx.body = await rp(option);
+        ctx.body = await rp(option
+        );
     } catch (err) {
         console.log(err.message);
         if (err instanceof errors.StatusCodeError) {

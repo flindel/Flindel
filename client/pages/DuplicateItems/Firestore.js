@@ -7,13 +7,18 @@ export async function postProduct(data){
   })
 }
 
-export async function getGitProduct(gitID, callback = doNothing){
+export async function getGitProduct(gitID, callback = doNothing, args = []){
   var temp;
   temp = await fetch(`${serveo_name}/dbcall/product/git/?gitID=${encodeURIComponent(gitID)}`, {
     method: 'get',
   })
-  var json  = await JSON.parse(temp);
-  callback(formatJSON(json._fieldsProto))
+  var json  = await temp.json();
+  if (args == []){
+    return callback(formatJSON(json._fieldsProto))
+  }
+  else {
+    return callback(formatJSON(json._fieldsProto), args)
+  }
 }
 
 export async function delProduct(gitID){
@@ -23,16 +28,21 @@ export async function delProduct(gitID){
   })
 }
 
-export async function getOrigProduct(orig_id, callback=doNothing){
+export async function getOrigProduct(orig_id, callback = doNothing){
  var temp;
  temp = await fetch(`${serveo_name}/dbcall/product/orig/?origID=${encodeURIComponent(orig_id)}`, {
    method: 'get',
  })
  var json  = await temp.json();
- callback(formatJSON(json._fieldsProto));
+ if (JSON.stringify(json) == "{}"){
+   callback({orig_id: orig_id})
+ }else{
+   return callback(formatJSON(json._fieldsProto));
+ }
 }
 
-function doNothing(data){console.log("doNothingFirestore")}
+
+function doNothing(data){console.log("doNothing: ", data)}
 
 //Only works for formatting Product JSONs
 function formatJSON(json){

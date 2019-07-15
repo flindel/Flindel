@@ -41,6 +41,20 @@ function DisplayIssue(props){
     && props.issue == null){
     return null;
   } else {
+    let parameter_issues_display = props.parameterIssues.map(issue =>
+      <div style={row} key={key++}>
+        <div style={cell}>{issue.parameter}</div>
+        <div style={cellG}>{issue.norm}</div>
+        <div style={cellR}>{issue.git}</div>
+      </div>
+    )
+    let variant_issues_display = props.variantIssues.map(issue =>
+      <div style={row} key={key++}>
+        <div style={cell}>{issue.title} -> {issue.parameter}</div>
+        <div style={cellG}>{issue.norm}</div>
+        <div style={cellR}>{issue.git}</div>
+      </div>
+    )
     let headers;
     if (props.issue == "Unequal parameters") {
       headers =(
@@ -66,33 +80,30 @@ function DisplayIssue(props){
                   <div style={cell}>Current Value</div>
                 </div>);
     }
-    const parameter_issues_display = props.parameterIssues.map(issue =>
-      <div style={row} key={key++}>
-        <div style={cell}>{issue.parameter}</div>
-        <div style={cellG}>{issue.norm}</div>
-        <div style={cellR}>{issue.git}</div>
-      </div>
-    )
-    const variant_issues_display = props.variantIssues.map(issue =>
-      <div style={row} key={key++}>
-        <div style={cell}>variant.{issue.parameter}</div>
-        <div style={cellG}>{issue.norm}</div>
-        <div style={cellR}>{issue.git}</div>
-      </div>
-    )
-    return (
-      <div>
-        <hr />
-        <h4>{props.name}: {props.issue}</h4>
-        <p>Update: {props.solution}</p>
-        <center>
-          {headers}
-          {parameter_issues_display}
-          {variant_issues_display}
-        </center>
-      </div>
+    if (props.issue == "\"Get it Today\" version of this product variant does not exist" ||
+        props.issue == "\"Original\" version of this \"Get it Today\" product variant does not exist") {
+      variant_issues_display = props.variantIssues.map(issue =>
+        <div style={row} key={key++}>
+          <div style={cell}>Variant Name: {issue.title}</div>
+          <div style={cell}>{}</div>
+          <div style={cell}>{}</div>
+        </div>
+      )
+    }
 
-    )
-  }
+  return (
+    <div>
+      <hr />
+      <h4>{props.name}: {props.issue}</h4>
+      <p>Update: {props.solution}</p>
+      <center>
+        {headers}
+        {parameter_issues_display}
+        {variant_issues_display}
+      </center>
+    </div>
+  )
 }
+}
+
 export default DisplayIssue;
