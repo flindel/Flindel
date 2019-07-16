@@ -1,0 +1,337 @@
+/*Navbar.......................................................*/
+/*Store name order portal*/
+h1.top{
+  font-size:250%;
+  text-align: center;
+}
+.container {
+  width: 30%;
+  margin-left: 33.5% ;
+}
+.progressbar {
+  counter-reset: step;
+}
+.progressbar li {
+  list-style-type: none;
+  width: 33.33333%;
+  float: left;
+  font-size: 12px;
+  position: relative;
+  text-align: center;
+  text-transform: uppercase;
+  color: #7d7d7d;
+}
+.progressbar li:before {
+  width: 30px;
+  height: 30px;
+  content: counter(step);
+  counter-increment: step;
+  line-height: 30px;
+  border: 2px solid #7d7d7d;
+  display: block;
+  text-align: center;
+  margin: 0 auto 10px auto;
+  border-radius: 50%;
+  background-color: white;
+}
+.progressbar li:after {
+  width: 100%;
+  height: 2px;
+  content: '';
+  position: absolute;
+  background-color: #7d7d7d;
+  top: 15px;
+  left: -50%;
+  z-index: -1;
+}
+.progressbar li:first-child:after {
+  content: none;
+}
+.progressbar li.active {
+  color: green;
+}
+.progressbar li.active:before {
+  border-color: #55b776;
+  background-color:#55b776;
+}
+.progressbar li.active + li:after {
+  background-color: #55b776;
+}
+img.headerLogo{
+  background-color:black;
+  margin-left: auto;
+  margin-right:auto;
+  display:block
+}
+p.headerLogo{
+  background-color: black;
+}
+/*End navbar ............................................................*/
+
+/*First Page (Find Order)................................................*/
+/*Submit button stuff*/
+button.Submit1{
+  background-color: rgb(107, 187, 107);
+  color: white;
+  padding: 3% 10%;
+  cursor: pointer;
+  margin: auto;
+  text-align: center;
+  border-radius: 15%;
+  display: block
+}
+button.Submit1:hover{
+  background-color: rgb(82, 145, 97);
+}
+button.Blackout1{
+  background-color: grey;
+  color:white;
+  padding: 3% 10%;
+  margin: auto;
+  text-align: center;
+  border-radius: 15%;
+  display: block;
+  pointer-events: none;
+
+}
+
+/*input fields(text boxes)*/
+input[type=text]{
+  padding: 12px 20px;
+  box-sizing: border-box;
+  margin: auto;
+  display: block;
+  border-radius: 2%
+}
+/*Order number/email label text*/
+p.label{
+  text-align:center;
+}
+/*Box around form*/
+fieldset.page1 {
+  display: block;
+  margin-left:40%;
+  margin-right:40%;
+  border: 2px groove (internal value);
+  border-color: white
+}
+/*End First Page..............................................................*/
+
+/*Second Page (Item Select)...................................................*/
+/*submit button stuff*/
+button.Submit2{
+  background-color: rgb(107, 187, 107);
+  color: white;
+  padding: 0.7% 2%;
+  cursor: pointer;
+  margin: auto;
+  text-align: center;
+  border-radius: 15%;
+  display: block
+}
+button.Submit2:hover{
+  background-color: rgb(82, 145, 97);
+}
+button.Blackout2{
+  background-color: grey;
+  color: white;
+  padding: 0.7% 2%;
+  pointer-events: none;
+  margin: auto;
+  text-align: center;
+  border-radius: 15%;
+  display: block
+}
+img.item2{
+  object-fit: contain;
+   max-width: 25%;
+   max-height: 10%;
+   width: auto;
+   height: auto;
+}
+p.errorMessage{
+  color:red;
+  text-align:center;
+}
+p.item2{
+  float: right;
+  margin-right: 7.5%;
+  max-width: 25%;
+  margin-top:5%;
+}
+label.dropdown2{
+  float:right;
+  margin-right:5%;
+  max-width:25%;
+  margin-top:5%;
+}
+
+fieldset.page2{
+  margin-left: 30%;
+  margin-right: 30%;
+  border-color: white;
+}
+/*End Second Page.........................................................*/
+/*Third Page (Reason Select)..............................................*/
+
+/*Label for email (email indent)*/
+label.l3On{
+  margin-left: 40%;
+  text-align:center;
+}
+label.l3Off{
+  margin-left:40%;
+  color: grey;
+  text-align:center;
+  font-size: 80%
+}
+label.l3Hidden{
+  margin-left:40%;
+  text-align:center;
+  visibility: hidden;
+}
+input.l3On{
+  color: black;
+  width:10%;
+}
+input.l3Off{
+  color:grey;
+  font-size: 90%;
+}
+/*Email header*/
+h3.emailHead{
+  text-align:center;
+}
+/*Title of page x2*/
+h3.pageTitle3{
+  text-align:center
+}
+p.description3{
+  display: inline
+}
+img.item3{
+  object-fit: contain;
+   max-width: 25%;
+   max-height: 10%;
+   width: auto;
+   height: auto;
+}
+fieldset.page3{
+  margin-left: 25%;
+  margin-right: 25%;
+  border-color: white;
+}
+p.item3{
+  float: right;
+  margin-right: 11.5%;
+  max-width: 15%;
+  margin-top:7%;
+}
+label.dropdown3{
+  float:right;
+  margin-right:8%;
+  max-width:25%;
+  margin-top:7%;
+}
+
+/*End third page.....................................................*/
+/*Fourth Page (Confirm)..............................................*/
+img.item4{
+  object-fit: contain;
+   max-width: 25%;
+   max-height: 10%;
+   width: auto;
+   height: auto;
+}
+h3.pageTitle4{
+  text-align: center
+}
+
+p.displayTotal{
+  color:black;
+  text-align:right;
+  margin-right: 5%;
+  font-weight: bold;
+}
+fieldset.page4 {
+  margin-left: 30%;
+  margin-right: 30%;
+  border-color: white;
+}
+
+hr.hl4{
+  margin-left: -2%;
+  margin-right:-2%;
+}
+
+p.item4{
+  float: right;
+  margin-right: 11%;
+  max-width: 25%;
+  margin-top:7%;
+}
+
+p.item4price{
+  float:right;
+  margin-right:5%;
+  max-width:25%;
+  margin-top:7%;
+}
+
+
+/*End fourth page.....................................................*/
+/*Fifth Page (Confirmation)...........................................*/
+div.centre{
+  text-align: center
+}
+
+
+/*End fifth page......................................................*/
+/*Map Page............................................................*/
+
+
+
+/*End Map Page........................................................*/
+
+
+/*UTIL*/
+p.orderHeader{
+  text-align: center;
+  font-weight: bold;
+}
+
+body{
+  font-family: sans-serif;
+}
+
+div.c{
+  margin-left: 45%;
+  object-fit: contain;
+   max-width: 30px;
+   width: auto;
+}
+
+/*Restart Popup............................................................*/
+
+.popup {
+  position: fixed;
+  width: 100%;
+  height: 100%;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  margin: auto;
+  background-color: rgba(0,0,0, 0.5);
+}
+.popup_inner {
+  position: absolute;
+  left: 25%;
+  right: 25%;
+  top: 25%;
+  bottom: 25%;
+  margin: auto;
+  background: white;
+}
+
+/*End Restart Popup........................................................*/

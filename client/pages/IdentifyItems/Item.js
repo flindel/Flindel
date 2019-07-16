@@ -12,12 +12,12 @@ class Item extends Component {
             variantid: this.props.item.variantID,
             name: this.props.item.name,
             value: "0",  //the quantity that user wants to return
-            src:"", 
+            src:"",
             quantity: this.props.item.quantity,//the quantity of a item that user total brought
             //returnReason:"---",
             //checkToReturn: false,
             //disableDrop: true
-            
+
         };
         this.handleQuantityChange=this.handleQuantityChange.bind(this);
         //this.handleReasonChange=this.handleReasonChange.bind(this);
@@ -29,13 +29,13 @@ class Item extends Component {
         //use callback to pass select item since setState is asyn
         this.setState({
             value:e.target.value
-        },()=>this.props.handleSelect(this.state.productid, this.state.variantid, this.state.name, 
+        },()=>this.props.handleSelect(this.state.productid, this.state.variantid, this.state.name,
             this.state.value, this.state.src, this.state.quantity))
-        
+
     }
 
-        
-    
+
+
 
     // handleReasonChange(e){
     //     this.setState({
@@ -57,7 +57,7 @@ class Item extends Component {
 
     componentWillMount(){
         //get img src
-        
+
         fetch(`https://depereo.serveo.net/products?id=${encodeURIComponent(this.props.item.productID)}`, {
             method: 'GET',})
         .then(response => response.json())
@@ -67,10 +67,10 @@ class Item extends Component {
             this.setState({
                     src: resData.product.image.src
             })
-            
+
             }
         });
-        
+
     }
 
 
@@ -86,16 +86,16 @@ class Item extends Component {
 
         return (
             <div>
-                
-                <img 
+
+                <img
                 style={imgStyle}
                 src={this.state.src} />
 
                 <p>{this.props.item.name}</p>
 
-                
+
                 {/* dropdown menu to choose return quantity */}
-                <label className="dropdown">choose quantity: 
+                <label className="dropdown">choose quantity:
                     <select value={this.state.value} onChange={this.handleQuantityChange}>
                       {quantityOption}
                     </select>
@@ -111,7 +111,7 @@ class Item extends Component {
                         <option value="reason4">reason4</option>
                     </select>
                 </label> */}
-                
+
                 {/* <div>item state: {JSON.stringify(this.state)}</div> */}
 
                 {/* checkbox for select item, if checked will enable user to select return reason and quantity */}

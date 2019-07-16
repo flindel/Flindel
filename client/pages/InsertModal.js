@@ -1,6 +1,6 @@
 import React, {Component} from 'react';
 import Modal from './ModalApp.js';
-import IdentifyApp from './IdentifyItems/IdentifyApp.js';
+import IdentifyApp from './Confirmation/IdentifyApp2.js';
 import Link from 'next/link';
 import { TextStyle, Button, Frame } from '@shopify/polaris';
 
@@ -90,7 +90,7 @@ class InsertModal extends React.Component {
         Do you want to proceed?
         </div>
         <div style={btnPosition}>
-        <Button primary><Link href='/apps/return-with-flindel/IdentifyItems/IdentifyApp.js'><a style={yesStyle}>Yes, please proceed</a></Link></Button>
+        <Button primary><Link href='/apps/return-with-flindel/Confirmation/IdentifyApp'><a style={yesStyle}>Yes, please proceed</a></Link></Button>
         <Button><Link href='/pages/returns-and-exchanges'><a style={noStyle}>No</a></Link></Button>
         </div>
         </div>

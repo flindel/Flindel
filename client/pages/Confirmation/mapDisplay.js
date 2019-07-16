@@ -42,7 +42,7 @@ export default PickupDisplay;
 
 
 /*// Initialize and add the map
-    initMap() 
+    initMap()
     {
 	//setting up directions
   var directionDisplay = new google.maps.DirectionsRenderer();
@@ -52,7 +52,7 @@ export default PickupDisplay;
   // The map, centered at toronto
   var map = new google.maps.Map(
       document.getElementById('map'), {zoom: 13, center: locations[0]});
-  var i;    
+  var i;
   for(i=0;i<locations.length;i++){
    	new google.maps.Marker({position:locations[i],title:String(locations[i].lat + "," + locations[i].lng),map});
   }

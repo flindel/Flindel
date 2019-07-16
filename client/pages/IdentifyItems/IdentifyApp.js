@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import Search from './Search';
 import ItemList from './ItemList';
 import { parsePhoneNumberFromString, parsePhoneNumber, ParseError } from 'libphonenumber-js'
-import './IdentifyApp.css'
+import './IdentifyApp.css';
 
 const shopName="getordertest";
 
@@ -14,10 +14,10 @@ class IdentifyApp extends Component {
             searchStatus: false
         };
         this.initStatus= true  // combine with searchStatus to control conditions for render
-        this.identifyItems=this.identifyItems.bind(this) 
+        this.identifyItems=this.identifyItems.bind(this)
         this.comparePhone=this.comparePhone.bind(this)
     }
-    
+
     //compare if input phone number matchs phone number in order info
     //set +1 as default country code
     comparePhone(orderPhone, inputPhone){
@@ -61,16 +61,16 @@ class IdentifyApp extends Component {
                         }),
                         searchStatus : true
                     })
-                 
+
                 }else{
                         this.setState({
                             searchStatus: false
-                        })              
+                        })
                 }
             })
-		
+
     }
-    
+
 
 
 	render() {
@@ -91,8 +91,8 @@ class IdentifyApp extends Component {
             );
         }else {
            return (
-               <ItemList items={this.state.items}/> 
-               ) 
+               <ItemList items={this.state.items}/>
+               )
         }
 	}
 }

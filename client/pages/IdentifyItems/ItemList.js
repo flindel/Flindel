@@ -66,8 +66,8 @@ class ItemList extends Component {
     }
 
     render() {
-        
-        
+
+
         return (
             <div className="ItemList">
                 {this.props.items.map((item)=>{
@@ -75,12 +75,12 @@ class ItemList extends Component {
                 })}
 
                 <button onClick={this.handleClick}>CONFIRM</button>
-            
+
 
             </div>
          );
-        
-    
+
+
     }
 }
 

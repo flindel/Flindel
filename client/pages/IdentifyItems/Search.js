@@ -1,36 +1,36 @@
 import React, { Component } from 'react';
 
 class Search extends Component {
-    
+
         constructor(props) {
             super(props);
             this.state = {
                 emailAdd: '',
-                orderNum: '',   
+                orderNum: '',
             };
             this.handleEmailChange = this.handleEmailChange.bind(this);
             this.handleOrderNumChange = this.handleOrderNumChange.bind(this);
             this.handleSearch = this.handleSearch.bind(this);
         }
-    
-    
+
+
         handleOrderNumChange(e){
             this.setState({
                 orderNum: e.target.value
             });
         }
-    
+
         handleEmailChange(e){
             this.setState({
                 emailAdd: e.target.value
             });
         }
-    
+
         handleSearch(e){
             this.props.identifyItems(this.state.orderNum, this.state.emailAdd);
             //event.preventDefault();
         }
-    
+
         render() {
             return (
                 <div className="Search">
@@ -49,9 +49,9 @@ class Search extends Component {
                     </div>
                   </div>
                 );
-        } 
+        }
     }
-    
+
 
 
 export default Search;
