@@ -10,8 +10,12 @@ const geocodingKey = process.env.GOOGLE_GEOCODING_KEY
 const turf = require('@turf/turf')
 const warehoue = turf.point([-79.3802531703975,43.6566807319543])
 
-//Delivery radius in km
-const deliveryDis = 10
+//define available deliver area
+const Bathurst = [-79.411215, 43.666233]
+const BloorEastJarvis = [-79.380506, 43.671632]
+const BathurstAtQueens = [-79.398840, 43.636067]
+const LowerJarvisAndQueens = [-79.368976, 43.643972]
+const DeliverPoly = turf.polygon([[Bathurst, BloorEastJarvis,  LowerJarvisAndQueens,BathurstAtQueens, Bathurst]])
 
 router.get('/', async ctx => {
     ctx.set('Access-Control-Allow-Origin', '*');
@@ -27,24 +31,25 @@ router.get('/', async ctx => {
     try {
         let resp = await rp(option)
         resp = JSON.parse(resp)
-        //console.log("resp+++++++++"+typeof(resp))
-        //console.log("res[0]----"+resp[0])
-        
         let valid = false
         //do lat and long check
-        if(resp.status=="ZERO_RESULTS"){
+        if(resp.status=="400"){
             console.log('no such postal code')
             ctx.body = {"valid":false}
         }else if(resp.status=="OK"){
+            //console.log("poly---"+DeliverPoly)
+            //console.log("poly type: "+typeof(DeliverPoly))
             let destination = turf.point([resp.results[0].geometry.location.lng, resp.results[0].geometry.location.lat])
-            let distance = turf.distance(warehoue, destination)
-            console.log("distance="+distance)
-            if(distance<=deliveryDis){
+            //let distance = turf.distance(warehoue, destination)
+            console.log("destination---"+JSON.stringify(destination))
+            //console.log(LowerJarvisAndQueens)
+            console.log("inside???"+turf.booleanPointInPolygon(destination, DeliverPoly))
+            if(turf.booleanPointInPolygon(destination, DeliverPoly)){
                 valid = true
             }
         }else{
             console.log(resp)
-            valid = "bad request"
+            valid = false
         }
         ctx.body = {"valid":valid}
         
