@@ -10,7 +10,7 @@ import Review from './reviewRestart'
 import {Card, AppProvider, Button, ProgressBar} from '@shopify/polaris';
 const serveoname = 'optimo.serveo.net';
 //const serveoname = 'facilis.serveo.net';
-class IdentifyApp extends Component {
+class IdentifyApp2 extends Component {
     //constructor and binding methods
     constructor(props){
 		super(props);
@@ -460,4 +460,4 @@ class IdentifyApp extends Component {
 	}
 }
 
-export default IdentifyApp;
+export default IdentifyApp2;
