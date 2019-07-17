@@ -107,9 +107,6 @@ router.get('/' , async ctx =>{
     }
     //read all documents to see if the return exisited based on email and orderNum
     else if (method ==4){
-        //console.log(order)
-        //console.log(customerEmail)
-        
         //check if exist by orderID and email
         db = ctx.db
         myRef = db.collection('requestedReturns')
@@ -150,8 +147,14 @@ router.get('/' , async ctx =>{
 
         myRef = db.collection('requestedReturns').doc(code)
         let query = await myRef.update({
-            order_status: 'replaced'
+            order_status: 'cancelled'
         })
+        let getDoc = await db.collection('requestedReturns').doc(code).get()
+        //console.log(getDoc.data())
+        let data = getDoc.data()
+        let setDoc = db.collection('history').doc().set(data)
+        let deleteDoc = db.collection('requestedReturns').doc(code).delete()
+
         ctx.body = {'success':true}
 
     }
