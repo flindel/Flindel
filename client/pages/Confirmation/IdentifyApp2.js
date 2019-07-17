@@ -7,7 +7,7 @@ import PickupInfo from './mapDisplay'
 import NB from './navbar.js'
 import PriceDisplay from './finalConfirmation.js'
 import Review from './reviewRestart'
-import {Card, AppProvider, Button, ProgressBar} from '@shopify/polaris';
+import '@shopify/polaris/styles.css';
 const serveoname = 'optimo.serveo.net';
 //const serveoname = 'facilis.serveo.net';
 class IdentifyApp extends Component {
@@ -185,7 +185,7 @@ class IdentifyApp extends Component {
         currentDate += (new Date().getMonth()+1)+'/'+ new Date().getDate() + '/'+  new Date().getFullYear()
         let items = JSON.stringify(this.state.returnlist)
         //1 for write, 2 for read
-        fetch(`https://${serveoname}/dbcall?location=${encodeURIComponent('returns')}&method=${encodeURIComponent(1)}&date=${encodeURIComponent(currentDate)}&code=${encodeURIComponent(this.state.code)}&orderNum=${encodeURIComponent(this.state.orderNum)}&email=${encodeURIComponent(this.state.email)}&items=${encodeURIComponent(items)}`, {
+        fetch(`https://${serveoname}/dbcall?location=${encodeURIComponent('requestedReturns')}&method=${encodeURIComponent(1)}&date=${encodeURIComponent(currentDate)}&code=${encodeURIComponent(this.state.code)}&orderNum=${encodeURIComponent(this.state.orderNum)}&email=${encodeURIComponent(this.state.email)}&items=${encodeURIComponent(items)}`, {
             method: 'get',
         })
     }
@@ -226,11 +226,11 @@ class IdentifyApp extends Component {
 
 
     async checkReturnsFromDB(orderNum,emailAdd){
+        orderNum = 1
         let temp = await fetch(`https://${serveoname}/dbcall?method=${encodeURIComponent(4)}&orderNum=${encodeURIComponent(orderNum)}&emailAdd=${encodeURIComponent(emailAdd)}`, {
             method: 'get',
         })
         let json = await temp.json()
-        console.log("checkDB jSON"+JSON.stringify(json))
         if(json.exist){
             const returnInfo = {'code':json.code,
                                 'email': emailAdd,
@@ -247,7 +247,6 @@ class IdentifyApp extends Component {
             method: 'get',
         })
         let json = await temp.json()
-        console.log('check DB: '+json)
         if(json.success){
             //restart return process
             this.setState({
@@ -280,9 +279,6 @@ class IdentifyApp extends Component {
         if(JSON.stringify(resData.orders)!="[]")
                 {
                 //get date difference:
-                
-                console.log("get data from shopify----"+JSON.stringify(resData.orders))
-
                 let dateString = resData.orders[0].processed_at
                 let orderDate =  ''
                 orderDate+= dateString.substring(5,7)+'/'+dateString.substring(8,10)+'/'+dateString.substring(0,4)
@@ -293,11 +289,9 @@ class IdentifyApp extends Component {
                 const diffTime = Math.abs(date2.getTime() - date1.getTime());
                 const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)); 
                 if (diffDays<=100){////////////////////////////////////////////////////IMPORT SOME STUFF HERE ///////check all restrictions here!!!!
-                    console.log("Within valid return day---------")
                     //check to see whether the email or phone number entered matches the one on record
                     if ((resData.orders[0].email.toLowerCase()==emailAdd.toLowerCase()) || (resData.orders[0].phone == phoneNum))
                     {
-                        console.log("order number and phone match---------")
                         //if correct
                         //if pass checkDB
                         let returnInfo = false
@@ -328,7 +322,6 @@ class IdentifyApp extends Component {
                                 orderNum: orderNum
                             })
                             }
-                        
                     }
                     else {
                         //show they made an incorrect attempt  
@@ -381,7 +374,7 @@ class IdentifyApp extends Component {
            return (
                <div>
                 <NB
-                step1={'active'}
+                step1={'live'}
                 step2={''}
                 step3={''}
                 show = {true}
@@ -399,7 +392,7 @@ class IdentifyApp extends Component {
                 <div>
                 <NB
                 step1={'active'}
-                step2={'active'}
+                step2={'live'}
                 step3={''}
                 show = {true}
                 viewPage2 = {this.viewPage2.bind(this)}
@@ -408,7 +401,6 @@ class IdentifyApp extends Component {
                 serveoname = {serveoname}
                 setReason = {this.setReason.bind(this)}
                 items={this.returnItemList}
-                shopName = {shopName}
                 email = {this.state.email} 
                 selectedEmail={this.state.selectedEmail} 
                 newEmail={this.state.newEmail} 
@@ -425,7 +417,7 @@ class IdentifyApp extends Component {
                 <NB
                 step1={'active'}
                 step2={'active'}
-                step3={'active'}
+                step3={'live'}
                 show = {true}
                 viewPage2 = {this.viewPage2.bind(this)}
                 viewPage3 = {this.viewPage3.bind(this)}
@@ -450,8 +442,7 @@ class IdentifyApp extends Component {
                 <ConfirmationPage
                 serveoname = {serveoname}
                 code = {this.state.code} 
-                email = {this.state.email} 
-                shopName = {shopName}/>
+                email = {this.state.email}/>
                 <br/><br/><br/>
                 <PickupInfo/>
                 </div>

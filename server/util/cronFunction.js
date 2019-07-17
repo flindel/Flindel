@@ -13,11 +13,11 @@ async function sendEmail(listIn) {
 }
 
 async function sendReport(){
-    var temp = await fetch(`https://${serveoname}/dbcall/report`, {
+    let temp = await fetch(`https://${serveoname}/dbcall/report`, {
             method: 'get',
         })
         t2 = await temp.json()
-        var acceptedList = []
+        let acceptedList = []
         for (var i = 0;i<t2.res.length;i++){
             let tempItem = {
                 name: t2.res[i].name.stringValue,
@@ -137,4 +137,22 @@ async function clearDB(){
         })
 }
 
-module.exports = {sendReport, clearDB, checkExpired}
+async function returningReport(){
+    let temp = await fetch(`https://${serveoname}/dbcall/returnReport`, {
+        method: 'get',
+    })
+    t2 = await temp.json()
+    let returningList = t2.res
+    for (var i = 0;i<returningList.length;i++){
+        for (var j = i+1;j<returningList.length;j++){
+            if (returningList[i].variantid == returningList[j].variantid && returningList[i].store == returningList[j].store){
+                returningList[i].quantity++
+                returningList.splice(j,1)
+                j--
+            }
+        }
+    }
+    console.log(returningList)//THIS IS ALL THE ITEMS MARKED RETURNING THAT WE HAVE
+}
+
+module.exports = {sendReport, clearDB, checkExpired, returningReport}

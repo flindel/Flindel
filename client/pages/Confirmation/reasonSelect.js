@@ -1,6 +1,6 @@
 import React from 'react';
 import Item from './Item2'
-
+import {Card, AppProvider, Button, ProgressBar, TextField} from '@shopify/polaris';
 /*
 GET REASONS FOR RETURN AND CONFIRM EMAIL ON THIS PAGE
 */
@@ -114,39 +114,46 @@ class confirmOrder extends React.Component{
     render(){
         return(
             <div>
-              <h3 className = 'pageTitle3'>
-               Return Confirmation
-              </h3>
               <p className = 'errorMessage'>{this.state.itemErrorMessage}</p>
+              <div className = 'itemListSmall'>
+                <fieldset className = 'page2'>
+                  <p className = 'orderHeader'>Order Number: {this.props.orderNum}</p>
+                      {this.props.items.map((item,index)=>{ 
+                      return <Item step = {2} item={item} serveoname={this.props.serveoname} key={index}handleSelect={this.handleSelect.bind(this)}/>    
+                      })} {/*show all items*/}
+                </fieldset>
               <br/>
-              <fieldset className = 'page3'>
-                <p className = 'orderHeader'>Order Number: {this.props.orderNum}</p>
-                    {this.props.items.map((item,index)=>{ 
-                    return <Item step = {2} item={item} serveoname={this.props.serveoname} key={index}handleSelect={this.handleSelect.bind(this)}/>    
-                    })} {/*show all items*/}
-              </fieldset>
-              <h3 className = 'emailHead'>Email Confirmation:</h3> {/* GET EMAIL INFO*/}
-              <p className = 'errorMessage'>{this.state.errorMessage}</p>
-              <form>
-                <div className="radio">
-                  <label className = {this.state.existingStyle}>
-                    Use existing email:
-                      <input className = {this.state.existingStyleText} type="email" value={this.state.emailToPrint} onClick = {this.set0} />
-                  </label>
-                  <br/>
-                  <label className = {this.state.newStyle}> 
-                    Enter new email:    
-                    <input className = {this.state.newStyleText} type="email" value={this.props.newEmail} onClick = {this.set1} onChange={this.props.updatehandleChange('newEmail')} />
-                  </label>
-                  <br/>
-                  <label className = {this.state.hiddenStyle}>
-                    Re- enter email:
-                    <input className = 'l3On' type="email" value = {this.state.emailCopy} onChange = {this.updateEmailCopy}/>
-                  </label>
+                <h3 className = 'emailHead'>Email Confirmation:</h3> {/* GET EMAIL INFO*/}
+                <p className = 'errorMessage'>{this.state.errorMessage}</p>
+                <form>
+                  <div className="c2">
+                    <p className = 'hi123'>
+                    <label className = {this.state.existingStyle}>
+                      Use existing email:
+                      <br/>
+                        <input readOnly className = {this.state.existingStyleText} type="text" value={this.state.emailToPrint} onClick = {this.set0} />
+                    </label>
+                    
+                    <br/>
+                    <label className = {this.state.newStyle}> 
+                      Enter new email:    
+                      <br/>
+                      <input className = {this.state.newStyleText} type="text" value={this.props.newEmail} onClick = {this.set1} onChange={this.props.updatehandleChange('newEmail')} />
+                    </label>
+                    <br/>
+                    <label className = {this.state.hiddenStyle}>
+                      Re-enter email:
+                      <br/>
+                      <input className = 'l3On' type="text" value = {this.state.emailCopy} onChange = {this.updateEmailCopy}/>
+                    </label>
+                    </p>
+                  </div>
+                </form>
                 </div>
-              </form>
-              <br/>
-              <button className = {this.state.style} onClick = {this.handleForward}> CONTINUE </button>  
+                  <br/>
+              <footer className = 'f1'>
+                  <button className = {this.state.style} onClick = {this.handleForward}> CONTINUE </button> 
+              </footer>
             </div>
         )
     }

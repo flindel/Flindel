@@ -1,6 +1,6 @@
 import React, {Component} from 'react';
 import Item from './Item2'
-const serveoname = 'optimu.serveo.net'
+const serveoname = 'optimo.serveo.net'
 
 /* NAVBAR to flip between map view and return portal view. Imported at the top of most pages */
 class sortingCentre extends Component{
@@ -11,7 +11,8 @@ class sortingCentre extends Component{
             step: 1,
             itemList: [],
             email: '',
-            orderNum:''
+            orderNum:'',
+            createdDate:'',
         }
         this.handleSubmit = this.handleSubmit.bind(this)
         this.handlecCode = this.handlecCode.bind(this)
@@ -58,11 +59,11 @@ class sortingCentre extends Component{
     
     //write to db
     async sendToDB(){
+        let currentDate = ''
+        currentDate += (new Date().getMonth()+1)+'/'+ new Date().getDate() + '/'+  new Date().getFullYear()
         let items = JSON.stringify(this.state.itemList)
-        await fetch(`https://${serveoname}/dbcall?location=${encodeURIComponent('pending')}&method=${encodeURIComponent(1)}&orderNum=${encodeURIComponent(this.state.orderNum)}&code=${encodeURIComponent(this.state.cCode)}&email=${encodeURIComponent(this.state.email)}&items=${encodeURIComponent(items)}`, {
-            method: 'get',
-        })
-        await fetch(`https://${serveoname}/dbcall?&method=${encodeURIComponent(7)}&code=${encodeURIComponent(this.state.cCode)}`, {
+        //write to pending + history, delete from reqReturns, all one transaction
+        await fetch(`https://${serveoname}/dbcall?location=${encodeURIComponent('pending')}&method=${encodeURIComponent(1)}&orderNum=${encodeURIComponent(this.state.orderNum)}&code=${encodeURIComponent(this.state.cCode)}&originalDate=${encodeURIComponent(this.state.createdDate)}&date=${encodeURIComponent(currentDate)}&email=${encodeURIComponent(this.state.email)}&items=${encodeURIComponent(items)}`, {
             method: 'get',
         })
     }
@@ -116,7 +117,7 @@ class sortingCentre extends Component{
             method: 'get',
         })
         let t2 = await temp.json()
-        this.setState({email:t2.res.email.stringValue,orderNum:t2.res.order.stringValue})
+        this.setState({email:t2.res.email.stringValue,orderNum:t2.res.order.stringValue, createdDate: t2.res.createdDate.stringValue})
         let tempList = []
         if(t2.valid == true){
             for (var i = 0;i<t2.res.items.arrayValue.values.length;i++){

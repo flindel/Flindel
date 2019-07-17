@@ -21,12 +21,8 @@ router.get('/' , async ctx =>{
         const loco = ctx.query.location
         const orderNum = ctx.query.orderNum
         let date = ctx.query.date
-        if (loco == 'pending'){
-            date = ''
-        }
         let itemsJSON = await JSON.parse(rawItems)
         let data = {
-            date:date,
             code: code,
             email: email,
             shop: shop,
@@ -34,21 +30,57 @@ router.get('/' , async ctx =>{
             order_status: 'submitted',
             items: []
         };
+        if (loco == 'pending'){
+            data.receivedDate = date
+            data.createdDate = ctx.query.originalDate
+        }
+        else if (loco == 'requestedReturns'){
+            data.createdDate = date
+        }
         for (var i = 0;i<itemsJSON.length;i++){
             if (loco == 'pending'){
                 var myStatus = itemsJSON[i].status
             }
-            else if (loco == 'returns'){
+            else if (loco == 'requestedReturns'){
                 var myStatus = 'submitted'
             }
             data.items.push({"name":itemsJSON[i].name, "price":itemsJSON[i].price, "reason":itemsJSON[i].reason, "variantid":itemsJSON[i].variantid.toString(),"status": myStatus})
         }
-        if(loco == 'returns'){
+        if(loco == 'requestedReturns'){
             setDoc = db.collection(loco).doc(code).set(data)
         }
         else if (loco == 'pending'){
+            console.log('something')
             data.order_status = 'pending'
             setDoc = db.collection(loco).doc().set(data)
+            //delete
+            let receiveDate = (new Date().getMonth()+1)+'/'+ (new Date().getDate()) + '/'+  new Date().getFullYear()
+            let processDate = (new Date().getMonth()+1)+'/'+ (new Date().getDate()+1) + '/'+  new Date().getFullYear()
+            doc = await db.collection('requestedReturns').doc(code).get()
+            data = {
+            code: doc._fieldsProto.code.stringValue,
+            email: doc._fieldsProto.email.stringValue,
+            shop: doc._fieldsProto.shop.stringValue,
+            items: [],
+            order_status: 'complete',
+            order: doc._fieldsProto.order.stringValue,
+            createdDate:doc._fieldsProto.createdDate.stringValue,
+            receivedDate: receiveDate,
+            processedDate : processDate,
+        }
+        for (var i = 0;i<doc._fieldsProto.items.arrayValue.values.length;i++){
+            let temp = doc._fieldsProto.items.arrayValue.values[i]
+            tempItem = {
+                price: temp.mapValue.fields.price.stringValue,
+                name: temp.mapValue.fields.name.stringValue,
+                variantid: temp.mapValue.fields.variantid.stringValue,
+                reason: temp.mapValue.fields.reason.stringValue,
+                status: temp.mapValue.fields.status.stringValue
+            }
+        }
+        data.items.push(tempItem)
+        let set = db.collection('history').doc().set(data)
+        let deleteDoc = db.collection('requestedReturns').doc(code).delete();
         }
           
           ctx.body = 'success'
@@ -56,7 +88,7 @@ router.get('/' , async ctx =>{
     //read single doc
     else if (method == 2){
         db = ctx.db
-        myRef = db.collection('returns').doc(code);
+        myRef = db.collection('requestedReturns').doc(code);
         getDoc = await myRef.get()
         ctx.body = {"res" : getDoc._fieldsProto.items}
     }
@@ -64,7 +96,7 @@ router.get('/' , async ctx =>{
     else if (method == 3){
         db = ctx.db
 
-        myRef = db.collection('returns')
+        myRef = db.collection('requestedReturns')
         let query = await myRef.where('code','==',code).get()
         if (query.empty){
             ctx.body = { "unique":true}
@@ -80,7 +112,7 @@ router.get('/' , async ctx =>{
         
         //check if exist by orderID and email
         db = ctx.db
-        myRef = db.collection('returns')
+        myRef = db.collection('requestedReturns')
         ctx.body = {
             'code':'none',
             'exsit':false
@@ -93,7 +125,7 @@ router.get('/' , async ctx =>{
     }
     else if (method == 5){
         db = ctx.db
-        myRef = db.collection('returns')
+        myRef = db.collection('requestedReturns')
         let query = await myRef.where('code','==',code).get()
         if (query.empty){
             ctx.body = { "valid":false}
@@ -108,42 +140,15 @@ router.get('/' , async ctx =>{
         db = ctx.db
         const rawItems = ctx.query.items
         let itemsJSON = await JSON.parse(rawItems)
-        myRef = db.collection('returns').doc(code)
+        myRef = db.collection('requestedReturns').doc(code)
         updateFields = myRef.update({items:itemsJSON})
-        ctx.body = {"success":true}
-    }
-    else if (method == 7){
-        db = ctx.db
-        doc = await db.collection('returns').doc(code).get()
-        data = {
-            code: doc._fieldsProto.code.stringValue,
-            email: doc._fieldsProto.email.stringValue,
-            shop: doc._fieldsProto.shop.stringValue,
-            items: [],
-            order_status: 'complete',
-            order: doc._fieldsProto.order.stringValue,
-            date:doc._fieldsProto.date.stringValue,
-        }
-        for (var i = 0;i<doc._fieldsProto.items.arrayValue.values.length;i++){
-            let temp = doc._fieldsProto.items.arrayValue.values[i]
-            tempItem = {
-                price: temp.mapValue.fields.price.stringValue,
-                name: temp.mapValue.fields.name.stringValue,
-                variantid: temp.mapValue.fields.variantid.stringValue,
-                reason: temp.mapValue.fields.reason.stringValue,
-                status: temp.mapValue.fields.status.stringValue
-            }
-        }
-        data.items.push(tempItem)
-        let set = db.collection('history').doc().set(data)
-        let deleteDoc = db.collection('returns').doc(code).delete();
         ctx.body = {"success":true}
     }
     //changing return order_status from "submitted" to "replaced" if customer restart an exsiting order
     else if (method == 8){
         db = ctx.db
 
-        myRef = db.collection('returns').doc(code)
+        myRef = db.collection('requestedReturns').doc(code)
         let query = await myRef.update({
             order_status: 'replaced'
         })
@@ -208,7 +213,7 @@ router.get('/expired', async ctx =>{
     let currentDate = ''
     currentDate += (new Date().getMonth()+1)+'/'+ new Date().getDate() + '/'+  new Date().getFullYear()
     db = ctx.db
-    myRef = db.collection('returns')
+    myRef = db.collection('requestedReturns')
     let query = await myRef.get()
     await query.forEach(async doc => {
         let orderDate = doc._fieldsProto.date.stringValue
@@ -293,6 +298,24 @@ router.get('/getToken' , async ctx =>{
     myRef = db.collection('shop_tokens').doc(storename);
     getDoc = await myRef.get()
     ctx.body = {"token" : getDoc._fieldsProto.token.stringValue}  
+})
+router.get('/returnReport' , async ctx =>{
+    let EMS = []
+    db = ctx.db
+    myRef = db.collection('items')
+    let query = await myRef.get()
+    await query.forEach(async doc => {
+        if (doc._fieldsProto.status.stringValue == 'returning'){
+            tempItem= {
+                variantid: doc._fieldsProto.variantid.stringValue,
+                name : doc._fieldsProto.name.stringValue,
+                store : doc._fieldsProto.store.stringValue,
+                quantity: 1
+            }
+        }
+        EMS.push(tempItem)
+    });
+    ctx.body = {'res': EMS}
 })
 
 
