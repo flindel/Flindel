@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
-import './universal.css';
-import RestartPop from './restartPop';
+import './universal.css'
+import RestartPop from './restartPop'
 
 class ReviewRestart extends Component {
     constructor(props){
@@ -29,20 +29,24 @@ class ReviewRestart extends Component {
     render(){
         return (
             <div className = 'pageReviewRestart'>
-                <h3 >Your return is in Process</h3>
-                <fieldset>
-                <h3>Your confirmation code is: {this.state.code}</h3>
-                <br/>
-                <p>If you want to delete your current return and start a new one, please click the delete button below</p>
-                <button onClick={this.togglePopup}>Delete</button>
-                {
+                <div className = 'centre'>
+                    <h2 className = 'r2' >You already made a return for this order! Your confirmation code is: {this.state.code}</h2>
+                    <br/><br/>
+                    <p>If you would like to delete your current return and create a new return for Order #{this.state.orderNum}, please click the delete button below:</p>
+                    <br/>
+                    <button className = 'r2'onClick={this.togglePopup}>DELETE</button>
+                    <br/><br/><br/><br/><br/><br/><br/><br/>
+                    <p>Or, to make a return for a different order, please click below to be redirected to the beginning of the return portal.</p>
+                    <br/>
+                    <button className = 'r2Home'onClick = {this.props.restart}>RESTART</button>
+                </div>
+                    {
                     this.state.showPop ?
                     <RestartPop closePopup = {this.togglePopup} handleDelete = {this.handlePopupDelete}/>: null
-                }
-                </fieldset>
+                    }
             </div>
         )
     }
 }
 
-export default ReviewRestart
+export default ReviewRestart;

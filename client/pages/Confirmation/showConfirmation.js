@@ -36,4 +36,4 @@ class finalPage extends React.Component{
     }
 }
 
-export default finalPage
+export default finalPage;

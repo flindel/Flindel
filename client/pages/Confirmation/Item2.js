@@ -1,5 +1,7 @@
 import React, { Component } from 'react';
-import './universal.css';
+import './universal.css'
+import {Card, AppProvider, Button, ProgressBar, TextField} from '@shopify/polaris';
+import Select from 'react-select';
 
 class Item extends Component {
     //constructor/binding methods
@@ -14,31 +16,47 @@ class Item extends Component {
             price: this.props.item.price,
             reason: this.props.item.reason,
             quantity: this.props.item.quantity,//the quantity of a item that user total brought
-            status: this.props.item.status
-
+            status: this.props.item.status,
+            activeReason: [],
+            reasons: [
+                { value: "Broken", label: "Item is broken." },
+                { value: "Wrong", label: "Item is wrong." },
+                { value: "Unhappy", label: "Item is unsatisfactory." }
+              ],
+            activeQuantity:[],
+            quantities:[]
         };
         this.setState = this.setState.bind(this)
         this.handleReasonChange = this.handleReasonChange.bind(this);
         this.handleQuantityChange=this.handleQuantityChange.bind(this);
         this.handleStatusChange=this.handleStatusChange.bind(this)
-
     }
 
     //handle selecting a change in quantity
-    handleQuantityChange(e){
+    handleQuantityChange(option){
         //use callback to pass select item since setState is asyn
+        this.setState(state => {
+            return {
+              activeQuantity: option
+            };
+          });
         this.setState({
-            value:e.target.value
+            value:option.value
         },()=>this.props.handleSelect(this.state.productid, this.state.variantid, this.state.name,
             this.state.value, this.state.src, this.state.quantity, this.state.price, this.state.reason))
 
     }
 
     //handle inputting the reason for return
-    handleReasonChange(e){
+    handleReasonChange(option){
         let old = this.state.reason
+        this.setState(state => {
+            return {
+              activeReason: option
+            };
+          });
          this.setState({
-                 reason:e.target.value
+                 reason:option.value
          },()=> this.props.handleSelect(this.props.item.variantid, this.state.reason, old))
      }
 
@@ -64,7 +82,12 @@ class Item extends Component {
             }
         });
         }
-
+        let quantityArr = [];
+            for(let i=0; i<=this.state.quantity; i++){
+                let temp = {value: i, label: i}
+                quantityArr.push(temp);
+            };
+        this.setState({quantities:quantityArr})
     }
 
 
@@ -83,16 +106,19 @@ class Item extends Component {
         return (
             <div>
                 <hr className = 'hl4'></hr>
-                <img
-                className = 'item2'
-                src={this.state.src} />
+                <div className = 'container1'>
+                    <img className = 'item2' src={this.state.src} />
+                </div>
                 {/* dropdown menu to choose return quantity */}
-                <span><label className="dropdown2">Quantity for Return:
-                    <select value={this.state.value} onChange={this.handleQuantityChange}>
-                      {quantityOption}
-                    </select>
-                </label></span>
-                <span><p className = 'item2'>{this.props.item.name}</p> </span>
+                <div className = 'container2'>
+                    <br/>
+                    <p className = 'item2'><strong>{this.props.item.name}</strong></p>
+                </div>
+                <div className = 'container3'>
+                <label >Quantity for Return: </label>
+                    <Select className = 'qty' placeholder = {'0'}value={this.state.activeQuantity} onChange={this.handleQuantityChange} options = {this.state.quantities}>
+                    </Select>
+                </div>
                 <br/>
             </div>
         );
@@ -101,20 +127,21 @@ class Item extends Component {
             return (
                 <div>
                     <hr className = 'hl4'></hr>
-                    <img
-                    className = 'item3'
-                    src={this.state.src} />
-                    {/* dropdown menu to choose return reason */}
-                    <span><label className="dropdown3">Reason for return:
-                        <select value={this.state.reason} onChange={this.handleReasonChange}>
-                            <option value="---">---</option>
-                            <option value="Unhappy">I'm unhappy with this product.</option>
-                            <option value="Broken">This product is damaged or broken.</option>
-                            <option value="Wrong">Product is wrong (size, color, etc).</option>
-                        </select>
-                    </label></span>
-                    <span><p className = 'item3'>{this.props.item.name}, QTY: {this.props.item.value}</p> </span>
-
+                    <div className = 'container1'>
+                        <img className = 'item2' src={this.state.src} />
+                    </div>
+                    <div className = 'container2'>
+                        <p className = 'item2'><strong>{this.props.item.name}</strong></p>
+                        <br/>
+                        <p className = 'item2'><strong>QTY: </strong> {this.props.item.value}</p>
+                    </div>
+                    <div className = 'container3'>
+                        {/* dropdown menu to choose return reason */}
+                        <label>Reason for return:
+                            <Select placeholder = {'Reason'}value={this.state.activeReason} onChange={this.handleReasonChange} options = {this.state.reasons}>
+                            </Select>
+                        </label>
+                    </div>
                 </div>
             );
         }
@@ -122,10 +149,18 @@ class Item extends Component {
             return(
                 <div>
                     <hr className = 'hl4'></hr>
-                    <img  className = 'item4'
-                    src={this.state.src} />
-                    <p className = 'item4price'>Reason: {this.props.item.reason}</p>
-                    <p className = 'item4'>{this.props.item.name}, QTY: {this.props.item.value}</p>
+                    <div className ='container1'>
+                        <img className = 'item2' src={this.state.src} />
+                    </div>
+                    <div className ='container2'>
+                        <p className = 'item2'><strong>{this.props.item.name}</strong></p>
+                        <br/>
+                        <p className = 'item2'><strong>QTY:</strong> {this.props.item.value}</p>
+                    </div>
+                    <div className ='container3'>
+                        <br/>
+                        <p className = 'item2'><strong>Reason:</strong> {this.props.item.reason}</p>
+                    </div>
                     <br/>
                 </div>
             );
@@ -147,4 +182,5 @@ class Item extends Component {
         }
     }
 }
+
 export default Item;

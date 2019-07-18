@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import Item from "./Item2";
-import './universal.css';
+import './universal.css'
 
 /*
 SELECTION PAGE
@@ -76,16 +76,20 @@ class ItemList extends Component {
     }
     render() {
         return (
-            <div className="ItemList">
+            <div>
                 <p className = 'errorMessage'>{this.state.errorMessage}</p>
-                <fieldset className = 'page2'>
-                    <p className = 'orderHeader'>Order Number: {this.props.orderNum}</p>
-                {this.props.items.map((item)=>{
-                    return <Item item={item} serveoname={this.props.serveoname} step = {1} key={item.variantID} handleSelect={this.handleSelect.bind(this)}/>
-                })}
-                </fieldset>
+                <div className = 'itemList'>
+                    <fieldset className = 'page2'>
+                        <p className = 'orderHeader'>Order Number: {this.props.orderNum}</p>
+                        {this.props.items.map((item)=>{
+                            return <Item item={item} serveoname={this.props.serveoname} step = {1} key={item.variantID} handleSelect={this.handleSelect.bind(this)}/>
+                        })}
+                    </fieldset>
+                </div>
                 <br/>
-                <button className = {this.state.style} onClick={this.handleSubmit}>CONTINUE</button>
+                <footer className = 'f1'>
+                    <button className = {this.state.style} onClick={this.handleSubmit}>CONTINUE</button>
+                </footer>
             </div>
          );
     }

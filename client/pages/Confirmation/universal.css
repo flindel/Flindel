@@ -4,9 +4,10 @@ h1.top{
   font-size:250%;
   text-align: center;
 }
-.container {
-  width: 30%;
-  margin-left: 33.5% ;
+.containerPB {
+  margin: auto;
+  max-width:400px;
+  background-color:yellowgreen;
 }
 .progressbar {
   counter-reset: step;
@@ -19,7 +20,7 @@ h1.top{
   position: relative;
   text-align: center;
   text-transform: uppercase;
-  color: #7d7d7d;
+  color: black;
 }
 .progressbar li:before {
   width: 30px;
@@ -48,20 +49,30 @@ h1.top{
   content: none;
 }
 .progressbar li.active {
-  color: green;
+  color: black;
 }
+
+/*CIRCLE*/
 .progressbar li.active:before {
-  border-color: #55b776;
-  background-color:#55b776;
+  border-color: #BBE5B3;
+  background-color: #BBE5B3;
 }
+.progressbar li.live:before{
+  border-color:#50BB3C;
+  background-color:#50BB3C;
+}
+
+/*LINE*/
 .progressbar li.active + li:after {
-  background-color: #55b776;
+  background-color:  #50BB3C;
 }
 img.headerLogo{
   background-color:black;
-  margin-left: auto;
-  margin-right:auto;
-  display:block
+  display:block;
+  max-height:5%;
+  max-width:5%;
+  width:auto;
+  height:auto;
 }
 p.headerLogo{
   background-color: black;
@@ -71,17 +82,23 @@ p.headerLogo{
 /*First Page (Find Order)................................................*/
 /*Submit button stuff*/
 button.Submit1{
-  background-color: rgb(107, 187, 107);
+  background-color: #50B83C;
   color: white;
   padding: 3% 10%;
   cursor: pointer;
   margin: auto;
   text-align: center;
   border-radius: 15%;
-  display: block
+  display: block;
+  border: none;
 }
 button.Submit1:hover{
-  background-color: rgb(82, 145, 97);
+  background-color: #108043;
+}
+button.Submit1:active {
+  background-color:#108043;
+  box-shadow: 0 0.125em #666666;
+  transform: translateY(-0.25em);
 }
 button.Blackout1{
   background-color: grey;
@@ -92,11 +109,12 @@ button.Blackout1{
   border-radius: 15%;
   display: block;
   pointer-events: none;
+  border: none;
 
 }
 
 /*input fields(text boxes)*/
-input[type=text]{
+input.p1[type=text]{
   padding: 12px 20px;
   box-sizing: border-box;
   margin: auto;
@@ -109,28 +127,34 @@ p.label{
 }
 /*Box around form*/
 fieldset.page1 {
-  display: block;
-  margin-left:40%;
-  margin-right:40%;
+  margin: auto;
+  max-width:300px;
   border: 2px groove (internal value);
-  border-color: white
+  border-color: white;
+  border-radius: 10%
 }
 /*End First Page..............................................................*/
 
 /*Second Page (Item Select)...................................................*/
 /*submit button stuff*/
 button.Submit2{
-  background-color: rgb(107, 187, 107);
+  background-color: #50B83C;
   color: white;
   padding: 0.7% 2%;
   cursor: pointer;
   margin: auto;
   text-align: center;
   border-radius: 15%;
-  display: block
+  display: block;
+  border: none;
 }
 button.Submit2:hover{
-  background-color: rgb(82, 145, 97);
+  background-color:  #108043;
+}
+button.Submit2:active {
+  background-color:#108043;
+  box-shadow: 0 0.125em #666666;
+  transform: translateY(-0.25em);
 }
 button.Blackout2{
   background-color: grey;
@@ -140,159 +164,118 @@ button.Blackout2{
   margin: auto;
   text-align: center;
   border-radius: 15%;
-  display: block
-}
-img.item2{
-  object-fit: contain;
-   max-width: 25%;
-   max-height: 10%;
-   width: auto;
-   height: auto;
+  display: block;
+  border:none;
 }
 p.errorMessage{
   color:red;
   text-align:center;
 }
-p.item2{
+Select.qty{
+  max-width: 10%
+}
+div.container1{
+  width:20%;
+  float:left;
+  height:100px;
+  text-align:center;
+  padding-top: 20px;
+}
+div.container2{
+  width: 40%;
+  height: 100px;
+  float:left;
+  text-align:center;
+  padding-top: 20px;
+}
+div.container3{
+  width:40%;
   float: right;
-  margin-right: 7.5%;
-  max-width: 25%;
-  margin-top:5%;
+  height: 100px;
+  padding-top: 20px;
+  text-align:center;
 }
-label.dropdown2{
-  float:right;
-  margin-right:5%;
-  max-width:25%;
-  margin-top:5%;
+img.item2{
+  object-fit: contain;
+   max-width: 100%;
+   max-height: 100%;
+   width: auto;
+   height: auto;
+   padding-bottom: 20px;
 }
-
 fieldset.page2{
-  margin-left: 30%;
-  margin-right: 30%;
+  margin: auto;
+  max-width:750px;
+}
+/*fieldset.page2{
+  margin-left: 25%;
+  margin-right: 25%;
   border-color: white;
+}*/
+p.item2{
+  vertical-align: middle;
+  line-height: normal
+
 }
 /*End Second Page.........................................................*/
 /*Third Page (Reason Select)..............................................*/
 
 /*Label for email (email indent)*/
 label.l3On{
-  margin-left: 40%;
+  margin:auto;
   text-align:center;
 }
 label.l3Off{
-  margin-left:40%;
   color: grey;
   text-align:center;
-  font-size: 80%
+  font-size: 80%;
+  margin:auto;
 }
 label.l3Hidden{
-  margin-left:40%;
   text-align:center;
   visibility: hidden;
+  margin:auto;
 }
 input.l3On{
   color: black;
-  width:10%;
+  width:auto;
+  max-width: 600px;
+  text-align:center;
+  margin:auto;
 }
 input.l3Off{
   color:grey;
-  font-size: 90%;
+  font-size: 100%;
+  width:auto;
+  max-width: 500px;
+  text-align:center;
+  margin:auto;
+  padding:none;
+}
+p.hi123{
+  margin:auto;
+  text-align:center;
 }
 /*Email header*/
 h3.emailHead{
   text-align:center;
+  font-size: 150%;
 }
-/*Title of page x2*/
-h3.pageTitle3{
-  text-align:center
-}
-p.description3{
-  display: inline
-}
-img.item3{
-  object-fit: contain;
-   max-width: 25%;
-   max-height: 10%;
-   width: auto;
-   height: auto;
-}
-fieldset.page3{
-  margin-left: 25%;
-  margin-right: 25%;
-  border-color: white;
-}
-p.item3{
-  float: right;
-  margin-right: 11.5%;
-  max-width: 15%;
-  margin-top:7%;
-}
-label.dropdown3{
-  float:right;
-  margin-right:8%;
-  max-width:25%;
-  margin-top:7%;
-}
-
 /*End third page.....................................................*/
 /*Fourth Page (Confirm)..............................................*/
-img.item4{
-  object-fit: contain;
-   max-width: 25%;
-   max-height: 10%;
-   width: auto;
-   height: auto;
-}
 h3.pageTitle4{
   text-align: center
 }
-
-p.displayTotal{
-  color:black;
-  text-align:right;
-  margin-right: 5%;
-  font-weight: bold;
-}
-fieldset.page4 {
-  margin-left: 30%;
-  margin-right: 30%;
-  border-color: white;
-}
-
 hr.hl4{
   margin-left: -2%;
   margin-right:-2%;
 }
-
-p.item4{
-  float: right;
-  margin-right: 11%;
-  max-width: 25%;
-  margin-top:7%;
-}
-
-p.item4price{
-  float:right;
-  margin-right:5%;
-  max-width:25%;
-  margin-top:7%;
-}
-
-
 /*End fourth page.....................................................*/
 /*Fifth Page (Confirmation)...........................................*/
 div.centre{
   text-align: center
 }
-
-
 /*End fifth page......................................................*/
-/*Map Page............................................................*/
-
-
-
-/*End Map Page........................................................*/
-
 
 /*UTIL*/
 p.orderHeader{
@@ -303,14 +286,6 @@ p.orderHeader{
 body{
   font-family: sans-serif;
 }
-
-div.c{
-  margin-left: 45%;
-  object-fit: contain;
-   max-width: 30px;
-   width: auto;
-}
-
 /*Restart Popup............................................................*/
 
 .popup {
@@ -326,12 +301,113 @@ div.c{
 }
 .popup_inner {
   position: absolute;
-  left: 25%;
-  right: 25%;
-  top: 25%;
-  bottom: 25%;
+  left: 0%;
+  right: 0%;
+  top: 30vh;
+  bottom: 40vh;
   margin: auto;
   background: white;
 }
+h2.r2{
+  font-size:150%;
+  font-weight:thick;
+}
+button.r2{
+  background-color: #50B83C;
+  color: white;
+  padding: 0.5% 1.6%;
+  cursor: pointer;
+  text-align: center;
+  border-radius: 15%;
+  border: none;
+}
+button.r2:hover{
+  background-color:  #108043;
+}
+button.r2:active {
+  background-color:#108043;
+  box-shadow: 0 0.125em #666666;
+  transform: translateY(-0.25em);
+}
+
+button.r2Home{
+  background-color: #5C6AC4;
+  color: white;
+  padding: 0.5% 1.6%;
+  cursor: pointer;
+  text-align: center;
+  border-radius: 15%;
+  border: none;
+}
+button.r2Home:hover{
+  background-color:  #202E78;
+}
+button.r2Home:active {
+  background-color:#202E78;
+  box-shadow: 0 0.125em #666666;
+  transform: translateY(-0.25em);
+}
+
+button.r2cancel{
+  background-color:#DE3618;
+  margin-left: 1%;
+  margin-top:3%;
+  float:left;
+  color: white;
+  padding: 1.5vh 4vw;
+  max-width: 40vw;
+  cursor: pointer;
+  text-align: center;
+  border-radius: 15%;
+  display: block;
+  border: none;
+}
+button.r2cancel:hover{
+  background-color:  #BF0711;
+}
+button.r2cancel:active {
+  background-color:#BF0711;
+  box-shadow: 0 0.125em #666666;
+  transform: translateY(-0.25em);
+}
+
+button.r2delete{
+  background-color: #50B83C;
+  margin-top: 3%;
+  margin-right:1%;
+  float:right;
+  color: white;
+  padding: 1.5vh 4vw;
+  max-width: 40vw;
+  cursor: pointer;
+  text-align: center;
+  border-radius: 15%;
+  display: block;
+  border: none;
+}
+button.r2delete:hover{
+  background-color:  #108043;
+}
+button.r2delete:active {
+  background-color:#108043;
+  box-shadow: 0 0.125em #666666;
+  transform: translateY(-0.25em);
+}
 
 /*End Restart Popup........................................................*/
+
+footer.f1{
+  position: fixed;
+  left:0;
+  right:0;
+  bottom: 3vh;
+}
+
+div.itemList{
+  max-height:60vh;
+  overflow-y:auto;
+}
+div.itemListSmall{
+  max-height:60vh;
+  overflow-y:auto;
+}

@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import './universal.css';
+import './universal.css'
 
 
 /* SEARCH PAGE
@@ -60,17 +60,17 @@ class Search extends Component {
                         <fieldset className = 'page1'>
                         <div className="Search-block">
                         <p className = 'label'>Order Number: </p>
-                              <input type="text" className="order-number" placeholder="1234" onChange={this.handleOrderNumChange} />
+                              <input type="text" className="p1" placeholder="1234" onChange={this.handleOrderNumChange} />
                           </div>
                           <br></br>
                           <div className="Search-block">
                               <p className = 'label'>Email Address or Phone Number:  </p>
-                              <input type="text" className="email-add" placeholder="your.email@example.com" onChange={this.handleEmailChange} />
+                              <input type="text" className="p1" placeholder="youremail@example.com" onChange={this.handleEmailChange} />
                           </div>
 
-                          <br/><br/>
+                          <br/>
                           <div className="Search-submit">
-                          <button className = {this.state.style} type="submit" onClick={this.handleSearch}>CONTINUE</button>
+                          <button className = {this.state.style} type="submit" onClick={this.handleSearch}>BEGIN</button>
                     </div>
                     </fieldset>
                     </div>
