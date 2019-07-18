@@ -3,7 +3,6 @@ import Search from './findOrder';
 import ItemList from './itemSelect';
 import ConfirmationPage from './showConfirmation'
 import CheckPage from './reasonSelect'
-import PickupInfo from './mapDisplay'
 import NB from './navbar.js'
 import PriceDisplay from './finalConfirmation.js'
 import Review from './reviewRestart'
@@ -450,8 +449,6 @@ class IdentifyApp extends Component {
                 serveoname = {serveoname}
                 code = {this.state.code} 
                 email = {this.state.email}/>
-                <br/><br/><br/>
-                <PickupInfo/>
                 </div>
             )
         }

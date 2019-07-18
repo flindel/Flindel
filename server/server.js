@@ -20,8 +20,8 @@ const errors = require('request-promise/errors');
 new CronJob('*/10 * * * * *', async function() {
   //cronUtil.returningReport();
   //cronUtil.checkExpired();
-  //cronUtil.sendReport();
-  //await cronUtil.clearDB();
+  //cronUtil.mainReport();
+  //await cronUtil.clearPending();
 }, null, true)
 
 const port = parseInt(process.env.PORT, 10) || 3000;

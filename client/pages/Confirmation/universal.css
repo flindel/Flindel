@@ -206,6 +206,8 @@ img.item2{
 fieldset.page2{
   margin: auto;
   max-width:750px;
+  min-width:400px;
+  overflow-x:auto;
 }
 /*fieldset.page2{
   margin-left: 25%;
@@ -252,14 +254,14 @@ input.l3Off{
   margin:auto;
   padding:none;
 }
-p.hi123{
-  margin:auto;
-  text-align:center;
-}
 /*Email header*/
 h3.emailHead{
   text-align:center;
   font-size: 150%;
+}
+p.emailText{
+  margin:auto;
+  text-align:center;
 }
 /*End third page.....................................................*/
 /*Fourth Page (Confirm)..............................................*/
@@ -274,6 +276,38 @@ hr.hl4{
 /*Fifth Page (Confirmation)...........................................*/
 div.centre{
   text-align: center
+}
+div.confirmation1{
+  width:33%;
+  float:left;
+  text-align:center;
+  padding-top: 20px;
+}
+div.confirmation2{
+  width: 34%;
+  float:left;
+  text-align:center;
+  padding-top: 20px;
+}
+div.confirmation3{
+  width:33%;
+  float: right;
+  padding-top: 20px;
+  text-align:center;
+}
+h2.confirmation{
+  text-align:center;
+  font-size: 150%;
+  font-weight: bold
+}
+div.instructions{
+  text-align:left;
+  margin-left: 10px
+}
+img.confirmationMap{
+  max-width: 100%;
+  width: auto;
+  height: auto;
 }
 /*End fifth page......................................................*/
 
