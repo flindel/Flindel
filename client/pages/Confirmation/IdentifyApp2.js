@@ -16,11 +16,6 @@ class IdentifyApp extends Component {
 		super(props);
 		this.state = {
             items:[],
-            existReturn:false, //check db to see if a return is existed or not
-            searchStatus: false, //whether the login was successful (matching order and password)
-            checkStatus:false, //proceed from item select page and show checkover page
-            priceStatus: false, //proceed from checkover page and show pricing page
-            submitStatus: false, //proceed from pricing page and show final page
             step: 1,
             code: '',
             email: '', 
@@ -226,7 +221,7 @@ class IdentifyApp extends Component {
 
 
     async checkReturnsFromDB(orderNum,emailAdd){
-        orderNum = 1
+        orderNum =1
         let temp = await fetch(`https://${serveoname}/dbcall?method=${encodeURIComponent(4)}&orderNum=${encodeURIComponent(orderNum)}&emailAdd=${encodeURIComponent(emailAdd)}`, {
             method: 'get',
         })
@@ -343,34 +338,42 @@ class IdentifyApp extends Component {
     All steps call a subpage based on the state variables on which page to show
     */
 	render() {
-        if(this.state.step == 1){
+        if(this.state.step == 1)
+        {
             if(this.state.existReturn){
                 return (
                     <div>
                        <NB
-                    
-                    //    viewMaps ={this.viewMaps.bind(this)}
-                    //    unviewMaps = {this.unviewMaps.bind(this)} 
-                     
                        shopName = {this.state.shopName}/>
-                       <Review code={this.state.code} email = {this.state.email} orderNum = {this.state.orderNum} restartReturn = {this.restartReturn}/>
-                       <p>{JSON.stringify(this.state)}</p>
+                       <Review 
+                        restart = {this.restart.bind(this)} 
+                        code={this.state.code}
+                        email = {this.state.email} 
+                        orderNum = {this.state.orderNum} 
+                        restartReturn = {this.restartReturn}/>
                    </div>
                 )
-               }
-		return (
-			<div>
-            <NB
-            step1={'active'}
-            step2={''}
-            step3={''}
-            show = {false}
-            shopName = {this.state.shopName}/>
-            <p className = 'errorMessage'>{this.state.errorMessage}</p>
-	  			<Search identifyCustomerID={this.identifyCustomerID} identifyItems={this.identifyItems} />
-			</div>
-        );
-        }else if (!this.state.existReturn && this.state.step==2) {
+            }
+            else
+            {
+		    return (
+			    <div>
+                    <NB
+                    step1={'active'}
+                    step2={''}
+                    step3={''}
+                    show = {false}
+                    shopName = {this.state.shopName}/>
+                    <p className = 'errorMessage'>{this.state.errorMessage}</p>
+                      <Search 
+                      identifyCustomerID={this.identifyCustomerID} 
+                      identifyItems={this.identifyItems} />
+			    </div>
+                );
+            }
+        }
+        else if (!this.state.existReturn && this.state.step==2) 
+        {
            return (
                <div>
                 <NB
@@ -387,7 +390,9 @@ class IdentifyApp extends Component {
                items={this.state.items}/> 
                </div>
                ) 
-        } else if (this.state.step==3){
+        } 
+        else if (this.state.step==3)
+        {
             return(
                 <div>
                 <NB
@@ -411,7 +416,8 @@ class IdentifyApp extends Component {
                 </div>
             )
         }
-        else if (this.state.step==4){
+        else if (this.state.step==4)
+        {
             return(
                 <div>
                 <NB
@@ -430,7 +436,8 @@ class IdentifyApp extends Component {
                 </div>
             )
         }
-        else if (this.state.step==5){
+        else if (this.state.step==5)
+        {
             return(
                 <div>
                 <NB

@@ -4,7 +4,7 @@ h1.top{
   font-size:250%;
   text-align: center;
 }
-.container {
+.containerPB {
   margin: auto;
   max-width:400px;
   background-color:yellowgreen;
@@ -275,8 +275,6 @@ hr.hl4{
 div.centre{
   text-align: center
 }
-
-
 /*End fifth page......................................................*/
 
 /*UTIL*/
@@ -288,8 +286,6 @@ p.orderHeader{
 body{
   font-family: sans-serif;
 }
-
-
 /*Restart Popup............................................................*/
 
 .popup {
@@ -305,12 +301,97 @@ body{
 }
 .popup_inner {
   position: absolute;
-  left: 25%;
-  right: 25%;
-  top: 25%;
-  bottom: 25%;
+  left: 0%;
+  right: 0%;
+  top: 30vh;
+  bottom: 40vh;
   margin: auto;
   background: white;
+}
+h2.r2{
+  font-size:150%;
+  font-weight:thick;
+}
+button.r2{
+  background-color: #50B83C;
+  color: white;
+  padding: 0.5% 1.6%;
+  cursor: pointer;
+  text-align: center;
+  border-radius: 15%;
+  border: none;
+}
+button.r2:hover{
+  background-color:  #108043;
+}
+button.r2:active {
+  background-color:#108043;
+  box-shadow: 0 0.125em #666666;
+  transform: translateY(-0.25em);
+}
+
+button.r2Home{
+  background-color: #5C6AC4;
+  color: white;
+  padding: 0.5% 1.6%;
+  cursor: pointer;
+  text-align: center;
+  border-radius: 15%;
+  border: none;
+}
+button.r2Home:hover{
+  background-color:  #202E78;
+}
+button.r2Home:active {
+  background-color:#202E78;
+  box-shadow: 0 0.125em #666666;
+  transform: translateY(-0.25em);
+}
+
+button.r2cancel{
+  background-color:#DE3618;
+  margin-left: 1%;
+  margin-top:3%;
+  float:left;
+  color: white;
+  padding: 1.5vh 4vw;
+  max-width: 40vw;
+  cursor: pointer;
+  text-align: center;
+  border-radius: 15%;
+  display: block;
+  border: none;
+}
+button.r2cancel:hover{
+  background-color:  #BF0711;
+}
+button.r2cancel:active {
+  background-color:#BF0711;
+  box-shadow: 0 0.125em #666666;
+  transform: translateY(-0.25em);
+}
+
+button.r2delete{
+  background-color: #50B83C;
+  margin-top: 3%;
+  margin-right:1%;
+  float:right;
+  color: white;
+  padding: 1.5vh 4vw;
+  max-width: 40vw;
+  cursor: pointer;
+  text-align: center;
+  border-radius: 15%;
+  display: block;
+  border: none;
+}
+button.r2delete:hover{
+  background-color:  #108043;
+}
+button.r2delete:active {
+  background-color:#108043;
+  box-shadow: 0 0.125em #666666;
+  transform: translateY(-0.25em);
 }
 
 /*End Restart Popup........................................................*/

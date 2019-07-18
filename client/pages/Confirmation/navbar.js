@@ -17,7 +17,7 @@ class universalNavBar extends Component{
                     <br/>
                     <h1 className='top'>Return Form</h1>
                     <br/>
-                    <div className = 'container'>  
+                    <div className = 'containerPB'>  
                     <ul className="progressbar">
                         <li className = {this.props.step1} onClick = {this.props.viewPage2}>Select</li>
                         <li className = {this.props.step2} onClick = {this.props.viewPage3}>Review</li>

@@ -14,10 +14,13 @@ class restartPop extends Component {
         return (
         <div className = 'popup'>
             <div className = 'popup_inner'>
-                <h1>DELETE WARNING</h1>
-                <p>If you click delete button, your current return form will be deactivated and deleted, then you can submit a new return form, do you really want to delete the current one?</p>
-                <button className='cancel-delete' onClick={this.props.closePopup}>No, keep my current return form</button>
-                <button className='delete' onClick = {this.props.handleDelete}>DELETE and START a new return</button>
+                <div className = 'centre'>
+                    <h2 className = 'r2'>Confirmation</h2>
+                    <br/>
+                    <p>If you proceed, your current return form will be deleted, and you will be able to submit a new return form. Are you sure you wish to proceed?</p>
+                    <button className='r2cancel' onClick={this.props.closePopup}>No, keep my old return.</button>
+                    <button className='r2delete' onClick={this.props.handleDelete}> Yes, begin my new return.</button>
+                </div>
             </div>
         </div>
         )
