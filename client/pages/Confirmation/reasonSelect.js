@@ -1,5 +1,5 @@
 import React from 'react';
-import Item from './Item2'
+import Item from './Item2';
 
 /*
 GET REASONS FOR RETURN AND CONFIRM EMAIL ON THIS PAGE

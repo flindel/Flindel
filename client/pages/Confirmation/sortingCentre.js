@@ -1,6 +1,6 @@
 import React, {Component} from 'react';
-import Item from './Item2'
-const serveoname = 'optimu.serveo.net'
+import Item from './Item2';
+const serveoname = 'primo.serveo.net';
 
 /* NAVBAR to flip between map view and return portal view. Imported at the top of most pages */
 class sortingCentre extends Component{

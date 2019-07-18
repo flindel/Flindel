@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
-import './universal.css'
-import RestartPop from './restartPop'
+import './universal.css';
+import RestartPop from './restartPop';
 
 class ReviewRestart extends Component {
     constructor(props){

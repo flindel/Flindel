@@ -1,10 +1,10 @@
 import React, {Component} from 'react';
 import Modal from './ModalApp.js';
-import IdentifyApp from './Confirmation/IdentifyApp2.js';
+import IdentifyApp2 from './Confirmation/IdentifyApp2.js';
 import Link from 'next/link';
 import { TextStyle, Button, Frame } from '@shopify/polaris';
-import SC from "./Confirmation/sortingCentre"
-import DeliveryWarning from "./DeliveryWarning"
+import SC from "./Confirmation/sortingCentre";
+import DeliveryWarning from "./DeliveryWarning";
 
   const yesStyle = {
     color: 'white',
@@ -74,7 +74,7 @@ class InsertModal extends React.Component {
     this.setState({
       ...this.state,
       show: !this.state.show,
-      data:<IdentifyApp />
+      data:<IdentifyApp2 />
     });
   }
 
@@ -92,7 +92,7 @@ class InsertModal extends React.Component {
         Do you want to proceed?
         </div>
         <div style={btnPosition}>
-        <Button primary><Link href='/apps/return-with-flindel/Confirmation/IdentifyApp2.js'><a style={yesStyle}>Yes, please proceed</a></Link></Button>
+        <Button primary><Link href='/apps/return-with-flindel/Confirmation/IdentifyApp2'><a style={yesStyle}>Yes, please proceed</a></Link></Button>
         <Button><Link href='/pages/returns-and-exchanges'><a style={noStyle}>No</a></Link></Button>
         </div>
         </div>

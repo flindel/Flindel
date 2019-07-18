@@ -1,4 +1,4 @@
-import React from 'react'
+import React from 'react';
 
 /* This page shows the message for return instructions and map */
 class PickupDisplay extends React.Component{

@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import './universal.css'
+import './universal.css';
 
 class restartPop extends Component {
     constructor(props){

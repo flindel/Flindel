@@ -1,14 +1,14 @@
 import React, { Component } from 'react';
 import Search from './findOrder';
 import ItemList from './itemSelect';
-import ConfirmationPage from './showConfirmation'
-import CheckPage from './reasonSelect'
-import PickupInfo from './mapDisplay'
-import NB from './navbar.js'
-import PriceDisplay from './finalConfirmation.js'
-import Review from './reviewRestart'
+import ConfirmationPage from './showConfirmation';
+import CheckPage from './reasonSelect';
+import PickupInfo from './mapDisplay';
+import NB from './navbar.js';
+import PriceDisplay from './finalConfirmation.js';
+import Review from './reviewRestart';
 import {Card, AppProvider, Button, ProgressBar} from '@shopify/polaris';
-const serveoname = 'optimo.serveo.net';
+const serveoname = 'primo.serveo.net';
 //const serveoname = 'facilis.serveo.net';
 class IdentifyApp2 extends Component {
     //constructor and binding methods
@@ -408,7 +408,7 @@ class IdentifyApp2 extends Component {
                 serveoname = {serveoname}
                 setReason = {this.setReason.bind(this)}
                 items={this.returnItemList}
-                shopName = {shopName}
+                shopName = {this.state.shopName}
                 email = {this.state.email}
                 selectedEmail={this.state.selectedEmail}
                 newEmail={this.state.newEmail}
@@ -451,7 +451,7 @@ class IdentifyApp2 extends Component {
                 serveoname = {serveoname}
                 code = {this.state.code}
                 email = {this.state.email}
-                shopName = {shopName}/>
+                shopName = {this.state.shopName}/>
                 <br/><br/><br/>
                 <PickupInfo/>
                 </div>

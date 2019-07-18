@@ -9,6 +9,7 @@
     "build": "next build ./client",
     "start": "next start ./client"
   },
+  "proxy": "https://primo.serveo.net/",
   "keywords": [],
   "author": "",
   "license": "ISC",

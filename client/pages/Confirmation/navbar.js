@@ -1,6 +1,6 @@
 import React, {Component} from 'react';
 import {Card, AppProvider, Button, ProgressBar} from '@shopify/polaris';
-import './universal.css'
+import './universal.css';
 //import { app } from '@shopify/app-bridge/actions/Print';
 /* NAVBAR to flip between map view and return portal view. Imported at the top of most pages */
 class universalNavBar extends Component{

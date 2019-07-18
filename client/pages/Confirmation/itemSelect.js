@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import Item from "./Item2";
-import './universal.css'
+import './universal.css';
 
 /*
 SELECTION PAGE

@@ -20,7 +20,7 @@ function HACK_removeMinimizeOptionFromCssLoaders(config) {
 }
 
 module.exports = withCSS({
-  assetPrefix: isProd ? '' : 'http://localhost:3000/',
+  assetPrefix: isProd ? '' : 'https://primo.serveo.net',
   webpack(config) {
     HACK_removeMinimizeOptionFromCssLoaders(config);
     const env = { API_KEY: apiKey };
