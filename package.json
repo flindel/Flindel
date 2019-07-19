@@ -21,6 +21,7 @@
     "cron": "^1.7.1",
     "dotenv": "^7.0.0",
     "firebase-admin": "^7.3.0",
+    "google-maps-react": "^2.0.2",
     "isomorphic-fetch": "^2.2.1",
     "koa": "^2.7.0",
     "koa-bodyparser": "^4.2.1",

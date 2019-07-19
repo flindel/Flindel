@@ -309,6 +309,10 @@ img.confirmationMap{
   width: auto;
   height: auto;
 }
+.mapContainer{
+  width: 100px;
+  height: 100px;
+}
 /*End fifth page......................................................*/
 
 /*UTIL*/
