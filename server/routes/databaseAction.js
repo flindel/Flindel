@@ -50,7 +50,6 @@ router.get('/' , async ctx =>{
             setDoc = db.collection(loco).doc(code).set(data)
         }
         else if (loco == 'pending'){
-            console.log('something')
             data.order_status = 'pending'
             setDoc = db.collection(loco).doc().set(data)
             //delete
@@ -176,50 +175,15 @@ router.get('/report' , async ctx =>{
     ctx.body = {'res': EMS}
 })
 
-router.get('/copy' , async ctx =>{
-    db = ctx.db
-    pending = db.collection('pending')
-    let query = await pending.get()
-    query.forEach(async doc =>{
-        data = {
-            code: doc._fieldsProto.code.stringValue,
-            email: doc._fieldsProto.email.stringValue,
-            shop: doc._fieldsProto.shop.stringValue,
-            items: [],
-            order_status: 'complete',
-            order: order,
-            date:date
-        }
-        for (var i = 0;i<doc._fieldsProto.items.arrayValue.values.length;i++){
-            let temp = doc._fieldsProto.items.arrayValue.values[i]
-            tempItem = {
-                price: temp.mapValue.fields.price.stringValue,
-                name: temp.mapValue.fields.name.stringValue,
-                variantid: temp.mapValue.fields.variantid.stringValue,
-                reason: temp.mapValue.fields.reason.stringValue,
-                status: temp.mapValue.fields.status.stringValue
-            }
-        }
-        data.items.push(tempItem)
-        let set = db.collection('history').doc().set(data)
-    })
-
-    let myRef2 = db.collection('pending').listDocuments().then(val => {
-        val.map((val) => {
-            val.delete()
-        })
-    })
-      
-})
-
 router.get('/expired', async ctx =>{
     let currentDate = ''
     currentDate += (new Date().getMonth()+1)+'/'+ new Date().getDate() + '/'+  new Date().getFullYear()
     db = ctx.db
+    let batch = db.batch()
     myRef = db.collection('requestedReturns')
     let query = await myRef.get()
     await query.forEach(async doc => {
-        let orderDate = doc._fieldsProto.date.stringValue
+        let orderDate = doc._fieldsProto.createdDate.stringValue
         const date2 = new Date(orderDate)
         const date1 = new Date(currentDate)
         const diffTime = Math.abs(date2.getTime() - date1.getTime());
@@ -232,7 +196,7 @@ router.get('/expired', async ctx =>{
                 items: [],
                 order_status: 'expired',
                 order: doc._fieldsProto.order.stringValue,
-                date:doc._fieldsProto.date.stringValue,
+                createdDate:doc._fieldsProto.createdDate.stringValue,
             }
             for (var i = 0;i<doc._fieldsProto.items.arrayValue.values.length;i++){
                 let temp = doc._fieldsProto.items.arrayValue.values[i]
@@ -245,26 +209,34 @@ router.get('/expired', async ctx =>{
                 }
             }
             data.items.push(tempItem)
-            let set = db.collection('history').doc().set(data)
-            doc.ref.delete()
+            let set = db.collection('history').doc()
+            batch.set(set,data)
+            batch.delete(doc.ref)
         }
     });
-    ctx.body = {'res': 'hi'}
+    batch.commit()
+    console.log('done')
+    ctx.body = {'res': 'done'}
 })
 
 router.get('/clear' , async ctx =>{
     db = ctx.db
-    let myRef = db.collection('pending').listDocuments().then(val => {
-        val.map((val) => {
-            val.delete()
-        })
-    })    
+    let batch = db.batch()
+    let myRef = db.collection('pending')
+    let query = await myRef.get()
+    await query.forEach(async doc =>{
+        batch.delete(doc.ref)
+    })
+    batch.commit();
 })
+
+
 router.get('/checkblacklist' , async ctx =>{
     db = ctx.db
     id = ctx.query.id
+    store = ctx.query.store
     myRef = db.collection('blacklist')
-    let query = await myRef.where('variantid','==',id).get()
+    let query = await myRef.where('product  id','==',id).where('store','==',store).get()
     if (query.empty){
         ctx.body = { "blacklist":false}
     }
@@ -279,19 +251,21 @@ router.get('/additem' , async ctx =>{
     let currentDate = ''
     currentDate += (new Date().getMonth()+1)+'/'+ new Date().getDate() + '/'+  new Date().getFullYear()
     db = ctx.db
+    let batch = db.batch()
     let itemJSON = await JSON.parse(item)
         let data = {
             name: itemJSON.name,
             variantid: itemJSON.variantid,
             store: itemJSON.store,
             status: status,
-            date:currentDate,
+            dateProcessed:currentDate,
 
         };
         for (var i = 0;i<itemJSON.quantity;i++){
-            setDoc = db.collection('items').doc().set(data)
+            setDoc = db.collection('items').doc()
+            batch.set(setDoc,data)
         }
-          
+        batch.commit()
         ctx.body = 'success'
 
 })
@@ -319,6 +293,43 @@ router.get('/returnReport' , async ctx =>{
         EMS.push(tempItem)
     });
     ctx.body = {'res': EMS}
+})
+
+router.get('/getBlacklist', async ctx => {
+    db = ctx.db
+    let store = ctx.query.store
+    let products = []
+    myRef = db.collection('blacklist')
+    let query = await myRef.where('store','==',store).get()
+    await query.forEach(async doc =>{
+        products.push(doc._fieldsProto.productid.stringValue)
+    })
+    ctx.body = {'res':products}
+})
+
+router.get('/deleteBlacklist', async ctx => {
+    db = ctx.db
+    store = ctx.query.store
+    id = ctx.query.id
+    myRef = db.collection('blacklist')
+    let query = await myRef.where('store','==',store).where('productid','==',id).get()
+    await query.forEach(async doc =>{
+        doc.ref.delete()
+    })
+    ctx.body = {'success':true}
+})
+
+router.get('/addBlacklist', async ctx => {
+    console.log('hello')
+    db = ctx.db
+    store = ctx.query.store
+    id = ctx.query.id
+    data = {
+        store:store,
+        productid: id
+    }
+    let setDoc = db.collection('blacklist').doc().set(data)
+    ctx.body = {'success':true}
 })
 
 

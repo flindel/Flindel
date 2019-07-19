@@ -12,7 +12,7 @@ async function sendEmail(listIn) {
         //delete stuff here
 }
 
-async function sendReport(){
+async function mainReport(){
     let temp = await fetch(`https://${serveoname}/dbcall/report`, {
             method: 'get',
         })
@@ -58,13 +58,36 @@ async function sendReport(){
 
 async function updateInventory(items){
     for (var i = 0;i<items.length;i++){
-        let temp = items[i].variantid
-        let t2 = await fetch(`https://${serveoname}/dbcall/checkblacklist?id=${encodeURIComponent(temp)}`, {
+        //get information for active item
+        let idActive = items[i].variantid
+        let storeActive = items[i].store
+        //get access token for specific store
+        let tokenresponse = await fetch(`https://${serveoname}/dbcall/getToken?name=${encodeURIComponent(storeActive)}`, {
+            method: 'get',
+        })
+        let tokenJSON = await tokenresponse.json()
+        const token = tokenJSON.token //THIS IS THE TOKEN
+        //get inventory id and product id of active item
+        const option = {
+        url: `https://${storeActive}/${api_link}/variants/${encodeURIComponent(idActive)}.json`,
+        headers: {
+            'X-Shopify-Access-Token': token
+        },
+        json: true,
+        }
+        let temp = await rp(option);
+        const invId =  temp.variant.inventory_item_id //THIS IS INVENTORY ID
+        const productId = temp.variant.product_id //THIS IS PRODUCT ID
+
+        //check blacklist
+        let t2 = await fetch(`https://${serveoname}/dbcall/checkblacklist?store=${encodeURIComponent(storeActive)}&id=${encodeURIComponent(productId)}`, {
             method: 'get',
         })
         t2json = await t2.json()
         let blacklist = t2json.blacklist
+        
         if (blacklist == true){
+            console.log(productId + '.....BAD')
             //create item status returning
             let item = JSON.stringify(items[i])
             if (live){
@@ -74,36 +97,21 @@ async function updateInventory(items){
             }
         }
         else{
+            console.log(productId + '.....GOOD')
             //create item status reselling
             if(live){
                 let item = JSON.stringify(items[i])
-            fetch(`https://${serveoname}/dbcall/additem?status=${encodeURIComponent('reselling')}&item=${encodeURIComponent(item)}`, {
+                fetch(`https://${serveoname}/dbcall/additem?status=${encodeURIComponent('reselling')}&item=${encodeURIComponent(item)}`, {
                 method: 'get',
             })
             }
             //add to shopify inv
-            addInv(items[i].variantid,items[i].store, items[i].quantity)
+            addInv(items[i].store, items[i].quantity, invId)    
         }
     }    
 }
 
-async function addInv(varID, shopname, quantity){
-        //get access token for shop of active item
-        let tokenresponse = await fetch(`https://${serveoname}/dbcall/getToken?name=${encodeURIComponent(shopname)}`, {
-            method: 'get',
-        })
-        let tokenJSON = await tokenresponse.json()
-        const token = tokenJSON.token
-        //get inventory id of active item
-        const option = {
-        url: `https://${shopname}/${api_link}/variants/${encodeURIComponent(varID)}.json`,
-        headers: {
-            'X-Shopify-Access-Token': token
-        },
-        json: true,
-        }
-        let temp = await rp(option);
-        const invId =  temp.variant.inventory_item_id
+async function addInv(shopname, quantity, invId){
         //update inventory of active item
         const option2 = {
             method: 'POST',
@@ -131,7 +139,7 @@ async function checkExpired(){
         })
 }
 //wipe pending, everything has been dealt with by this point
-async function clearDB(){
+async function clearPending(){
     fetch(`https://${serveoname}/dbcall/clear`, {
             method: 'get',
         })
@@ -155,4 +163,4 @@ async function returningReport(){
     console.log(returningList)//THIS IS ALL THE ITEMS MARKED RETURNING THAT WE HAVE
 }
 
-module.exports = {sendReport, clearDB, checkExpired, returningReport}
+module.exports = {mainReport, clearPending, checkExpired, returningReport}

@@ -126,8 +126,8 @@ class confirmOrder extends React.Component{
                 <h3 className = 'emailHead'>Email Confirmation:</h3> {/* GET EMAIL INFO*/}
                 <p className = 'errorMessage'>{this.state.errorMessage}</p>
                 <form>
-                  <div className="c2">
-                    <p className = 'hi123'>
+                  <div>
+                    <p className = 'emailText'>
                     <label className = {this.state.existingStyle}>
                       Use existing email:
                       <br/>

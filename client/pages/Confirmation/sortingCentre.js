@@ -1,5 +1,6 @@
 import React, {Component} from 'react';
 import Item from './Item2'
+import Blacklist from './blacklist'
 const serveoname = 'optimo.serveo.net'
 
 /* NAVBAR to flip between map view and return portal view. Imported at the top of most pages */
@@ -147,6 +148,8 @@ class sortingCentre extends Component{
                     <input type="cCode" value={this.state.cCode} onChange={this.handlecCode} />
                     </label>
                     <button onClick = {this.handleSubmit}>SUBMIT</button>
+                    <br/><br/>
+                    <Blacklist/>
                 </div>
             )
         }
