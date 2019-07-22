@@ -5,7 +5,6 @@ const productRouter = require('./products');
 const sendRouter = require('./sendEmail')
 const dbRouter = require('./databaseAction')
 const shopRouter = require('./shopName')
-const GEORouter = require('./geocoding')
 
 router = combineRouters(
     rootRouter,
@@ -13,7 +12,6 @@ router = combineRouters(
     productRouter,
     sendRouter,
     dbRouter,
-    GEORouter,
     shopRouter
 )
 
