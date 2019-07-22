@@ -16,6 +16,25 @@ export function get(product_id, callback = doNothing){
     .catch((error) => console.log(error))
 }
 
+export function getShopID(callback, args = []){
+  fetch(`${serveo_name}/shop/id/`, {
+    method: 'get',
+    })
+    .then((response) => {
+      if(response.ok){return response.json()}
+      else{throw Error(response.statusText)}
+    })
+    .then((data) => {
+      if (args == []){
+        callback(data);
+      }
+      else {
+        callback(data, args);
+      }
+    })
+    .catch((error) => console.log(error))
+}
+
 export function del(product_id, callback = doNothing){
   fetch(`${serveo_name}/products?id=${encodeURIComponent(product_id)}`, {
     method: 'delete',
@@ -113,7 +132,7 @@ export function getSmartCollections(callback = doNothing){
 export function postGitVariant(product_id, variants, update, callback = doNothing){
   console.log("Product ID: ", product_id);
   console.log("Variants: ", variants);
-  console.log("Update: ", update);
+  console.log("Update: ", update.git.variants, update.norm.variants);
   let body = null;
   let orig = update.norm;
   let git = update.git;
@@ -199,7 +218,6 @@ function postData(git, orig){
           varIssue.title = orig.product.variants[i].title
       }
       variants.push(varIssue);
-
     }
     out = {
       git_id: ""+git.product.id,
@@ -229,4 +247,30 @@ function postData(git, orig){
 
 function doNothing(data){
   return;
+}
+
+export function postScriptTag(url){
+  const options = {
+    method: 'post',
+    headers: {
+      'Accept': 'application/json, text/plain, */*',
+      'Content-Type': 'application/json'
+    },
+      body: JSON.stringify({
+        "script_tag" :{
+          "event":"onload",
+          "src":url
+        }
+      }),
+  }
+  fetch(`${serveo_name}/scriptTag/`, options)
+    .then((response) => {
+      if(response.ok){return response.json()}
+      else{throw Error(response.statusText)}
+    })
+    .then((data) => {
+      console.log('POST Script Tag: ', data)
+      callback(data);
+    })
+    .catch((error) => console.log(error))
 }

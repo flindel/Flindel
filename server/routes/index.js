@@ -3,16 +3,20 @@ const rootRouter = require('./root');
 const orderRouter = require('./orders');
 const collectionRouter = require('./collections');
 const productRouter = require('./products');
-const dbRouter = require('./databaseAction');
+const dbGitRouter = require('./databaseActionGit');
 const geoCodingRouter = require('./geocoding');
+const shopRouter = require('./shop');
+const scriptTag = require('./scriptTag');
 
 router = combineRouters(
     rootRouter,
     orderRouter,
     collectionRouter,
     productRouter,
-    dbRouter,
-    geoCodingRouter
+    dbGitRouter,
+    geoCodingRouter,
+    shopRouter,
+    scriptTag,
 )
 
 module.exports = router;

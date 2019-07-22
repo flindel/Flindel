@@ -271,6 +271,7 @@ class FindIssues extends Component {
           }
         }
       }
+
     if (productIssues.length > 0){
       return ({
         norm: null,

@@ -83,14 +83,14 @@ class FixIssues extends Component {
   }
 
   fixGitVarDne(update){
-    console.log("fixGitDne: ", update);
+    console.log("fixGitVarDne: ", update.git.variants, update.norm.variants);
     getGitProduct(update.git.id, this.fixGitVarDne2, [update])
   }
 
   fixGitVarDne2(fsData, args){
     let update = args[0];
     console.log("FSDATA", fsData);
-    console.log("Update", update);
+    console.log("fixGitVarDne2", update.git.variants, update.norm.variants);
     const variants = this.normVarToGitVar(update, fsData);
     postGitVariant(update.git.id, variants, update, this.finishedFixing);
   }
@@ -120,7 +120,7 @@ class FixIssues extends Component {
       }
       newVariants.push(normVar);
     }
-    console.log("normToGitVar: ", update, newVariants);
+    console.log("normVarToGitVar: ", update.git.variants, update.norm.variants);
     return newVariants;
   }
 
