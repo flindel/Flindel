@@ -30,7 +30,7 @@ class sortingCentre extends Component{
         this.setState({cCode:e.target.value})
     }
 
-    //start from beginning
+    //start from beginning (shows at end so you don't have to refresh)
     resetAll(){
         this.setState({cCode:'',
         step: 1,
@@ -86,6 +86,7 @@ class sortingCentre extends Component{
         }
     }
 
+    //handle changing status
     async handleReasonChange(varID, status, oldstatus){
         let count = 0
         let found = false
@@ -103,6 +104,7 @@ class sortingCentre extends Component{
         await this.setState({itemList:tempList})
     }
 
+    //submit the changing of reasons, finish process and send to db
     async handleSubmit2(){
         let items = await JSON.stringify(this.state.itemList)
         //update new reasons
@@ -112,7 +114,7 @@ class sortingCentre extends Component{
         this.setState({step:4})
     }
 
-
+    //handle initial submit, load items for order
     async handleSubmit(){
         let temp = await fetch(`https://${serveoname}/dbcall?method=${encodeURIComponent(5)}&code=${encodeURIComponent(this.state.cCode)}`, {
             method: 'get',
@@ -149,7 +151,6 @@ class sortingCentre extends Component{
                     </label>
                     <button onClick = {this.handleSubmit}>SUBMIT</button>
                     <br/><br/>
-                    <Blacklist/>
                 </div>
             )
         }

@@ -1,6 +1,5 @@
 import React, { Component } from 'react';
 import './universal.css'
-import {Card, AppProvider, Button, ProgressBar, TextField} from '@shopify/polaris';
 import Select from 'react-select';
 
 class Item extends Component {
@@ -18,11 +17,14 @@ class Item extends Component {
             quantity: this.props.item.quantity,//the quantity of a item that user total brought
             status: this.props.item.status,
             activeReason: [],
+            //potential reasons for return
             reasons: [
                 { value: "Broken", label: "Item is broken." },
                 { value: "Wrong", label: "Item is wrong." },
-                { value: "Unhappy", label: "Item is unsatisfactory." }
+                { value: "Unhappy", label: "Item is unsatisfactory." },
+                { value: "Multiple", label: "Multiple reasons"}
               ],
+              //potential quantities - this holds single return value, stored like this because it's a different component
             activeQuantity:[],
             quantities:[]
         };
@@ -60,6 +62,7 @@ class Item extends Component {
          },()=> this.props.handleSelect(this.props.item.variantid, this.state.reason, old))
      }
 
+     //change status of item (done by sorting center)
      handleStatusChange(e){
          let old = this.state.status
          this.setState({
@@ -82,6 +85,7 @@ class Item extends Component {
             }
         });
         }
+        //push quantity array
         let quantityArr = [];
             for(let i=0; i<=this.state.quantity; i++){
                 let temp = {value: i, label: i}
@@ -103,30 +107,54 @@ class Item extends Component {
         })
         if (this.props.step == 1)
         {
-        return (
-            <div>
-                <hr className = 'hl4'></hr> 
-                <div className = 'container1'>
-                    <img className = 'item2' src={this.state.src} />
-                </div> 
-                {/* dropdown menu to choose return quantity */}
-                <div className = 'container2'>
-                    <br/>
-                    <p className = 'item2'><strong>{this.props.item.name}</strong></p>   
-                </div>
-                <div className = 'container3'>
-                <label >Quantity for Return: </label>
-                    <Select className = 'qty' placeholder = {'0'}value={this.state.activeQuantity} onChange={this.handleQuantityChange} options = {this.state.quantities}>
-                    </Select>
-                </div>            
-                <br/>
-            </div>
-        );
+            //quantity == 0: black out item, can't select it, don't display quantity bar
+            if (this.state.quantity == 0){
+                return (
+                    <div>
+                        {/*<hr className = 'hl4'></hr> */}
+                        <div className = 'container1Grey'>
+                            <img className = 'item2' src={this.state.src} />
+                        </div> 
+                        {/* dropdown menu to choose return quantity */}
+                        <div className = 'container2Grey'>
+                            <br/>
+                            <p className = 'item2'><strong>{this.props.item.name}</strong></p>   
+                        </div>
+                        <div className = 'container3Grey'>
+                            <br/>
+                            <p className = 'item2'>This item is past store return policy and can't be returned.</p>
+                        </div>            
+                        <br/>
+                    </div>
+                ); 
+            }
+            else{
+                //quantity > 0 ... selectable, display normal with quantity dropdown
+                return (
+                    <div>
+                        {/*<hr className = 'hl4'></hr> */}
+                        <div className = 'container1'>
+                            <img className = 'item2' src={this.state.src} />
+                        </div> 
+                        {/* dropdown menu to choose return quantity */}
+                        <div className = 'container2'>
+                            <br/>
+                            <p className = 'item2'><strong>{this.props.item.name}</strong></p>   
+                        </div>
+                        <div className = 'container3'>
+                        <label >Quantity for Return: </label>
+                            <Select className = 'qty' placeholder = {'0'}value={this.state.activeQuantity} onChange={this.handleQuantityChange} options = {this.state.quantities}>
+                            </Select>
+                        </div>            
+                        <br/>
+                    </div>
+                );
+            }
         }
+        //second trip through of item ... select reason
         else if (this.props.step == 2){
             return (
-                <div>
-                    <hr className = 'hl4'></hr>  
+                <div> 
                     <div className = 'container1'>        
                         <img className = 'item2' src={this.state.src} />  
                     </div> 
@@ -145,10 +173,10 @@ class Item extends Component {
                 </div>
             );
         }
+        //third time through item - display confirmation, no dropdown
         else if (this.props.step == 3){
             return(
                 <div>  
-                    <hr className = 'hl4'></hr> 
                     <div className ='container1'>
                         <img className = 'item2' src={this.state.src} />     
                     </div>     
@@ -165,6 +193,7 @@ class Item extends Component {
                 </div>
             );
         }
+        //this method used by sorting centre to display
         else if (this.props.step == 4){
             return(
                 <div>

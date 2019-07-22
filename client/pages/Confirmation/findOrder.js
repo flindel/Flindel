@@ -12,6 +12,7 @@ class Search extends Component {
             this.state = {
                 emailAdd: '',
                 orderNum: '',  
+                //button is blacked out at beginning, can't submit until they have both fields filled out
                 style:'Blackout1'
             };
             this.handleEmailChange = this.handleEmailChange.bind(this);
@@ -21,7 +22,7 @@ class Search extends Component {
         }
         
     
-        //handle input of info
+        //handle input of order num
         handleOrderNumChange(e){
             this.setState({
                 orderNum: e.target.value
@@ -29,7 +30,7 @@ class Search extends Component {
             this.checkButton()
         }
     
-        //handle input of info
+        //handle input of email address
         handleEmailChange(e){
             this.setState({
                 emailAdd: e.target.value
@@ -37,6 +38,7 @@ class Search extends Component {
             this.checkButton()
         }
 
+        //check to see each time they enter something if the button should flip from (un)available
         checkButton(){
             alert
             if (this.state.emailAdd !='' && this.state.orderNum!=''){

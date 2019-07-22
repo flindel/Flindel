@@ -1,6 +1,5 @@
 import React from 'react';
 import Item from './Item2'
-import {Card, AppProvider, Button, ProgressBar, TextField} from '@shopify/polaris';
 /*
 GET REASONS FOR RETURN AND CONFIRM EMAIL ON THIS PAGE
 */
@@ -12,7 +11,9 @@ class confirmOrder extends React.Component{
                     itemErrorMessage:'', 
                     errorMessage:'', 
                     emailToPrint: this.props.email,
+                    //style for blackout out continue button until all reasons selected. like page 2 and 3
                     style: 'Blackout2',
+                    //styles for the emails, visible/hidden, big/small
                     existingStyle: 'l3On',
                     newStyle: 'l3Off',
                     hiddenStyle:' l3Hidden',
@@ -38,33 +39,41 @@ class confirmOrder extends React.Component{
     set0(){
       //setting state from radio button (either old or new email)
       if (this.state.emailToPrint!=''){
+        //if they select the 'old' email, check if valid, switch styles to hide confirm email bar + make current bigger
         this.setState({selectedEmail: 0,existingStyle:'l3On',newStyle:'l3Off', hiddenStyle:'l3Hidden', newStyleText:'l3Off',existingStyleText:'l3On'})
       }
   }
 
   set1(){
     //setting state from radio button (either old or new email)
+    //set the style to show the double confirmation etc
       this.setState({selectedEmail: 1,existingStyle:'l3Off', newStyle:'l3On',hiddenStyle:'l3On', existingStyleText:'l3Off',newStyleText:'l3On'})
   }
 
+  //update email field for email confirmation field
   updateEmailCopy(e){
     this.setState({emailCopy:e.target.value})
   }
 
+  //handle reason select
   async handleSelect(variantidX,reasonX, oldreasonX){
     if (oldreasonX == null || oldreasonX == '---'){
       await this.setState((prevState) => ({
+        //count number of times they select reason to see if we can proceed
         count: prevState.count + 1
     })); 
     }
     else if (reasonX == '---'){
       await this.setState((prevState) => ({
+        //if they set reason to empty, decrement count
         count: prevState.count -1
     }));
     }
     
+    //feed back to master
     this.props.setReason(variantidX,reasonX,oldreasonX)
 
+    //actually toggle the button style if all reasons/not enough are selected
     if (this.state.count == this.props.items.length){
         this.setState({style:'Submit2'})
     }
@@ -73,6 +82,7 @@ class confirmOrder extends React.Component{
     }
   }
 
+  //handle submit (PRESS CONTINUE)
   handleForward(){
     if (this.state.count == this.props.items.length){
       this.setState({itemErrorMessage:''})
@@ -118,6 +128,7 @@ class confirmOrder extends React.Component{
               <div className = 'itemListSmall'>
                 <fieldset className = 'page2'>
                   <p className = 'orderHeader'>Order Number: {this.props.orderNum}</p>
+                  <br/>
                       {this.props.items.map((item,index)=>{ 
                       return <Item step = {2} item={item} serveoname={this.props.serveoname} key={index}handleSelect={this.handleSelect.bind(this)}/>    
                       })} {/*show all items*/}

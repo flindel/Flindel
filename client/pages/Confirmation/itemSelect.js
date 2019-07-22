@@ -20,6 +20,7 @@ class ItemList extends Component {
             price:"",
             reason: ""
         }
+        //black out return button until item is selected, like first page
         this.state = {
             errorMessage:'',
             style:'Blackout2',
@@ -28,11 +29,13 @@ class ItemList extends Component {
         this.handleSubmit = this.handleSubmit.bind(this)
     }
 
-    handleSubmit(){
+    //handle submit of items
+    handleSubmit(){//this is a failsafe, shouldn't ever happen because button will be grey
         if (this.returnItems.length == 0){
             this.setState({errorMessage: '*ERROR: Please select one or more items to return in order to continue*'})
         }
         else {
+            //if allowed, set the return list in the main
             this.props.setReturnList(this.returnItems)
             this.props.handleSubmit()
         }

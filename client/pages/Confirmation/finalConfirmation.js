@@ -1,8 +1,8 @@
 import React from 'react';
 import Item from "./Item2";
 
-/* PRICING PAGE
-Shows the customer the financial information for their return
+/* Final confirmation page
+Allow customer to look over one more time before submit
 */
 
 class finalPage extends React.Component{
@@ -13,6 +13,7 @@ class finalPage extends React.Component{
             <div className = 'itemList'>
                 <fieldset className = 'page2'>
                     <p className = 'orderHeader'>Order Number: {this.props.orderNum}</p>
+                    <br/>
                     {this.props.items.map((item,index)=>{
                         return <Item item={item} serveoname={this.props.serveoname} step = {3} key={index}/>    
                     })}

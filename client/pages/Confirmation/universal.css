@@ -69,8 +69,9 @@ h1.top{
 img.headerLogo{
   background-color:black;
   display:block;
-  max-height:5%;
-  max-width:5%;
+  max-height:13vh;
+  max-width:13vh;
+  margin-left: 5vh;
   width:auto;
   height:auto;
 }
@@ -179,21 +180,39 @@ div.container1{
   float:left;
   height:100px;
   text-align:center;
-  padding-top: 20px;
 }
 div.container2{
   width: 40%;
   height: 100px;
   float:left;
   text-align:center;
-  padding-top: 20px;
 }
 div.container3{
   width:40%;
   float: right;
   height: 100px;
-  padding-top: 20px;
   text-align:center;
+}
+div.container1Grey{
+  width:20%;
+  float:left;
+  height:100px;
+  text-align:center;
+  background-color: grey
+}
+div.container2Grey{
+  width: 40%;
+  height: 100px;
+  float:left;
+  text-align:center;
+  background-color:grey;
+}
+div.container3Grey{
+  width:40%;
+  float: right;
+  height: 100px;
+  text-align:center;
+  background-color:grey;
 }
 img.item2{
   object-fit: contain;
@@ -201,13 +220,14 @@ img.item2{
    max-height: 100%;
    width: auto;
    height: auto;
-   padding-bottom: 20px;
+   padding-bottom: 10px;
 }
 fieldset.page2{
   margin: auto;
   max-width:750px;
   min-width:400px;
   overflow-x:auto;
+  border:0
 }
 /*fieldset.page2{
   margin-left: 25%;
@@ -267,10 +287,6 @@ p.emailText{
 /*Fourth Page (Confirm)..............................................*/
 h3.pageTitle4{
   text-align: center
-}
-hr.hl4{
-  margin-left: -2%;
-  margin-right:-2%;
 }
 /*End fourth page.....................................................*/
 /*Fifth Page (Confirmation)...........................................*/
@@ -438,10 +454,16 @@ footer.f1{
 }
 
 div.itemList{
-  max-height:60vh;
+  max-height:45vh;
   overflow-y:auto;
 }
 div.itemListSmall{
-  max-height:60vh;
+  max-height:45vh;
   overflow-y:auto;
+}
+
+div.loading{
+  color:black;
+  text-align:center;
+  font-size: 150%;
 }

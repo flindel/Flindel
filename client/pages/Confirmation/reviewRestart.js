@@ -16,12 +16,14 @@ class ReviewRestart extends Component {
         this.togglePopup = this.togglePopup.bind(this)
     }
 
+    //flip between show/not show popup
     togglePopup(){
         this.setState({
             showPop:!this.state.showPop
         })
     }
 
+    //customer wants to restart return,feeds back to master to delete old + continue new
     handlePopupDelete(e){
         this.props.restartReturn(this.state.orderNum, this.state.email, this.state.code)
     }

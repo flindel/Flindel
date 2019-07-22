@@ -4,10 +4,8 @@ import './universal.css'
 class restartPop extends Component {
     constructor(props){
         super(props)
-        this.state = {
-
-        }
-
+        //could be used later, not necessary now
+        this.state = {}
     }
 
     render(){

@@ -18,9 +18,10 @@ const errors = require('request-promise/errors');
 
 //second (0-59) - minute (0-59) - hour(0-23) - day of month (1-31) - Month (1-12) - Day of Week (0-6, Sun-Sat)
 new CronJob('*/10 * * * * *', async function() {
-  //cronUtil.returningReport();
+  //KEEP THIS ORDER OF STUFF. unblock all when we go live
   //cronUtil.checkExpired();
   //cronUtil.mainReport();
+  //cronUtil.returningReport();
   //await cronUtil.clearPending();
 }, null, true)
 

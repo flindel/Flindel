@@ -7,6 +7,7 @@ const router = Router({
     prefix: '/shopName'
 });
 
+//this will likely be used on an onMount for the return portal so we can determine what header logo, return policy etc to import
 router.get('/', async ctx => {
     // Get all orders
     const { shop, accessToken } = getShopHeaders(ctx);

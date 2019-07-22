@@ -8,14 +8,14 @@ import PriceDisplay from './finalConfirmation.js'
 import Review from './reviewRestart'
 import '@shopify/polaris/styles.css';
 const serveoname = 'optimo.serveo.net';
-//const serveoname = 'facilis.serveo.net';
+
 class IdentifyApp extends Component {
     //constructor and binding methods
     constructor(props){
 		super(props);
 		this.state = {
             items:[],
-            step: 1,
+            step: 0,
             code: '',
             email: '', 
             newEmail: '',
@@ -23,6 +23,8 @@ class IdentifyApp extends Component {
             shopName:'',
             orderNum:'',
             errorMessage:'',
+            returnPolicy: [],
+            defaultReturn: '',
         };
         this.returnItemList= []
         this.identifyItems=this.identifyItems.bind(this) 
@@ -41,6 +43,27 @@ class IdentifyApp extends Component {
         this.viewPage4 = this.viewPage4.bind(this)
         this.checkReturnsFromDB = this.checkReturnsFromDB.bind(this)
         this.restartReturn = this.restartReturn.bind(this)
+        this.checkValid = this.checkValid.bind(this)
+    }
+
+    //check to see if return item is valid
+    checkValid(varID){
+        //check database table from didMount
+        if (this.state.returnPolicy[varID]==null){
+            return (parseInt(this.state.defaultReturn))
+        }
+        else{
+            return (this.state.returnPolicy[varID].stringValue)
+        }
+    }
+
+    //load return policy - have to expand this to multiple stores once we load
+    async componentDidMount(){
+        let temp = await fetch(`https://${serveoname}/dbcall/returnPolicy`, {
+            method: 'get',
+        })
+        let json = await temp.json()
+        this.setState({step:1,returnPolicy: json.res.mapValue.fields, defaultReturn: json.default.stringValue})
     }
 
     //generate usable unique codes
@@ -62,15 +85,21 @@ class IdentifyApp extends Component {
               this.generateID() 
           }
     }
+
+    //view second page (item select)
     viewPage2(){
         this.setState({step:2})
     }
+
+    //view third page (reason select)
     viewPage3(){
         for (var i =0;i<this.returnItemList.length;i++){
             this.returnItemList[i].reason = '---'
         }
         this.setState({step:3})
     }
+
+    //view fourth page (check over)
     viewPage4(){
         this.setState({step:4})
     }
@@ -121,6 +150,7 @@ class IdentifyApp extends Component {
     async finishPricing(){
         
         let tempList = this.state.returnlist
+        //duplicate items for database entry
         for (var i = 0;i<tempList.length;i++){
             let curr = tempList[i]
             if(curr.value > 1){
@@ -138,17 +168,14 @@ class IdentifyApp extends Component {
         this.setState({step:5})
     }
 
+    //begin return portal from very start
     restart(){
-        this.setState({items:[],
-            existReturn:false, //whether the return is existed in database
-            searchStatus: false, //whether the login was successful (matching order and password)
-            checkStatus:false, //proceed from item select page and show checkover page
-            priceStatus: false, //proceed from checkover page and show pricing page
-            submitStatus: false, //proceed from pricing page and show final page
+        this.setState({
+            items:[],
+            step:1,
             code: '',
             email: '', 
             newEmail: '',
-            mapView: 0, //used to show navbar option
             returnlist: [],
             shopName:'',
             orderNum:'',
@@ -218,7 +245,7 @@ class IdentifyApp extends Component {
         }
       }
 
-
+      //check returns database to see if return already exists
     async checkReturnsFromDB(orderNum,emailAdd){
         orderNum =1
         let temp = await fetch(`https://${serveoname}/dbcall?method=${encodeURIComponent(4)}&orderNum=${encodeURIComponent(orderNum)}&emailAdd=${encodeURIComponent(emailAdd)}`, {
@@ -226,6 +253,7 @@ class IdentifyApp extends Component {
         })
         let json = await temp.json()
         if(json.exist){
+            //set information if it already does
             const returnInfo = {'code':json.code,
                                 'email': emailAdd,
                                 'orderNum': orderNum,}
@@ -234,6 +262,7 @@ class IdentifyApp extends Component {
          else{ return false }
     }
 
+    //if they do restart, flip statu to replaced and move to history
     async restartReturn(orderNum, emailAdd, code){
         
         // call database change order_status
@@ -265,6 +294,7 @@ class IdentifyApp extends Component {
         }
         this.setState({email:emailAdd.toLowerCase()})
         const data = {orderNumber: orderNum, emailAddress:emailAdd};
+        //get order fromm shopify db
         let temp = await fetch(`https://${serveoname}/orders?orderNum=${encodeURIComponent(data.orderNumber)}`, {
             method: 'GET',
 
@@ -272,37 +302,39 @@ class IdentifyApp extends Component {
         let resData = await temp.json()
         if(JSON.stringify(resData.orders)!="[]")
                 {
-                //get date difference:
-                let dateString = resData.orders[0].processed_at
-                let orderDate =  ''
-                orderDate+= dateString.substring(5,7)+'/'+dateString.substring(8,10)+'/'+dateString.substring(0,4)
-                let currentDate = ''
-                currentDate += (new Date().getMonth()+1)+'/'+ new Date().getDate() + '/'+  new Date().getFullYear()
-                const date2 = new Date(dateString)
-                const date1 = new Date(currentDate)
-                const diffTime = Math.abs(date2.getTime() - date1.getTime());
-                const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)); 
-                if (diffDays<=100){////////////////////////////////////////////////////IMPORT SOME STUFF HERE ///////check all restrictions here!!!!
-                    //check to see whether the email or phone number entered matches the one on record
-                    if ((resData.orders[0].email.toLowerCase()==emailAdd.toLowerCase()) || (resData.orders[0].phone == phoneNum))
-                    {
-                        //if correct
-                        //if pass checkDB
-                        let returnInfo = false
-                        if(checkDB){
-                          returnInfo = await this.checkReturnsFromDB(data.orderNumber, data.emailAddress)
-                        }
-                            if(returnInfo){
-                                this.setState({
-                                    'code':returnInfo.code,
-                                    'email': returnInfo.email,
-                                    'orderNum': returnInfo.orderNum,
-                                    'existReturn': true
-                                })
-                            }else{
+                    //date that order occured
+                    let dateString = resData.orders[0].processed_at
+                    const orderDate= dateString.substring(5,7)+'/'+dateString.substring(8,10)+'/'+dateString.substring(0,4)
+                    const currentDate = (new Date().getMonth()+1)+'/'+ new Date().getDate() + '/'+  new Date().getFullYear()
+                    const date2 = new Date(dateString)
+                    const date1 = new Date(currentDate)
+                    const diffTime = Math.abs(date2.getTime() - date1.getTime());
+                    //see how long has passed - used to filter items
+                    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)); 
+                if ((resData.orders[0].email.toLowerCase()==emailAdd.toLowerCase()) || (resData.orders[0].phone == phoneNum))
+                {
+                    //if correct
+                    //if order doesn't already exist in db
+                    let returnInfo = false
+                    if(checkDB){
+                      returnInfo = await this.checkReturnsFromDB(data.orderNumber, data.emailAddress)
+                    }
+                        //redirect if item already exists
+                        if(returnInfo){
                             this.setState({
-                                //set the items var to the items in the order
-                                items:resData.orders[0].line_items.map(item=>{
+                                'code':returnInfo.code,
+                                'email': returnInfo.email,
+                                'orderNum': returnInfo.orderNum,
+                                'existReturn': true
+                            })
+                        }else{
+                        this.setState({
+                            //set the items var to the items in the order
+                            items:resData.orders[0].line_items.map(item=>{
+                                //see if the time passed is less or greater than allowed
+                                let numDays = parseInt(this.checkValid(item.variant_id))
+                                let toAccept = numDays - diffDays
+                                if (toAccept > 0){
                                     return {
                                         variantID:item.variant_id,
                                         productID: item.product_id,
@@ -310,34 +342,50 @@ class IdentifyApp extends Component {
                                         quantity: item.quantity,
                                         price: item.price,
                                     }
-                                }),
-                                //set searchstatus to true to move forward
-                                step:2,
-                                orderNum: orderNum
-                            })
-                            }
-                    }
-                    else {
-                        //show they made an incorrect attempt  
-                            this.setState({
-                                errorMessage:"The order number, email, or phone number you entered didn't match our records."
-                            })      
-                    }
-                    }
-                else{
-                    this.setState({
-                        errorMessage: "Your order is past store return policy and is no longer eligible for return."
-                    }) 
+                                }
+                                else{
+                                    return{
+                                        variantID:item.variant_id,
+                                        productID: item.product_id,
+                                        name: item.name,
+                                        quantity: 0,
+                                        price: item.price,
+                                    }
+                                }
+                            }),
+                            //set searchstatus to true to move forward
+                            step:2,
+                            orderNum: orderNum
+                        })
+                        }
                 }
+                else {
+                    //show they made an incorrect attempt  
+                        this.setState({
+                            errorMessage:"The order number, email, or phone number you entered didn't match our records."
+                        })      
                 }
-    }
+            }
+}
     
     /*
     Conditional render/mainline
     All steps call a subpage based on the state variables on which page to show
     */
 	render() {
-        if(this.state.step == 1)
+        if (this.state.step == 0){
+            return(
+                <div>
+                    <NB
+                    shopName = {this.state.shopName}/>
+                    <br/><br/><br/>
+                    <div className = 'loading'>
+                        <p>Loading.......</p>
+                    </div>
+                </div>
+            )
+        }
+        else if(this.state.step == 1)
         {
             if(this.state.existReturn){
                 return (
