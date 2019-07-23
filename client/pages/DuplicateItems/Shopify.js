@@ -1,5 +1,5 @@
 import {serveo_name} from '../config'
-import {postProduct, delProduct} from './Firestore'
+import {postProduct, delProduct, getGitProduct} from './Firestore'
 
 export function get(product_id, callback = doNothing){
   fetch(`${serveo_name}/products?id=${encodeURIComponent(product_id)}`, {
@@ -150,6 +150,7 @@ export function postGitVariant(product_id, variants, update, callback = doNothin
     },
       body: JSON.stringify(body),
   }
+  console.log("PostGitVarID: ", product_id);
   fetch(`${serveo_name}/products/variant?id=${encodeURIComponent(product_id)}`, options)
     .then((response) => {
       if(response.ok){return response.json()}
@@ -164,10 +165,10 @@ export function postGitVariant(product_id, variants, update, callback = doNothin
           variants[i].id = data.variant.id;
         }
       }
-
-      git.variants = variants;
+      git.variants = variants.slice();
       console.log("Git2: ", git);
-      const out = postData({product: git}, {product: orig});
+      const out = postData({product: JSON.parse(JSON.stringify(git))}, {product: JSON.parse(JSON.stringify(orig))});
+      console.log("Formatted Body: ", out);
       postProduct(out);
     })
     .catch((error) => console.log(error))

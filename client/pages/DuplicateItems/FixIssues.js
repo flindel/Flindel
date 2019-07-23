@@ -96,7 +96,7 @@ class FixIssues extends Component {
   }
 
   normVarToGitVar(update, fsData){
-    let normVariants = update.norm.variants.map(variant => {return variant});
+    let normVariants = update.norm.variants.slice();
     let newVariants = [];
     for(let i = 0; i < normVariants.length; i++){
       let normVar = normVariants[i];
@@ -121,7 +121,7 @@ class FixIssues extends Component {
       newVariants.push(normVar);
     }
     console.log("normVarToGitVar: ", update.git.variants, update.norm.variants);
-    return newVariants;
+    return newVariants.slice();
   }
 
   findGitVarID(fsData, normVarID){

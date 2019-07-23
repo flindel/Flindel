@@ -1,3 +1,4 @@
 //INSERT THE NAME OF YOUR SERVEO BELOW
-//export const serveo_name = "https://terga.serveo.net";
-export const serveo_name =  "https://f8dfc6f2.ngrok.io";
+export const serveo_name = "https://poop.serveo.net";
+export const script_tag_url = "https://drive.google.com/uc?export=view&id=11tNBHBcdpPSvOw39APpyayC6J0Maua7C";
+//export const serveo_name = "https://flindel.pagekite.me";
