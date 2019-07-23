@@ -1,4 +1,4 @@
-const serveoname = 'optimo.serveo.net'
+const serveoname = '04071318.serveo.net'
 const rp = require('request-promise');
 const { api_link } = require('../default-shopify-api.json');
 //LIVE controls whether things actually happen i.e. sending emails, updating DB, updating inventory

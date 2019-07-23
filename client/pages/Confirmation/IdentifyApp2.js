@@ -7,7 +7,7 @@ import NB from './navbar.js'
 import PriceDisplay from './finalConfirmation.js'
 import Review from './reviewRestart'
 import '@shopify/polaris/styles.css';
-const serveoname = 'optimo.serveo.net';
+const serveoname = '04071318.serveo.net';
 
 class IdentifyApp extends Component {
     //constructor and binding methods

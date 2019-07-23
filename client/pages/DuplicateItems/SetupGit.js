@@ -1,5 +1,4 @@
 
-import DateTime from 'react-datetime';
 import React, { Component } from 'react';
 import {postCollection, getShopID, postScriptTag} from './Shopify';
 import {postInstallTime, getShopToken} from './Firestore';

@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import './universal.css'
 import { Key } from '@shopify/polaris';
-const serveoname = 'optimo.serveo.net'
+const serveoname = '04071318.serveo.net'
 //for error message - alows page to stand alone
 const myStyle = {
     color: 'red'

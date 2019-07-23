@@ -9,7 +9,7 @@ const shopRouter = require('./shop');
 const scriptTag = require('./scriptTag');
 const sendRouter = require('./sendEmail')
 const dbRouter = require('./databaseAction')
-const shopRouter = require('./shopName')
+const shopNameRouter = require('./shopName')
 
 router = combineRouters(
     rootRouter,
@@ -21,7 +21,8 @@ router = combineRouters(
     shopRouter,
     scriptTag,
     sendRouter,
-    dbRouter
+    dbRouter,
+    shopNameRouter,
 )
 
 module.exports = router;
