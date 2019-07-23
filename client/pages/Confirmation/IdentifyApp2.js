@@ -35,7 +35,7 @@ class IdentifyApp extends Component {
         this.setReturnList = this.setReturnList.bind(this)
         this.sendEmail = this.sendEmail.bind(this)
         this.sendToDB = this.sendToDB.bind(this)
-        this.finishPricing = this.finishPricing.bind(this)
+        this.finishOrder = this.finishOrder.bind(this)
         this.setReason = this.setReason.bind(this)
         this.restart = this.restart.bind(this)
         this.viewPage2 = this.viewPage2.bind(this)
@@ -138,7 +138,7 @@ class IdentifyApp extends Component {
         }
     }
 
-    //move forward from checkover page to pricing page
+    //move forward from checkover page to confirmation page
     forward(){
         for (var i =0;i<this.returnItemList.length;i++){
             this.returnItemList[i].reason = ''
@@ -146,8 +146,8 @@ class IdentifyApp extends Component {
         this.setState({step:4})
     }
 
-    //move forward from pricing page to final page
-    async finishPricing(){
+    //move forward from confirmation page to final page
+    async finishOrder(){
         
         let tempList = this.state.returnlist
         //duplicate items for database entry
@@ -164,7 +164,7 @@ class IdentifyApp extends Component {
         await this.setState({returnlist:tempList})
         await this.generateID()
         await this.sendToDB()
-        //this.sendEmail()
+        this.sendEmail()
         this.setState({step:5})
     }
 
@@ -183,7 +183,7 @@ class IdentifyApp extends Component {
             this.returnItemList = [];
     }
 
-    //send email, calls backend function
+    //send email to customer to confirm their return, calls backend function
     sendEmail(){
         fetch(`https://${serveoname}/send?method=${encodeURIComponent(1)}&email=${encodeURIComponent(this.state.email)}&code=${encodeURIComponent(this.state.code)}`, 
         {
@@ -479,7 +479,7 @@ class IdentifyApp extends Component {
                 serveoname={serveoname}
                 items = {this.state.returnlist}
                 orderNum = {this.state.orderNum}
-                finishPricing = {this.finishPricing.bind(this)}/>
+                finishOrder = {this.finishOrder.bind(this)}/>
                 </div>
             )
         }

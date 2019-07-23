@@ -17,7 +17,7 @@ class finalPage extends React.Component{
 
     //resend email if necessary
     sendEmail(){
-        fetch(`https://${this.props.serveoname}/send?method=${encodeURIComponent(3)}&email=${encodeURIComponent(this.state.email)}&code=${encodeURIComponent(this.state.code)}`, 
+        fetch(`https://${this.props.serveoname}/send?method=${encodeURIComponent(1)}&email=${encodeURIComponent(this.state.email)}&code=${encodeURIComponent(this.state.code)}`, 
         {
             method: 'POST',     
         })

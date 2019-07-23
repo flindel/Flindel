@@ -21,7 +21,7 @@ class finalPage extends React.Component{
             </div>
             <br/>
             <footer className = 'f1'>
-                <button className = 'Submit2' onClick = {this.props.finishPricing}>SUBMIT</button>
+                <button className = 'Submit2' onClick = {this.props.finishOrder}>SUBMIT</button>
             </footer>
         </div>
     )}

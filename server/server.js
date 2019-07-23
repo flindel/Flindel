@@ -17,12 +17,12 @@ const errors = require('request-promise/errors');
 
 
 //second (0-59) - minute (0-59) - hour(0-23) - day of month (1-31) - Month (1-12) - Day of Week (0-6, Sun-Sat)
-new CronJob('*/10 * * * * *', async function() {
-  //KEEP THIS ORDER OF STUFF. unblock all when we go live
+new CronJob('*/10 * * * * *', async function() { 
+  //KEEP THIS ORDER OF STUFF. unblock all when we go live, set time '0 0 0 * * *'
   //cronUtil.checkExpired();
   //cronUtil.mainReport();
   //cronUtil.returningReport();
-  //await cronUtil.clearPending();
+  //cronUtil.clearPending();
 }, null, true)
 
 const port = parseInt(process.env.PORT, 10) || 3000;

@@ -257,6 +257,9 @@ router.get('/expiredItems', async ctx =>{
     currentDate += (new Date().getMonth()+1)+'/'+ new Date().getDate() + '/'+  new Date().getFullYear()
     myRef = db.collection('items')
     let query = await myRef.where('status','==','reselling').get()
+    if (!query.empty){
+        
+    }
     await query.forEach(async doc => {
         //calculate time difference between current and date of entry
         let orderDate = doc._fieldsProto.date.stringValue
@@ -325,7 +328,7 @@ router.get('/checkblacklist' , async ctx =>{
     id = ctx.query.id
     store = ctx.query.store
     myRef = db.collection('blacklist')
-    let query = await myRef.where('product  id','==',id).where('store','==',store).get()
+    let query = await myRef.where('productid','==',id).where('store','==',store).get()
     if (query.empty){
         ctx.body = { "blacklist":false}
     }

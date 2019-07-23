@@ -2,7 +2,7 @@ const serveoname = 'optimo.serveo.net'
 const rp = require('request-promise');
 const { api_link } = require('../default-shopify-api.json');
 //LIVE controls whether things actually happen i.e. sending emails, updating DB, updating inventory
-const live = 0
+const live = 1
 
 //send email to brand about items that are going to be put up for resale
 async function sendEmail(listIn) {
@@ -87,7 +87,7 @@ async function mainReport(){
         //update the inventory for accepted items, send email
         if(live){
             updateInventory(acceptedList)
-            sendEmail(acceptedList)
+            //sendEmail(acceptedList)
         }
 
         //this part condenses the items into their specific orders, filters them by store, and then combines to send to brand
@@ -126,7 +126,7 @@ async function mainReport(){
             }
             //send the email to the store about who to refund
             if (live){
-                sendStoreEmail(currStore, storeItems)
+                //sendStoreEmail(currStore, storeItems)
             }
         }
 }
@@ -162,7 +162,6 @@ async function updateInventory(items){
         })
         t2json = await t2.json()
         let blacklist = t2json.blacklist
-        
         if (blacklist == true){
             //create item status returning
             let item = JSON.stringify(items[i])
@@ -240,6 +239,7 @@ async function returningReport(){
             }
         }
     }
+    console.log(returningList)
 }
 
 module.exports = {mainReport, clearPending, checkExpired, returningReport}

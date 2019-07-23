@@ -17,7 +17,7 @@ router.post('/', async ctx=>{
     const code = ctx.query.code
     const method = ctx.query.method
     //email to be sent confirming return request was submitted (end of return portal)
-    if(method == 3){
+    if(method == 3){ //CHANGE THIS TO ==1 to make it actually send
       const option = {
         method: 'POST',
         url: 'https://api.sendgrid.com/v3/mail/send',
