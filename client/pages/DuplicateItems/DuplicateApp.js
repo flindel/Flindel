@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import FindIssues from './FindIssues'
-import TestStore from './TestStore'
+//import TestStore from './TestStore'
 import SetupGit from './SetupGit'
 import Blacklist from './Blacklist'
 import { post, put, postCollection, getSmartCollections} from './Shopify'
@@ -59,7 +59,6 @@ class DuplicateApp extends Component {
     if (!this.state.isBlackList){
       return (
         <div>
-          {testControls&&<TestStore />}
           {this.state.isLoading && <h1>Loading Store Setup</h1>}
           <button onClick={()=> this.handleClick(true)}>Blacklist</button>
           {(!this.state.isGitSetup && !this.state.isLoading) &&
