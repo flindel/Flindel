@@ -1,7 +1,9 @@
 import React, { Component } from 'react';
 import './universal.css'
 import { Key } from '@shopify/polaris';
-const serveoname = '04071318.serveo.net'
+import {serveo_name} from '../config'
+const sname = serveo_name
+const serveoname = sname.substring(8)
 //for error message - alows page to stand alone
 const myStyle = {
     color: 'red'

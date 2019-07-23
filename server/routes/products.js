@@ -9,7 +9,6 @@ const router = Router({
 
 router.get('/', async ctx => {
   const productid = ctx.query.id;
-  console.log("productID:---------"+productid)
   const { cookies } = ctx;
   const shop = cookies.get('shop_id');
   const accessToken = cookies.get('accessToken');

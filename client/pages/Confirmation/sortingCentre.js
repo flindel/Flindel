@@ -1,7 +1,9 @@
 import React, {Component} from 'react';
 import Item from './Item2'
 import Blacklist from './blacklist'
-const serveoname = '04071318.serveo.net'
+import {serveo_name} from '../config'
+const sname = serveo_name
+const serveoname = sname.substring(8)
 
 /* NAVBAR to flip between map view and return portal view. Imported at the top of most pages */
 class sortingCentre extends Component{
@@ -120,9 +122,9 @@ class sortingCentre extends Component{
             method: 'get',
         })
         let t2 = await temp.json()
-        this.setState({email:t2.res.email.stringValue,orderNum:t2.res.order.stringValue, createdDate: t2.res.createdDate.stringValue})
-        let tempList = []
         if(t2.valid == true){
+            let tempList = []
+            this.setState({email:t2.res.email.stringValue,orderNum:t2.res.order.stringValue, createdDate: t2.res.createdDate.stringValue})
             for (var i = 0;i<t2.res.items.arrayValue.values.length;i++){
             let tempItem = {
                 name: t2.res.items.arrayValue.values[i].mapValue.fields.name.stringValue,
