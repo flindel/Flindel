@@ -15,7 +15,7 @@
   "dependencies": {
     "@material-ui/core": "^4.2.1",
     "@shopify/koa-shopify-auth": "^3.1.20",
-    "@shopify/polaris": "^3.18.0",
+    "@shopify/polaris": "^3.20.0",
     "@turf/turf": "^5.1.6",
     "@zeit/next-css": "^1.0.1",
     "bootstrap": "^4.3.1",
