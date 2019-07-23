@@ -2,12 +2,12 @@ const serveoname = '04071318.serveo.net'
 const rp = require('request-promise');
 const { api_link } = require('../default-shopify-api.json');
 //LIVE controls whether things actually happen i.e. sending emails, updating DB, updating inventory
-const live = 1
+const live = 0
 
 //send email to brand about items that are going to be put up for resale
 async function sendEmail(listIn) {
     let LI = await JSON.stringify(listIn)
-        fetch(`https://${serveoname}/send/itemReport?list=${encodeURIComponent(LI)}`, 
+        fetch(`https://${serveoname}/send/itemReport?list=${encodeURIComponent(LI)}`,
         {
             method: 'POST',
         })
@@ -22,7 +22,7 @@ async function sendStoreEmail(store, listIn){
     let emailAdd = t2.email //email address for brand
 
     let LI = await JSON.stringify(listIn)
-    fetch(`https://${serveoname}/send/refundReport?list=${encodeURIComponent(LI)}&email=${encodeURIComponent(emailAdd)}`, 
+    fetch(`https://${serveoname}/send/refundReport?list=${encodeURIComponent(LI)}&email=${encodeURIComponent(emailAdd)}`,
     {
         method: 'POST',
     })
@@ -71,7 +71,7 @@ async function mainReport(){
                         method: 'get',
                     })
                 }
-               
+
             }
         }
         //cancel duplicates to get accurate quantities
@@ -155,7 +155,7 @@ async function updateInventory(items){
         let temp = await rp(option);
         const invId =  temp.variant.inventory_item_id //THIS IS INVENTORY ID
         const productId = temp.variant.product_id //THIS IS PRODUCT ID
-        
+
         //check blacklist
         let t2 = await fetch(`https://${serveoname}/dbcall/checkblacklist?store=${encodeURIComponent(storeActive)}&id=${encodeURIComponent(productId)}`, {
             method: 'get',
@@ -180,9 +180,9 @@ async function updateInventory(items){
             })
             }
             //add to shopify inv
-            addInv(items[i].store, items[i].quantity, invId, torontoLocation)    
+            addInv(items[i].store, items[i].quantity, invId, torontoLocation)
         }
-    }    
+    }
 }
 
 //actually add the inventory

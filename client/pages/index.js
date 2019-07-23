@@ -4,7 +4,7 @@ import DuplicateApp from "./DuplicateItems/DuplicateApp";
 import IdentifyApp from "./Confirmation/IdentifyApp2";
 import SC from "./Confirmation/sortingCentre"
 import Blacklist from './Confirmation/blacklist'
-const ui = 0;
+const ui = 2;
 //0: ADMIN APP
 //1: SORTING CENTER INTERFACE
 //2: RETURN PORTAL
