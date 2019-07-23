@@ -7,3 +7,4 @@ node_modules/
 process.env
 serviceAccountCredentials.json
 client/pages/DuplicateItems/TestStore.js
+firebase_credentials.json
