@@ -8,3 +8,8 @@ process.env
 serviceAccountCredentials.json
 client/pages/DuplicateItems/TestStore.js
 firebase_credentials.json
+firebase_credentials.json
+package-lock.json
+package-lock.json
+flindel-dev-firebase-adminsdk-j38ch-def9c6e1c2.json
+serviceAccountCredentials.json

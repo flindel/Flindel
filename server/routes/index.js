@@ -7,6 +7,9 @@ const dbGitRouter = require('./databaseActionGit');
 const geoCodingRouter = require('./geocoding');
 const shopRouter = require('./shop');
 const scriptTag = require('./scriptTag');
+const sendRouter = require('./sendEmail')
+const dbRouter = require('./databaseAction')
+const shopRouter = require('./shopName')
 
 router = combineRouters(
     rootRouter,
@@ -17,6 +20,8 @@ router = combineRouters(
     geoCodingRouter,
     shopRouter,
     scriptTag,
+    sendRouter,
+    dbRouter
 )
 
 module.exports = router;

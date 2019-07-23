@@ -10,7 +10,20 @@ dotenv.config();
 const cronUtil = require('./util/cronFunction')
 const cron = require('cron')
 const { CronJob } = cron;
+/////////////
+const rp = require('request-promise');
+const errors = require('request-promise/errors');
+/////////////
 
+
+//second (0-59) - minute (0-59) - hour(0-23) - day of month (1-31) - Month (1-12) - Day of Week (0-6, Sun-Sat)
+new CronJob('*/10 * * * * *', async function() { 
+  //KEEP THIS ORDER OF STUFF. unblock all when we go live, set time '0 0 0 * * *'
+  //cronUtil.checkExpired();
+  //cronUtil.mainReport();
+  //cronUtil.returningReport();
+  //cronUtil.clearPending();
+}, null, true)
 
 const port = parseInt(process.env.PORT, 10) || 3000;
 const dev = process.env.NODE_ENV !== 'production';
@@ -45,13 +58,13 @@ app.prepare().then(() => {
     createShopifyAuth({
       apiKey: SHOPIFY_API_KEY,
       secret: SHOPIFY_API_SECRET_KEY,
-      scopes: ['read_products', 'read_orders', 'write_products'],
+      scopes: ['read_products', 'read_orders', 'write_products', 'write_inventory'],
       async afterAuth(ctx) {
         const { shop, accessToken } = ctx.session;
         // TODO: create the shop in the database and store the accessToken
-        console.log('shop.............');
-        console.log(accessToken);
-        console.log(shop);
+        //console.log('shop.............');
+        //console.log(accessToken);
+        //console.log(shop);
         ctx.cookies.set('shop_id', shop);
         ctx.cookies.set('accessToken', accessToken);
         let tokenRef = ctx.db.collection('shop_tokens').doc(shop);
