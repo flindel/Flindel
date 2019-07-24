@@ -56,6 +56,7 @@ app.prepare().then(() => {
 
   server.use(
     createShopifyAuth({
+      //THIS KEEPS GETTING DELETED AND I NEED IT
       apiKey: SHOPIFY_API_KEY,
       secret: SHOPIFY_API_SECRET_KEY,
       scopes: ['read_products', 'read_orders', 'write_products', 'write_inventory'],

@@ -15,7 +15,7 @@ async function sendEmail(listIn) {
 
 //send email to brand about which customers/orders need to be refunded because we accepted the item
 async function sendStoreEmail(store, listIn){
-    let temp = await fetch(`https://${serveoname}/dbcall/getStoreEmail?store=${encodeURIComponent(store)}`, {
+    let temp = await fetch(`https://${serveoname}/shop/email?store=${encodeURIComponent(store)}`, {
             method: 'get',
         })
     t2 = await temp.json()
@@ -31,7 +31,7 @@ async function sendStoreEmail(store, listIn){
 //main function, gets handles the orders that are in pending
 async function mainReport(){
     //pull all the items from pending
-    let temp = await fetch(`https://${serveoname}/dbcall/report`, {
+    let temp = await fetch(`https://${serveoname}/return/pending/report`, {
             method: 'get',
         })
         t2 = await temp.json()
@@ -67,7 +67,7 @@ async function mainReport(){
                 let item = JSON.stringify(tempItem)
                 //write into items
                 if (live){
-                    fetch(`https://${serveoname}/dbcall/additem?status=${encodeURIComponent('returning')}&item=${encodeURIComponent(item)}`, {
+                    fetch(`https://${serveoname}/item/add?status=${encodeURIComponent('returning')}&item=${encodeURIComponent(item)}`, {
                         method: 'get',
                     })
                 }
@@ -138,7 +138,7 @@ async function updateInventory(items){
         let idActive = items[i].variantid
         let storeActive = items[i].store
         //get access token for specific store
-        let tokenresponse = await fetch(`https://${serveoname}/dbcall/getToken?name=${encodeURIComponent(storeActive)}`, {
+        let tokenresponse = await fetch(`https://${serveoname}/shop/token?name=${encodeURIComponent(storeActive)}`, {
             method: 'get',
         })
         let tokenJSON = await tokenresponse.json()
@@ -157,7 +157,7 @@ async function updateInventory(items){
         const productId = temp.variant.product_id //THIS IS PRODUCT ID
 
         //check blacklist
-        let t2 = await fetch(`https://${serveoname}/dbcall/checkblacklist?store=${encodeURIComponent(storeActive)}&id=${encodeURIComponent(productId)}`, {
+        let t2 = await fetch(`https://${serveoname}/blacklist/check?store=${encodeURIComponent(storeActive)}&id=${encodeURIComponent(productId)}`, {
             method: 'get',
         })
         t2json = await t2.json()
@@ -166,7 +166,7 @@ async function updateInventory(items){
             //create item status returning
             let item = JSON.stringify(items[i])
             if (live){
-                fetch(`https://${serveoname}/dbcall/additem?status=${encodeURIComponent('returning')}&item=${encodeURIComponent(item)}`, {
+                fetch(`https://${serveoname}/item/add?status=${encodeURIComponent('returning')}&item=${encodeURIComponent(item)}`, {
                 method: 'get',
             })
             }
@@ -175,7 +175,7 @@ async function updateInventory(items){
             //create item status reselling
             if(live){
                 let item = JSON.stringify(items[i])
-                fetch(`https://${serveoname}/dbcall/additem?status=${encodeURIComponent('reselling')}&item=${encodeURIComponent(item)}`, {
+                fetch(`https://${serveoname}/item/add?status=${encodeURIComponent('reselling')}&item=${encodeURIComponent(item)}`, {
                 method: 'get',
             })
             }
@@ -207,24 +207,24 @@ async function addInv(shopname, quantity, invId, location){
 //get rid of anything that's been in orders for over 7 days
 async function checkExpired(){
     //returns over 7 days - mark expired
-    fetch(`https://${serveoname}/dbcall/expiredReturns`, {
+    fetch(`https://${serveoname}/return/requested/expired`, {
             method: 'get',
         })
     //items reselling for over 7 days - mark returning
-    fetch(`https://${serveoname}/dbcall/expiredItems`, {
+    fetch(`https://${serveoname}/item/expired`, {
             method: 'get',
         })
 }
 //wipe pending, everything has been dealt with by this point
-async function clearPending(){
-    fetch(`https://${serveoname}/dbcall/clear`, {
+function clearPending(){
+    fetch(`https://${serveoname}/return/pending/clear`, {
             method: 'get',
         })
 }
 
 //notify of all items marked returning so we know when to send shipments back
 async function returningReport(){
-    let temp = await fetch(`https://${serveoname}/dbcall/returnReport`, {
+    let temp = await fetch(`https://${serveoname}/item/returningReport`, {
         method: 'get',
     })
     t2 = await temp.json()

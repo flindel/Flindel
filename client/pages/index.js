@@ -9,6 +9,7 @@ const ui = 1;
 //0: ADMIN APP
 //1: SORTING CENTER INTERFACE
 //2: RETURN PORTAL
+//3: BLACKLIST
 class Index extends React.Component{
  render(){
    if(ui == 0){
@@ -29,6 +30,13 @@ class Index extends React.Component{
      return (
        <div>
          <IdentifyApp />
+       </div>
+     )
+   }
+   if (ui == 3){
+     return(
+       <div>
+         <Blacklist/>
        </div>
      )
    }

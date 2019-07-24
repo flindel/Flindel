@@ -8,8 +8,9 @@ const geoCodingRouter = require('./geocoding');
 const shopRouter = require('./shop');
 const scriptTag = require('./scriptTag');
 const sendRouter = require('./sendEmail')
-const dbRouter = require('./databaseAction')
-const shopNameRouter = require('./shopName')
+const blacklistRouter = require('./blacklistFunctions')
+const returnItemRouter = require('./returnItem')
+const returnRouter = require('./existingReturn')
 
 router = combineRouters(
     rootRouter,
@@ -21,8 +22,9 @@ router = combineRouters(
     shopRouter,
     scriptTag,
     sendRouter,
-    dbRouter,
-    shopNameRouter,
+    blacklistRouter,
+    returnItemRouter,
+    returnRouter
 )
 
 module.exports = router;

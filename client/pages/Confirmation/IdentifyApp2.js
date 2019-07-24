@@ -62,7 +62,7 @@ class IdentifyApp extends Component {
 
     //load return policy - have to expand this to multiple stores once we load
     async componentDidMount(){
-        let temp = await fetch(`https://${serveoname}/dbcall/returnPolicy`, {
+        let temp = await fetch(`https://${serveoname}/shop/returnPolicy`, {
             method: 'get',
         })
         let json = await temp.json()
@@ -188,7 +188,7 @@ class IdentifyApp extends Component {
 
     //send email to customer to confirm their return, calls backend function
     sendEmail(){
-        fetch(`https://${serveoname}/send?method=${encodeURIComponent(1)}&email=${encodeURIComponent(this.state.email)}&code=${encodeURIComponent(this.state.code)}`, 
+        fetch(`https://${serveoname}/send/confirmation?email=${encodeURIComponent(this.state.email)}&code=${encodeURIComponent(this.state.code)}`, 
         {
             method: 'post',
         })
@@ -196,7 +196,7 @@ class IdentifyApp extends Component {
 
     //check if code is unique (call to db)
     async checkUnique(){
-        let temp = await fetch(`https://${serveoname}/dbcall?method=${encodeURIComponent(3)}&code=${encodeURIComponent(this.state.code)}`, {
+        let temp = await fetch(`https://${serveoname}/return/requested/uuid?code=${encodeURIComponent(this.state.code)}`, {
             method: 'get',
         })
         let json = await temp.json()
@@ -208,9 +208,8 @@ class IdentifyApp extends Component {
         let currentDate = ''
         currentDate += (new Date().getMonth()+1)+'/'+ new Date().getDate() + '/'+  new Date().getFullYear()
         let items = JSON.stringify(this.state.returnlist)
-        //1 for write, 2 for read
-        fetch(`https://${serveoname}/dbcall?location=${encodeURIComponent('requestedReturns')}&method=${encodeURIComponent(1)}&date=${encodeURIComponent(currentDate)}&code=${encodeURIComponent(this.state.code)}&orderNum=${encodeURIComponent(this.state.orderNum)}&email=${encodeURIComponent(this.state.email)}&items=${encodeURIComponent(items)}`, {
-            method: 'get',
+        fetch(`https://${serveoname}/return/requested/new?date=${encodeURIComponent(currentDate)}&code=${encodeURIComponent(this.state.code)}&orderNum=${encodeURIComponent(this.state.orderNum)}&email=${encodeURIComponent(this.state.email)}&items=${encodeURIComponent(items)}`, {
+            method: 'POST',
         })
     }
 
@@ -250,8 +249,8 @@ class IdentifyApp extends Component {
 
       //check returns database to see if return already exists
     async checkReturnsFromDB(orderNum,emailAdd){
-        orderNum =1
-        let temp = await fetch(`https://${serveoname}/dbcall?method=${encodeURIComponent(4)}&orderNum=${encodeURIComponent(orderNum)}&emailAdd=${encodeURIComponent(emailAdd)}`, {
+        //orderNum =1
+        let temp = await fetch(`https://${serveoname}/return/requested/exists?orderNum=${encodeURIComponent(orderNum)}&emailAdd=${encodeURIComponent(emailAdd)}`, {
             method: 'get',
         })
         let json = await temp.json()
@@ -265,12 +264,12 @@ class IdentifyApp extends Component {
          else{ return false }
     }
 
-    //if they do restart, flip statu to replaced and move to history
+    //if they do restart, flip status to replaced and move to history
     async restartReturn(orderNum, emailAdd, code){
         
         // call database change order_status
-        let temp = await fetch(`https://${serveoname}/dbcall?method=${encodeURIComponent(8)}&code=${encodeURIComponent(this.state.code)}`, {
-            method: 'get',
+        let temp = await fetch(`https://${serveoname}/return/requested/orderStatus?code=${encodeURIComponent(this.state.code)}`, {
+            method: 'PUT',
         })
         let json = await temp.json()
         if(json.success){

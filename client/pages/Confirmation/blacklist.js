@@ -64,7 +64,7 @@ class Blacklist extends Component {
         }
         //save to db
         this.setState({items:tempList})
-        fetch(`https://${serveoname}/dbcall/addBlacklist?id=${encodeURIComponent(toAdd)}&store=${encodeURIComponent(this.state.storeName)}`, {
+        fetch(`https://${serveoname}/blacklist/add?id=${encodeURIComponent(toAdd)}&store=${encodeURIComponent(this.state.storeName)}`, {
             method: 'get',
         })
     }
@@ -90,7 +90,7 @@ class Blacklist extends Component {
         }
         this.setState({items:tempList})
         //submit to database
-        fetch(`https://${serveoname}/dbcall/deleteBlacklist?id=${encodeURIComponent(toDelete)}&store=${encodeURIComponent(this.state.storeName)}`, {
+        fetch(`https://${serveoname}/blacklist/delete?id=${encodeURIComponent(toDelete)}&store=${encodeURIComponent(this.state.storeName)}`, {
             method: 'get',
         })
     }
@@ -105,7 +105,7 @@ class Blacklist extends Component {
 
     //get items on blacklist of current store
     async getItems(){
-        let temp = await fetch(`https://${serveoname}/dbcall/getBlacklist?store=${encodeURIComponent(this.state.storeName)}`, {
+        let temp = await fetch(`https://${serveoname}/blacklist/load?store=${encodeURIComponent(this.state.storeName)}`, {
             method: 'get',
         })
         let json = await temp.json()

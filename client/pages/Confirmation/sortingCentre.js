@@ -54,7 +54,7 @@ class sortingCentre extends Component{
         }
         let RL = await JSON.stringify(rejectList)
         let AL = await JSON.stringify(acceptList)
-        fetch(`https://${serveoname}/send?rejectList=${encodeURIComponent(RL)}&acceptList=${encodeURIComponent(AL)}&method=${encodeURIComponent(2)}&email=${encodeURIComponent(this.state.email)}&code=${encodeURIComponent(this.state.cCode)}`, 
+        fetch(`https://${serveoname}/send/update?rejectList=${encodeURIComponent(RL)}&acceptList=${encodeURIComponent(AL)}&email=${encodeURIComponent(this.state.email)}&code=${encodeURIComponent(this.state.cCode)}`, 
         {
             method: 'post',
         })
@@ -66,8 +66,8 @@ class sortingCentre extends Component{
         currentDate += (new Date().getMonth()+1)+'/'+ new Date().getDate() + '/'+  new Date().getFullYear()
         let items = JSON.stringify(this.state.itemList)
         //write to pending + history, delete from reqReturns, all one transaction
-        await fetch(`https://${serveoname}/dbcall?location=${encodeURIComponent('pending')}&method=${encodeURIComponent(1)}&orderNum=${encodeURIComponent(this.state.orderNum)}&code=${encodeURIComponent(this.state.cCode)}&originalDate=${encodeURIComponent(this.state.createdDate)}&date=${encodeURIComponent(currentDate)}&email=${encodeURIComponent(this.state.email)}&items=${encodeURIComponent(items)}`, {
-            method: 'get',
+        await fetch(`https://${serveoname}/return/pending/new?orderNum=${encodeURIComponent(this.state.orderNum)}&code=${encodeURIComponent(this.state.cCode)}&originalDate=${encodeURIComponent(this.state.createdDate)}&date=${encodeURIComponent(currentDate)}&email=${encodeURIComponent(this.state.email)}&items=${encodeURIComponent(items)}`, {
+            method: 'post',
         })
     }
     //send see if anything has been changed, make sure all items have been dealt with before moving
@@ -110,15 +110,15 @@ class sortingCentre extends Component{
     async handleSubmit2(){
         let items = await JSON.stringify(this.state.itemList)
         //update new reasons
-        fetch(`https://${serveoname}/dbcall?method=${encodeURIComponent(6)}&code=${encodeURIComponent(this.state.cCode)}&items=${encodeURIComponent(items)}`, {
-            method: 'get',
+        fetch(`https://${serveoname}/return/requested/itemStatus?code=${encodeURIComponent(this.state.cCode)}&items=${encodeURIComponent(items)}`, {
+            method: 'POST',
         })
         this.setState({step:4})
     }
 
     //handle initial submit, load items for order
     async handleSubmit(){
-        let temp = await fetch(`https://${serveoname}/dbcall?method=${encodeURIComponent(5)}&code=${encodeURIComponent(this.state.cCode)}`, {
+        let temp = await fetch(`https://${serveoname}/return/requested/items?code=${encodeURIComponent(this.state.cCode)}`, {
             method: 'get',
         })
         let t2 = await temp.json()
