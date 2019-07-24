@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import {serveo_name} from '../config';
-import {post, put, get, del, postGIT} from './Shopify';
+import {post, put, get, del, postGIT, postGitVariant} from './Shopify';
+import {getGitProduct} from './Firestore'
 
 let updates = [];
 let reloadFunction;
@@ -10,7 +11,7 @@ const butterfly_id = "2114548007009";
 const gitPara = {
                   name:["fulfillment_service", "grams", "inventory_management", "weight"],
                   value:["flindel", 0, "shopify", 0],
-                  defaultCorrection:["manual", 100, "shopify", .1]
+                  defaultCorrection:["manual", 100, "shopify", .1] //REMOVE THIS INCASE COMPANY DOES NOT USE SHOPIFY INVENTORY
                 }
 
 class FixIssues extends Component {
@@ -20,13 +21,15 @@ class FixIssues extends Component {
       hasError: false,
     }
     this.handleClick = this.handleClick.bind(this);
+    this.print = this.print.bind(this);
+    this.fixUnequalVariants = this.fixUnequalVariants.bind(this);
+    this.fixGitVarDne2 = this.fixGitVarDne2.bind(this);
   }
 
   finishedFixing(data){
     fixes += 1
     console.log("Fixes", fixes)
-    console.log("Updates", updates)
-    if(fixes == updates.length){
+    if(fixes == updates.length) {
       console.log("Finished Fixing")
       reloadFunction();
     }
@@ -39,7 +42,7 @@ class FixIssues extends Component {
     for(let i=0; i < updates.length; i++) {
       switch(updates[i].issue){
         case "Unequal parameters":
-          //this.fixUnequalParameters(updates[i]);
+          this.fixUnequalParameters(updates[i]);
           break;
         case "\"Get it Today\" version of this product does not exist":
           this.fixGitDne(updates[i]);
@@ -53,6 +56,9 @@ class FixIssues extends Component {
         case "The Original item has information that conflicts with Get it Today":
           this.fixNormDefaultPara(updates[i]);
           break;
+        case "\"Get it Today\" version of this product variant does not exist":
+          this.fixGitVarDne(updates[i]);
+          break;
       }
     }
   }
@@ -61,22 +67,78 @@ class FixIssues extends Component {
   //Copies the parameters from normal product to GIT product
   //Does not account for shifting vairants
   fixUnequalParameters(update){
-    console.log("fixUnequalParameters", update);
     let gitBody = update.norm;
     gitBody.title = update.norm.title + " - Get it Today";
-    /*
-    for(let j = 0; j < update.norm.variants.length; j++){
-      gitBody.variants[j].inventory_quantity = update.git.variants[j].inventory_quantity;
-      gitBody.variants[j].old_inventory_quantity = update.git.variants[j].old_inventory_quantity;
-      for(let i = 0; i < gitPara.name.length; i++){
-        eval("gitBody.variants["+j+"]."+gitPara.name[i]+" = gitPara.value[i]");
-      }
-    }
-    */
-    let body = {product: gitBody};
+    gitBody.id = update.git.id;
+    getGitProduct(update.git.id, this.fixUnequalVariants, [update, gitBody]);
+  }
+
+  fixUnequalVariants(fsData, args){
+    let update = args[0];
+    let gitBody = args[1];
+    console.log("fixUnequalVariants",fsData, update);
+    gitBody.variants = this.normVarToGitVar(update, fsData);
+    const body = {product: gitBody};
     put(update.git.id, body, this.finishedFixing);
   }
 
+  fixGitVarDne(update){
+    console.log("fixGitVarDne: ", update.git.variants, update.norm.variants);
+    getGitProduct(update.git.id, this.fixGitVarDne2, [update])
+  }
+
+  fixGitVarDne2(fsData, args){
+    let update = args[0];
+    console.log("FSDATA", fsData);
+    console.log("fixGitVarDne2", update.git.variants, update.norm.variants);
+    const variants = this.normVarToGitVar(update, fsData);
+    postGitVariant(update.git.id, variants, update, this.finishedFixing);
+  }
+
+  normVarToGitVar(update, fsData){
+    let normVariants = update.norm.variants.slice();
+    let newVariants = [];
+    for(let i = 0; i < normVariants.length; i++){
+      let normVar = normVariants[i];
+      let gitVarID = this.findGitVarID(fsData, normVar.id);
+      let gitVar = this.findGitVar(update.git.variants, gitVarID);
+      //Required git values
+      for(let m = 0; m < gitPara.name.length; m++){
+        eval("normVar."+gitPara.name[m]+" = gitPara.value[m]");
+      }
+      normVar.id = null;
+      if (gitVar !== undefined){
+        normVar.id = gitVar.id;
+        normVar.product_id = update.git.id;
+        normVar.sku = gitVar.sku;
+        normVar.inventory_quantity = gitVar.inventory_quantity;
+        normVar.old_inventory_quantity = gitVar.old_inventory_quantity;
+      }else {
+        normVar.product_id = update.git.id;
+        normVar.inventory_quantity = 0;
+        normVar.old_inventory_quantity = 0;
+      }
+      newVariants.push(normVar);
+    }
+    console.log("normVarToGitVar: ", update.git.variants, update.norm.variants);
+    return newVariants.slice();
+  }
+
+  findGitVarID(fsData, normVarID){
+    for (let j = 0; j < fsData.variants.length; j++){
+      if (fsData.variants[j].orig_var+"" == normVarID+"") {
+        return fsData.variants[j].git_var;
+      }
+    }
+  }
+
+  findGitVar(gitVariants, gitVarID){
+    for (let k = 0; k < gitVariants.length; k++){
+      if(gitVariants[k].id == gitVarID){
+        return gitVariants[k];
+      }
+    }
+  }
 
   fixGitDefaultPara(update){
     let gitBody = update.git;
@@ -104,8 +166,7 @@ class FixIssues extends Component {
 
   //POST REQUEST
   //Creates GIT product with same parameters as NORM
-  //DOES NOT SETUP CORRECT INVENTORY
-  //NEEDS TO ADD IDS TO FIRESTORE
+  //DOES NOT ADD SKU NUMBER TO VARIANTS
   fixGitDne(update){
     console.log("fixGitDne", update);
     let gitBody = update.norm;

@@ -2,19 +2,20 @@ import React, { Component } from 'react';
 import DisplayIssue from './DisplayIssue';
 import FixIssues from './FixIssues';
 import {serveo_name} from '../config'
+import {get} from './Shopify'
+import {getGitProduct, getOrigProduct} from './Firestore'
 
 
-const collection_all_products_id = "97721974881";
-const collection_get_it_today_id = "97721155681";
-const location_brand_id = "21803171937";
-const location_flindel_id = "21890891873";
+let collection_all_products_id = "97721974881";
+let collection_get_it_today_id = "97721155681";
 
 let key = 1;
-const butterfly_id = "2114548007009";
 
 class FindIssues extends Component {
-  constructor(){
-    super();
+  constructor(props){
+    collection_all_products_id = props.collection_all_products_id;
+    collection_get_it_today_id = props.collection_get_it_today_id;
+    super(props);
     this.state = {
       load_all: true,
       load_git: true,
@@ -26,6 +27,15 @@ class FindIssues extends Component {
     }
     this.componentDidMount = this.componentDidMount.bind(this);
     this.compareUpdates = this.compareUpdates.bind(this);
+    this.compareProductParameters = this.compareProductParameters.bind(this);
+    this.normProductIssuesLoop = this.normProductIssuesLoop.bind(this);
+    this.gitProductIssuesLoop = this.gitProductIssuesLoop.bind(this);
+    this.findGit = this.findGit.bind(this);
+    this.findOrig = this.findOrig.bind(this);
+  }
+
+  callback(data) {
+    console.log(data);
   }
 
   componentDidMount() {
@@ -40,7 +50,7 @@ class FindIssues extends Component {
       updates: [],
       displayUpdates: [],
     })
-    //Assumption, Brand has less than 250 inventory item/product variations
+    //Assumption, Brand has less than 50 inventory item/product variations
     fetch(`${serveo_name}/collections?id=${encodeURIComponent(collection_all_products_id)}`, {
       method: 'GET',
       })
@@ -53,7 +63,7 @@ class FindIssues extends Component {
         this.setState({load_all: false});
         this.loaded();
       })
-      .catch((error) => console.log("error"))
+      .catch((error) => console.log(error))
 
     fetch(`${serveo_name}/collections?id=${encodeURIComponent(collection_get_it_today_id)}`, {
       method: 'GET',
@@ -67,7 +77,7 @@ class FindIssues extends Component {
         this.setState({load_git: false});
         this.loaded();
       })
-      .catch((error) => console.log("error"))
+      .catch((error) => console.log(error))
   }
 
   loaded(){
@@ -76,15 +86,16 @@ class FindIssues extends Component {
       console.log("Git Products: ", this.state.git);
       this.compareUpdates();
     }
+
   }
 
-  //Assumption, every product has a unique name
-  //Variants can never swtich names
   compareUpdates(){
     let diff = [];
     diff = this.normalProductIssues().concat(this.gitProductIssues());
     this.setState({hasCompared: true});
-    this.setState({updates: diff})
+    this.setState({
+      updates: this.state.updates.concat(diff)
+    })
   }
 
   normalProductIssues(){
@@ -94,13 +105,39 @@ class FindIssues extends Component {
       if(this.normProductParameters(product)) {
         diff.push(this.normProductParameters(product));
       }
-      let gitProduct = this.findGetItTodayDuplicate(product.title);
-      if (gitProduct) {
-        let comparison = this.compareProducts(product, gitProduct);
-        if (comparison){diff.push(comparison);}
-      } else {
-        //GIT version of product does not exist
-        diff.push({
+      getOrigProduct(product.id, this.normProductIssuesLoop);
+      }
+    return diff;
+  }
+
+  findGit(id){
+    for (let product of this.state.git.products) {
+      if (product.id+"" == id){
+        return product;
+      }
+    }
+    return {};
+  }
+
+  findOrig(id){
+    for (let product of this.state.all.products) {
+      if (product.id+"" == id){
+        return product;
+      }
+    }
+    return {};
+  }
+
+
+  normProductIssuesLoop(data){
+    const product = this.findOrig(data.orig_id);
+    if (data.git_id !== undefined) {
+      let comparison = this.compareProducts(this.findOrig(data.orig_id), this.findGit(data.git_id), data);
+      if (comparison){this.setState(this.state.updates.concat(comparison));}
+    } else {
+      //GIT version of product does not exist
+      this.setState({
+        updates: this.state.updates.concat({
           norm: product,
           git: null,
           name: product.title,
@@ -109,21 +146,19 @@ class FindIssues extends Component {
           issue: "\"Get it Today\" version of this product does not exist",
           solution: "A \"Get it Today\" version of the product will be created"
         })
-      }
-    }
-    return diff;
+    })
   }
+}
 
   //name: String, title of original product.
   //return product duplicate Get it Today item
-  findGetItTodayDuplicate(name){
+  findGetItTodayDuplicate2(name){
     for(let i = 0; i < this.state.git.products.length; i++){
       let product = this.state.git.products[i];
       if ((name + " - Get it Today") === (product.title)){
         return product;
       }
     }
-    console.log("GIT DNE: ", name);
     return null;
   }
 
@@ -134,20 +169,27 @@ class FindIssues extends Component {
       if (this.gitProductParameters(product)){
         diff.push(this.gitProductParameters(product));
       }
-      let normProduct = this.findNormalDuplicate(product.title);
-      if (normProduct == null) {
-        diff.push({
+      getGitProduct(product.id, this.gitProductIssuesLoop);
+    }
+    return diff;
+  }
+
+  gitProductIssuesLoop(data){
+    let normProduct = this.findOrig(data.orig_id);
+    let gitProduct = this.findGit(data.git_id);
+    if (data.orig_id == "") {
+      this.setState({
+        updates: this.state.updates.concat({
           norm: null,
-          git: product,
-          name: product.title,
+          git: gitProduct,
+          name: gitProduct.title,
           parameterIssues: [],
           variantIssues: [],
           issue: "\"Original\" version of this \"Get it Today\" product does not exist",
           solution: "This product will be deleted"
-        })
-      }
+      })
+    })
     }
-    return diff;
   }
 
   //name: String, title of "Get it Today" product
@@ -164,21 +206,24 @@ class FindIssues extends Component {
 
   //norm: product, product ID of original item
   //git: product, product ID of duplicate get it today item
+  //fsPairs: product pairs stored in firestore
   //DOES NOT COMPARE IMAGES, IMAGE CHANGES WILL NOT BE FLAGGED
-  compareProducts(norm, git){
+  compareProducts(norm, git, fsPairs){
     let display_issue = {
       norm: norm,
       git: git,
       name: norm.title,
       parameterIssues: this.compareProductParameters(norm, git),
-      variantIssues: this.compareVariantParameters(norm, git),
+      variantIssues: this.compareVariantParameters(norm, git, fsPairs),
     }
     let para_len = display_issue.parameterIssues.length;
     let var_len = display_issue.variantIssues.length;
     if (!(para_len == 0) || !(var_len == 0)){
         display_issue.issue = "Unequal parameters";
         display_issue.solution = "The \"Original\" product's info will replace the \"Get it Today\" product's info."
-        return display_issue;
+        this.setState({
+          updates: this.state.updates.concat(display_issue)
+        })
       }
   }
 
@@ -212,13 +257,13 @@ class FindIssues extends Component {
     let productIssues = [];
     const para = {name:["fulfillment_service", "grams", "inventory_management", "weight"],
                   value:["flindel", 0, "shopify", 0]}
-
     for (let j = 0; j < git.variants.length; j++){
       let variant = git.variants[j];
       for (let i = 0; i < para.name.length; i++){
         if(eval(`variant.${para.name[i]}`) !== para.value[i]){
           productIssues.push(
             {
+              title: variant.title,
               parameter: para.name[i],
               norm: para.value[i],
               git: eval("variant."+para.name[i]),
@@ -226,7 +271,7 @@ class FindIssues extends Component {
           }
         }
       }
-    //console.log("productIssues: ", productIssues)
+
     if (productIssues.length > 0){
       return ({
         norm: null,
@@ -265,7 +310,6 @@ class FindIssues extends Component {
           }
         }
       }
-    //console.log("productIssues: ", productIssues)
     if (productIssues.length > 0){
       return ({
         norm: norm,
@@ -281,29 +325,74 @@ class FindIssues extends Component {
     }
   }
 
-  compareVariantParameters(norm, git){
+  compareVariantParameters(norm, git, fsPairs){
+    const varPairs = fsPairs.variants;
     let variantIssues = [];
-    if (norm.variants.length != git.variants.length) {
-      return variantIssues;
-    }
     const para = ["barcode", "compare_at_price", "image_id", "option1",
-     "option2", "option3", "position", "price", "requires_shipping", "taxable",
+     "option2", "option3", "price", "requires_shipping", "taxable",
      "title", "weight_unit"]
-    for(let i = 0; i < norm.variants.length; i++){
-      for(let j = 0; j < para.length; j++){
-        let norm_string = "norm.variants["+i+"]."+para[j];
-        let git_string = "git.variants["+i+"]."+para[j];
-        if(!(eval(norm_string) === eval(git_string))) {
-          variantIssues.push(
-          {
-            parameter: para[j],
-            norm: eval(norm_string),
-            git: eval(git_string),
-          });
+    for(let i = 0; i < varPairs.length; i++){
+      //FS id -> Shopify id
+      let gitVarID = varPairs[i].git_var;
+      let origVarID = varPairs[i].orig_var;
+      //Find index in shopify variants
+      let gitIndex = this.findVarIndex(git, gitVarID);
+      let origIndex = this.findVarIndex(norm, origVarID);
+
+      if ((origIndex == -1)&&(gitIndex != -1)){ //WHAT IF GIT INDEX AND ORIG INDEX IS -1
+        this.setState({
+          updates: this.state.updates.concat({
+            norm: norm,
+            git: git,
+            name: norm.title,
+            parameterIssues: [],
+            variantIssues: [{
+              title: git.variants[gitIndex].title,
+              gitVar: git.variants[gitIndex]
+            }],
+            issue: "\"Original\" version of this \"Get it Today\" product variant does not exist",
+            solution: "The \"Get it Today\" product variant will be deleted"
+          })})
+      }
+      else if ((gitIndex == -1)&&(origIndex != -1)){
+        this.setState({
+          updates: this.state.updates.concat({
+            norm: norm,
+            git: git,
+            name: norm.title,
+            parameterIssues: [],
+            variantIssues: [{
+              title: norm.variants[origIndex].title,
+              normVar: norm.variants[origIndex]
+            }],
+            issue: "\"Get it Today\" version of this product variant does not exist",
+            solution: "A \"Get it Today\" version of the product variant will be created"
+          })})
+      }
+      else {
+        for(let j = 0; j < para.length; j++){
+          let norm_string = "norm.variants["+origIndex+"]."+para[j];
+          let git_string = "git.variants["+gitIndex+"]."+para[j];
+          if(!(eval(norm_string) === eval(git_string))) {
+            variantIssues.push(
+            {
+              title: norm.variants[origIndex].title,
+              parameter: para[j],
+              norm: eval(norm_string),
+              git: eval(git_string),
+            });
+          }
         }
       }
     }
     return variantIssues;
+  }
+
+  findVarIndex(product, varID){
+    for(let i = 0; i < product.variants.length; i++){
+      if(product.variants[i].id+"" == varID){return i;}
+    }
+    return -1;
   }
 
   render() {
@@ -321,7 +410,7 @@ class FindIssues extends Component {
     let isSync = displayUpdates.length ==  0;
     return (
       <div>
-        <h1>{isLoading? "Loading" : "Get it Today Product Admin"}</h1>
+        <h1>{isLoading? "Loading Products" : "Get it Today Product Admin"}</h1>
         {!isLoading&&<h3>{isSync? "Get it Today is syncronized"
         :"Get it Today is not synchronized"}</h3>}
         {(!isLoading&&!isSync)&&

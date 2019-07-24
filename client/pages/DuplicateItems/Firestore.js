@@ -1,38 +1,68 @@
 import {serveo_name} from '../config'
 
-export async function postProduct(data){
+export async function postInstallTime(data){
   var temp;
-  temp = await fetch(`${serveo_name}/dbcall/product/git/?body=${encodeURIComponent(JSON.stringify(data))}`, {
+  temp = await fetch(`${serveo_name}/dbcallGit/shop_tokens/install_time/?body=${encodeURIComponent(JSON.stringify(data))}`, {
     method: 'post',
   })
 }
 
-export async function getGitProduct(gitID, callback = doNothing){
+export async function getShopToken(shop_id, callback = doNothing, args){
   var temp;
-  temp = await fetch(`${serveo_name}/dbcall/product/git/?gitID=${encodeURIComponent(gitID)}`, {
+  temp = await fetch(`${serveo_name}/dbcallGit/shop_tokens/?shop_id=${encodeURIComponent(shop_id)}`, {
     method: 'get',
   })
-  var json  = await JSON.parse(temp);
-  callback(formatJSON(json._fieldsProto))
+  var json  = await temp.json();
+  if (args == []){
+    return callback(formatJSON(json._fieldsProto))
+  }
+  else {
+    return callback(formatJSON(json._fieldsProto), args)
+  }
+}
+
+export async function postProduct(data){
+  var temp;
+  temp = await fetch(`${serveo_name}/dbcallGit/product/git/?body=${encodeURIComponent(JSON.stringify(data))}`, {
+    method: 'post',
+  })
+}
+
+export async function getGitProduct(gitID, callback = doNothing, args = []){
+  var temp;
+  temp = await fetch(`${serveo_name}/dbcallGit/product/git/?gitID=${encodeURIComponent(gitID)}`, {
+    method: 'get',
+  })
+  var json  = await temp.json();
+  if (args == []){
+    return callback(formatJSON(json._fieldsProto))
+  }
+  else {
+    return callback(formatJSON(json._fieldsProto), args)
+  }
 }
 
 export async function delProduct(gitID){
   var temp;
-  temp = await fetch(`${serveo_name}/dbcall/product/git/?gitID=${encodeURIComponent(gitID)}`, {
+  temp = await fetch(`${serveo_name}/dbcallGit/product/git/?gitID=${encodeURIComponent(gitID)}`, {
     method: 'delete',
   })
 }
 
-export async function getOrigProduct(orig_id, callback=doNothing){
+export async function getOrigProduct(orig_id, callback = doNothing){
  var temp;
- temp = await fetch(`${serveo_name}/dbcall/product/orig/?origID=${encodeURIComponent(orig_id)}`, {
+ temp = await fetch(`${serveo_name}/dbcallGit/product/orig/?origID=${encodeURIComponent(orig_id)}`, {
    method: 'get',
  })
  var json  = await temp.json();
- callback(formatJSON(json._fieldsProto));
+ if (JSON.stringify(json) == "{}"){
+   callback({orig_id: orig_id})
+ }else{
+   return callback(formatJSON(json._fieldsProto));
+ }
 }
 
-function doNothing(data){console.log("doNothingFirestore")}
+function doNothing(data){console.log("doNothing: ", data)}
 
 //Only works for formatting Product JSONs
 function formatJSON(json){

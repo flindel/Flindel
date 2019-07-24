@@ -10,6 +10,8 @@ const router = Router({
 router.get('/', async ctx => {
     // Get all orders
     const { shop, accessToken } = getShopHeaders(ctx);
+    const name = ctx.query.orderNum;
+    const { cookies } = ctx;
     const option = {
         url: `https://${shop}/${api_link}/orders.json`,
         headers: {
