@@ -6,9 +6,6 @@ import SC from "./Confirmation/sortingCentre"
 import Blacklist from './Confirmation/blacklist'
 
 import {ui} from './config'
-//0: ADMIN APP
-//1: SORTING CENTER INTERFACE
-//2: RETURN PORTAL
 class Index extends React.Component{
  render(){
    if(ui == 0){

@@ -54,7 +54,7 @@ class sortingCentre extends Component{
         }
         let RL = await JSON.stringify(rejectList)
         let AL = await JSON.stringify(acceptList)
-        fetch(`https://${serveoname}/send/update?rejectList=${encodeURIComponent(RL)}&acceptList=${encodeURIComponent(AL)}&email=${encodeURIComponent(this.state.email)}&code=${encodeURIComponent(this.state.cCode)}`, 
+        fetch(`https://${serveoname}/send/update?rejectList=${encodeURIComponent(RL)}&acceptList=${encodeURIComponent(AL)}&email=${encodeURIComponent(this.state.email)}`, 
         {
             method: 'post',
         })
@@ -111,7 +111,7 @@ class sortingCentre extends Component{
         let items = await JSON.stringify(this.state.itemList)
         //update new reasons
         fetch(`https://${serveoname}/return/requested/itemStatus?code=${encodeURIComponent(this.state.cCode)}&items=${encodeURIComponent(items)}`, {
-            method: 'POST',
+            method: 'PUT',
         })
         this.setState({step:4})
     }

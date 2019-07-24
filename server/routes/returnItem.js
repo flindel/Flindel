@@ -26,7 +26,7 @@ router.get('/returningReport', async ctx => {
     ctx.body = {'res': returningItems}
 });
 
-router.get('/add', async ctx => {
+router.post('/add', async ctx => {
     const item = ctx.query.item
     const status = ctx.query.status
     let currentDate = ''
@@ -54,7 +54,7 @@ router.get('/add', async ctx => {
 
 });
 
-router.get('/expired', async ctx => {
+router.put('/expired', async ctx => {
     db = ctx.db
     //batch for efficiency
     let batch = db.batch()

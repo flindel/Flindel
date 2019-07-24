@@ -7,17 +7,6 @@ const router = Router({
     prefix: '/return'
 });
 
-router.get('/pending/clear', async ctx => {
-    db = ctx.db
-    let batch = db.batch()
-    let myRef = db.collection('pending')
-    let query = await myRef.get()
-    await query.forEach(async doc =>{
-        batch.delete(doc.ref)
-    })
-    batch.commit();
-});
-
 router.get('/pending/report', async ctx => {
     let items = []
     db = ctx.db
@@ -35,7 +24,7 @@ router.get('/pending/report', async ctx => {
     ctx.body = {'res': items}
 });
 
-router.get('/requested/expired', async ctx => {
+router.put('/requested/expired', async ctx => {
     let currentDate = ''
     currentDate += (new Date().getMonth()+1)+'/'+ new Date().getDate() + '/'+  new Date().getFullYear()
     db = ctx.db
@@ -111,7 +100,7 @@ router.get('/requested/exists', async ctx=>{
     }
 })
 
-router.post('/requested/itemStatus', async ctx=>{
+router.put('/requested/itemStatus', async ctx=>{
         code = ctx.query.code
         rawItems = ctx.query.items
         db = ctx.db

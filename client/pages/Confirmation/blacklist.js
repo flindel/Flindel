@@ -1,6 +1,5 @@
 import React, { Component } from 'react';
 import './universal.css'
-import { Key } from '@shopify/polaris';
 import {serveo_name} from '../config'
 const sname = serveo_name
 const serveoname = sname.substring(8)
@@ -64,8 +63,8 @@ class Blacklist extends Component {
         }
         //save to db
         this.setState({items:tempList})
-        fetch(`https://${serveoname}/blacklist/add?id=${encodeURIComponent(toAdd)}&store=${encodeURIComponent(this.state.storeName)}`, {
-            method: 'get',
+        fetch(`https://${serveoname}/blacklist/new?id=${encodeURIComponent(toAdd)}&store=${encodeURIComponent(this.state.storeName)}`, {
+            method: 'post',
         })
     }
 
@@ -90,8 +89,8 @@ class Blacklist extends Component {
         }
         this.setState({items:tempList})
         //submit to database
-        fetch(`https://${serveoname}/blacklist/delete?id=${encodeURIComponent(toDelete)}&store=${encodeURIComponent(this.state.storeName)}`, {
-            method: 'get',
+        fetch(`https://${serveoname}/blacklist?id=${encodeURIComponent(toDelete)}&store=${encodeURIComponent(this.state.storeName)}`, {
+            method: 'DELETE',
         })
     }
 
@@ -105,7 +104,7 @@ class Blacklist extends Component {
 
     //get items on blacklist of current store
     async getItems(){
-        let temp = await fetch(`https://${serveoname}/blacklist/load?store=${encodeURIComponent(this.state.storeName)}`, {
+        let temp = await fetch(`https://${serveoname}/blacklist/list?store=${encodeURIComponent(this.state.storeName)}`, {
             method: 'get',
         })
         let json = await temp.json()

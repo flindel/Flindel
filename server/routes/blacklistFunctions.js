@@ -7,7 +7,7 @@ const router = Router({
     prefix: '/blacklist'
 });
 
-router.get('/check', async ctx => {
+router.get('/exists', async ctx => {
     db = ctx.db
     id = ctx.query.id
     store = ctx.query.store
@@ -21,7 +21,7 @@ router.get('/check', async ctx => {
     }  
 });
 
-router.get('/add', async ctx => {
+router.post('/new', async ctx => {
     db = ctx.db
     store = ctx.query.store
     id = ctx.query.id
@@ -33,7 +33,7 @@ router.get('/add', async ctx => {
     ctx.body = {'success':true}
 });
 
-router.get('/load', async ctx => {
+router.get('/list', async ctx => {
     db = ctx.db
     let store = ctx.query.store
     let products = []
@@ -45,7 +45,7 @@ router.get('/load', async ctx => {
     ctx.body = {'res':products}
 })
 
-router.get('/delete', async ctx =>{
+router.delete('/', async ctx =>{
     db = ctx.db
     store = ctx.query.store
     id = ctx.query.id
