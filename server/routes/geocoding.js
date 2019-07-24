@@ -10,7 +10,7 @@ const geocodingKey = process.env.GOOGLE_GEOCODING_KEY
 const turf = require('@turf/turf')
 const warehoue = turf.point([-79.3802531703975,43.6566807319543])
 
-//define available deliver area
+//define available deliver area with point
 const Bathurst = [-79.411215, 43.666233]
 const BloorEastJarvis = [-79.380506, 43.671632]
 const BathurstAtQueens = [-79.398840, 43.636067]
@@ -23,8 +23,8 @@ router.get('/', async ctx => {
     ctx.set('Access-Control-Allow-Methods', 'POST, GET, PUT, DELETE, OPTIONS');
     
     const postalCode = ctx.query.postalCode;
-    console.log("postal code:---------"+postalCode)
-     const option = {
+    //console.log("postal code:---------"+postalCode)
+    const option = {
          url: `https://maps.googleapis.com/maps/api/geocode/json?address=${encodeURI(postalCode)}&key=${geocodingKey}&format=json`,
      }
 
@@ -37,23 +37,18 @@ router.get('/', async ctx => {
             console.log('no such postal code')
             ctx.body = {"valid":false}
         }else if(resp.status=="OK"){
-            //console.log("poly---"+DeliverPoly)
-            //console.log("poly type: "+typeof(DeliverPoly))
             let destination = turf.point([resp.results[0].geometry.location.lng, resp.results[0].geometry.location.lat])
-            //let distance = turf.distance(warehoue, destination)
-            console.log("destination---"+JSON.stringify(destination))
-            //console.log(LowerJarvisAndQueens)
-            console.log("inside???"+turf.booleanPointInPolygon(destination, DeliverPoly))
+            //console.log("destination---"+JSON.stringify(destination))
+            //console.log("inside???"+turf.booleanPointInPolygon(destination, DeliverPoly))
             if(turf.booleanPointInPolygon(destination, DeliverPoly)){
                 valid = true
             }
         }else{
-            console.log(resp)
+            //console.log(resp)
             valid = false
         }
         ctx.body = {"valid":valid}
-        
-        console.log("ctx-------"+JSON.stringify(ctx.body))
+        //console.log("ctx-------"+JSON.stringify(ctx.body))
     } catch (err) {
         console.log(err.message);
         if (err instanceof errors.StatusCodeError) {
