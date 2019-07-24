@@ -1,7 +1,7 @@
 
 import React, { Component } from 'react';
 import {postCollection, getShopID, postScriptTag} from './Shopify';
-import {postInstallTime, getShopToken} from './Firestore';
+import {postInstallTime} from './Firestore';
 import {script_tag_url} from '../config'
 
 import Button from '@material-ui/core/Button';

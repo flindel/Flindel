@@ -50,7 +50,7 @@ class Blacklist extends Component {
             this.setState({errorMessage:'This item is already on the blacklist.'})
         }
         this.setState({items:tempList})
-        fetch(`${serveo_name}/dbcallGit/addBlacklist?id=${encodeURIComponent(toAdd)}&store=${encodeURIComponent(this.state.storeName)}`, {
+        fetch(`${serveo_name}/blacklist/add?id=${encodeURIComponent(toAdd)}&store=${encodeURIComponent(this.state.storeName)}`, {
             method: 'get',
         })
     }
@@ -70,7 +70,7 @@ class Blacklist extends Component {
             this.setState({errorMessage:'This item is not currently on the blacklist.'})
         }
         this.setState({items:tempList})
-        fetch(`${serveo_name}/dbcallGit/deleteBlacklist?id=${encodeURIComponent(toDelete)}&store=${encodeURIComponent(this.state.storeName)}`, {
+        fetch(`${serveo_name}/blacklist/delete?id=${encodeURIComponent(toDelete)}&store=${encodeURIComponent(this.state.storeName)}`, {
             method: 'get',
         })
     }
@@ -81,7 +81,7 @@ class Blacklist extends Component {
         this.getItems()
     }
     async getItems(){
-        let temp = await fetch(`${serveo_name}/dbcallGit/getBlacklist?store=${encodeURIComponent(this.state.storeName)}`, {
+        let temp = await fetch(`${serveo_name}/blacklist/load?store=${encodeURIComponent(this.state.storeName)}`, {
             method: 'get',
         })
         let json = await temp.json()

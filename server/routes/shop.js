@@ -18,7 +18,7 @@ router.get('/token', async ctx =>{
     storename = ctx.query.name
     myRef = db.collection('shop_tokens').doc(storename);
     getDoc = await myRef.get()
-    ctx.body = {"token" : getDoc._fieldsProto.token.stringValue, "tLocation":getDoc._fieldsProto.torontoLocation.stringValue}  
+    ctx.body = {"token" : getDoc._fieldsProto.token.stringValue, "tLocation":getDoc._fieldsProto.torontoLocation.stringValue}
 })
 
 router.get('/returnPolicy', async ctx =>{
@@ -37,6 +37,19 @@ router.get('/email', async ctx =>{
     myRef = db.collection('shop_tokens').doc(store)
     let query = await myRef.get()
     ctx.body = {'email':query._fieldsProto.email.stringValue}
+})
+
+router.post('/install_time/', async ctx =>{
+  ctx.set('Access-Control-Allow-Origin', '*');
+  ctx.set('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept');
+  ctx.set('Access-Control-Allow-Methods', 'POST, GET, PUT, DELETE, OPTIONS');
+  let body = JSON.parse(ctx.query.body);
+  let db = ctx.db
+  let setDoc = db.collection('shop_tokens').doc(body.shop_id+"").set(
+    {
+      install_time: body.install_time
+    }, {merge:true});
+  ctx.body = 'success'
 })
 
 module.exports = router;
