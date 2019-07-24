@@ -2,7 +2,7 @@
 import React, { Component } from 'react';
 import {postCollection, getShopID, postScriptTag} from './Shopify';
 import {postInstallTime} from './Firestore';
-import {script_tag_url} from '../config'
+import {script_tag_url, script_tag_url_returnPortal} from '../config'
 
 import Button from '@material-ui/core/Button';
 import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
@@ -77,6 +77,7 @@ class SetupGit extends Component {
     }
 
     postScriptTag(script_tag_url);
+    postScriptTag(script_tag_url_returnPortal);
   }
 
   callbackGit(data){
