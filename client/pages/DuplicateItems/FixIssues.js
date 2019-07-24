@@ -6,7 +6,6 @@ import {getGitProduct} from './Firestore'
 let updates = [];
 let reloadFunction;
 let fixes = 0;
-const butterfly_id = "2114548007009";
 
 const gitPara = {
                   name:["fulfillment_service", "grams", "inventory_management", "weight"],
@@ -64,8 +63,6 @@ class FixIssues extends Component {
   }
 
   //PUT REQUEST
-  //Copies the parameters from normal product to GIT product
-  //Does not account for shifting vairants
   fixUnequalParameters(update){
     let gitBody = update.norm;
     gitBody.title = update.norm.title + " - Get it Today";
