@@ -136,12 +136,13 @@ export function postGitVariant(product_id, variants, update, callback = doNothin
   let body = null;
   let orig = update.norm;
   let git = update.git;
+  let newVariant = {};
   for (let i = 0; i < variants.length; i++){
     if (variants[i].id == null){
-      body = variants[i];
+      newVariant = variants[i];
     }
   }
-  body = {variant: body}
+  body = {variant: newVariant}
   const options = {
     method: 'post',
     headers: {
@@ -157,6 +158,7 @@ export function postGitVariant(product_id, variants, update, callback = doNothin
       else{throw Error(response.statusText)}
     })
     .then((data) => {
+      /*
       console.log('POST Var: ', data);
       console.log("Git1: ", git)
       callback(data);
@@ -170,8 +172,23 @@ export function postGitVariant(product_id, variants, update, callback = doNothin
       const out = postData({product: JSON.parse(JSON.stringify(git))}, {product: JSON.parse(JSON.stringify(orig))});
       console.log("Formatted Body: ", out);
       postProduct(out);
+      */
+      getGitProduct(update.git.id, postGitVariantToFirestore, [update, data.variant.id]);
     })
     .catch((error) => console.log(error))
+}
+
+function postGitVariantToFirestore(json, args){
+  console.log("Firestore JSON: ", json);
+  let update = args[0];
+  let newVariantId = args[1];
+
+  for (let i = 0; i < json.variants.length; i++){
+    if(!json.variants[i].git_var){
+      json.variants[i].git_var = newVariantId;
+    }
+  }
+  postProduct(json);
 }
 
 //Adds product to shopify and adds original and GIT IDs to FIRESTORE
