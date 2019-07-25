@@ -3,6 +3,7 @@ const rp = require("request-promise");
 const errors = require("request-promise/errors");
 const { api_link } = require("../default-shopify-api.json");
 const { getShopHeaders } = require("../util/shop-headers");
+const { SERVEO_NAME } = process.env;
 
 const router = Router({
   prefix: "/fulserv"
@@ -24,7 +25,7 @@ router.post("/", async ctx => {
     body: {
       fulfillment_service: {
         name: "Flindel",
-        callback_url: "https://suus.serveo.net/dbcall",
+        callback_url: `https://${SERVEO_NAME}.serveo.net/dbcall`,
         inventory_management: false,
         tracking_support: false,
         requires_shipping_method: true,

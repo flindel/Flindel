@@ -6,17 +6,9 @@ const dotenv = require("dotenv");
 const { verifyRequest } = require("@shopify/koa-shopify-auth");
 const session = require("koa-session");
 const bodyParser = require("koa-bodyparser");
-const {
-  calculateDistance,
-  getLatLng,
-  sendEmail,
-  warehouseOrder,
-  setupWebhooks
-} = require("./serverFunctions");
-const {
-  receiveWebhook,
-  registerWebhook
-} = require("@shopify/koa-shopify-webhooks");
+const { warehouseOrder } = require("./serverFunctions");
+const { registerWebhook } = require("@shopify/koa-shopify-webhooks");
+const { SERVEO_NAME } = process.env;
 dotenv.config();
 
 const cron = require("cron");
@@ -85,76 +77,39 @@ app.prepare().then(() => {
           console.log(err);
         }
         ctx.redirect("/");
-
-        await setupWebhooks(accessToken, shop);
-      }
-    })
-  );
-  server.use(
-    receiveWebhook({
-      path: "/hookendpoint",
-      secret: SHOPIFY_API_SECRET_KEY,
-      async onReceived(ctx) {
-        ctx.response.status = 200; //tell shopify that we got payload
-        ctx.body = "OK";
-
-        let hookload = ctx.request.body;
-
-        for (let i = 0; i < hookload.variants.length; i++) {
-          //instead of variants it should be line_items
-          if (hookload.variants[i].fulfillment_service == "flindel") {
-            console.log("found flindel");
-            let fJSON = ctx.request.body.variants;
-            sendEmail(fJSON);
-            fetch(
-              `https://${serveo_name}.serveo.net/dbcall/update_order_database?items=${fJSON}&id=${encodeURIComponent(
-                JSON.stringify(hookload.order_id)
-              )}`,
-              {
-                method: "post"
-              }
-            );
-          } else {
-            console.log("not found");
-          }
+        //HAS TO BE IN SERVER.js
+        const registration = await registerWebhook({
+          address: `https://${SERVEO_NAME}.serveo.net/hookendpoint`,
+          topic: "PRODUCTS_CREATE",
+          accessToken,
+          shop
+        });
+        // const registration = await registerWebhook({
+        //   address: "https://suus.serveo.net/hookendpoint",
+        //   topic: "PRODUCTS_CREATE",
+        //   accessToken,
+        //   shop
+        // });
+        if (registration.success) {
+          console.log("webhooks registered");
+        } else {
+          console.log("Failed to webhook ", registration.result);
+        }
+        const registration1 = await registerWebhook({
+          address: `https://${SERVEO_NAME}.serveo.net/hookorderendpoint`,
+          topic: "ORDERS_CREATE",
+          accessToken,
+          shop
+        });
+        if (registration1.success) {
+          console.log("webhooks registered");
+        } else {
+          console.log("Failed to webhook ", registration1.result);
         }
       }
     })
   );
-  server.use(
-    receiveWebhook({
-      path: "/hookorderendpoint",
-      secret: SHOPIFY_API_SECRET_KEY,
-      async onReceived(ctx) {
-        ctx.response.status = 200;
 
-        let hookload = ctx.request.body;
-
-        let address =
-          hookload.shipping_address.address1 +
-          "," +
-          hookload.shipping_address.city +
-          "," +
-          hookload.shipping_address.province;
-
-        let latlng = await getLatLng(address);
-        latlng = latlng.results[0].geometry.location;
-        let validLocation = calculateDistance(latlng);
-        //console.log(distance);
-        if (validLocation == false) {
-          console.log("TOO FAR");
-          fetch(
-            `https://${serveo_name}.serveo.net/orders/cancel?id=${encodeURIComponent(
-              JSON.stringify(hookload.id)
-            )}`,
-            {
-              method: "post"
-            }
-          );
-        }
-      }
-    })
-  );
   // server.use(verifyRequest());
   server.use(router());
   server.use(async ctx => {
