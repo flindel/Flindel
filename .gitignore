@@ -4,3 +4,5 @@ assets/
 node_modules/
 .next/
 .secret/
+client/pages/config.js
+client/pages/DuplicateItems/TestStore.js
