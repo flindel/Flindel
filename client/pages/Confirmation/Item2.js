@@ -73,7 +73,7 @@ class Item extends Component {
      //on mount, get important information including image source to show the display picture
     componentWillMount(){
         if(this.props.step !=4){
-            fetch(`https://${this.props.serveoname}/products?id=${encodeURIComponent(this.props.item.productID)}`, {
+            fetch(`https://${this.props.serveoname}/products/img?id=${encodeURIComponent(this.props.item.productID)}`, {
             method: 'GET',})
         .then(response => response.json())
         .then(resData=>{
