@@ -4,3 +4,4 @@ assets/
 node_modules/
 .next/
 .secret/
+firebase_dev.json

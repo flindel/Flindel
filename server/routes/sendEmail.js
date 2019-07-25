@@ -25,7 +25,7 @@ router.post("/", async ctx => {
               email: "someEmail@gmail.com"
             }
           ],
-          subject: "APLLLLLLLLL"
+          subject: "GIT ITEMS"
         }
       ],
       from: {
