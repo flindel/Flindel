@@ -36,9 +36,6 @@ new CronJob('*/10 * * * * *', async function() {
   //await cronUtil.clearPending(db);
 }, null, true)
 
-const cron = require("cron");
-const { CronJob } = cron;
-
 new CronJob("* * */23 * * *", warehouseOrder, null, true);
 
 const port = parseInt(process.env.PORT, 10) || 3000;
@@ -58,7 +55,7 @@ admin.initializeApp({
 });
 const db = admin.firestore();
 
-const { SHOPIFY_API_SECRET_KEY, SHOPIFY_API_KEY } = process.env;
+const { SHOPIFY_API_SECRET_KEY, SHOPIFY_API_KEY, serveo_name } = process.env;
 
 app.prepare().then(() => {
   const server = new Koa();
@@ -103,7 +100,7 @@ app.prepare().then(() => {
         ctx.redirect("/");
 
         const registration = registerWebhook({
-          address: "https://suus.serveo.net/hookendpoint",
+          address: serveo_name+"/hookendpoint",
           topic: "FULFILLMENTS_CREATE",
           accessToken,
           shop
@@ -120,7 +117,7 @@ app.prepare().then(() => {
           console.log("Failed to webhook ", registration.result);
         }
         const registration1 = registerWebhook({
-          address: "https://suus.serveo.net/hookorderendpoint",
+          address: (serveo_name+"/hookorderendpoint"),
           topic: "ORDERS_CREATE",
           accessToken,
           shop
@@ -150,7 +147,7 @@ app.prepare().then(() => {
             let fJSON = ctx.request.body.variants;
             sendEmail(fJSON);
             fetch(
-              `https://${serveo_name}.serveo.net/dbcall/update_order_database?items=${fJSON}&id=${encodeURIComponent(
+              `${serveo_name}/dbcall/update_order_database?items=${fJSON}&id=${encodeURIComponent(
                 JSON.stringify(hookload.order_id)
               )}`,
               {
@@ -187,7 +184,7 @@ app.prepare().then(() => {
         if (validLocation == false) {
           console.log("TOO FAR");
           fetch(
-            `https://${serveo_name}.serveo.net/orders/cancel?id=${encodeURIComponent(
+            `${serveo_name}/orders/cancel?id=${encodeURIComponent(
               JSON.stringify(hookload.id)
             )}`,
             {

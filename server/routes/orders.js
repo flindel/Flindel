@@ -32,7 +32,7 @@ router.get('/', async ctx => {
         }
     }
   }
-});
+);
 
 //cancel order
 router.post("/cancel", async ctx => {
