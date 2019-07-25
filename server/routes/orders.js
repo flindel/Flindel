@@ -13,7 +13,7 @@ router.get('/', async ctx => {
     const name = ctx.query.orderNum;
     const { cookies } = ctx;
     const option = {
-        url: `https://${shop}/${api_link}/orders.json`,
+        url: `https://${shop}/${api_link}/orders.json?name=${name}&status=any`,
         headers: {
             'X-Shopify-Access-Token': accessToken
         },

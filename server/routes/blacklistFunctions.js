@@ -16,14 +16,16 @@ router.put('/', async ctx => {
     ctx.body = {'success':true}
 });
 
-router.get('/list', async ctx => {
+router.get('/', async ctx => {
     db = ctx.db
     let store = ctx.query.store
     let products = []
     myRef = db.collection('blacklist')
     let query = await myRef.doc(store).get()
-    for (var i = 0;i<query._fieldsProto.items.arrayValue.values.length;i++){
+    if (query._fieldsProto){
+        for (var i = 0;i<query._fieldsProto.items.arrayValue.values.length;i++){
         products.push(query._fieldsProto.items.arrayValue.values[i].stringValue)
+        }
     }
     ctx.body = {'res':products}
 })

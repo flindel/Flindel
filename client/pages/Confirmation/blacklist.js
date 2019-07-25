@@ -19,7 +19,9 @@ class Blacklist extends Component {
             addItems : [],
             addIn : '',
             deleteIn :'',
-            errorMessage:''
+            errorMessage: '',
+            loginMessage: 'LOADING............',
+            valid: 0
         }
         this.handleSubmit = this.handleSubmit.bind(this)
         this.handleInputChange = this.handleInputChange.bind(this)
@@ -28,6 +30,22 @@ class Blacklist extends Component {
         this.handleChangeDelete = this.handleChangeDelete.bind(this)
         this.addToBlacklist = this.addToBlacklist.bind(this)
         this.deleteFromBlacklist = this.deleteFromBlacklist.bind(this)
+        this.restart = this.restart.bind(this)
+    }
+
+    restart(){
+        this.setState({
+            storeName: '',
+            step: 1,
+            items : [],
+            deleteItems : [],
+            addItems : [],
+            addIn : '',
+            deleteIn :'',
+            errorMessage: '',
+            loginMessage: 'LOADING............',
+            valid: 0
+        })
     }
 
     //input field for entering store name at beginning of process
@@ -47,6 +65,7 @@ class Blacklist extends Component {
 
     //add item to blacklist (on submit of add)
     addToBlacklist(){
+        if (this.state.valid){
         //make sure previous error message goes away
         this.setState({errorMessage:''})
         let toAdd = this.state.addIn;
@@ -67,11 +86,13 @@ class Blacklist extends Component {
         fetch(`https://${serveoname}/blacklist?items=${encodeURIComponent(itemString)}&store=${encodeURIComponent(this.state.storeName)}`, {
             method: 'put',
         })
+        }
     }
 
     //delete an item from blacklist (on submit of delete)
     deleteFromBlacklist(){
-        //make sure previous error message goes away
+        if (this.state.valid){
+            //make sure previous error message goes away
         this.setState({errorMessage:''})
         let toDelete = this.state.deleteIn;
         this.setState({deleteIn:''})
@@ -94,6 +115,7 @@ class Blacklist extends Component {
         fetch(`https://${serveoname}/blacklist?items=${encodeURIComponent(itemString)}&store=${encodeURIComponent(this.state.storeName)}`, {
             method: 'put',
         })
+        }
     }
 
     //handle submit of store name - very beginning
@@ -106,11 +128,16 @@ class Blacklist extends Component {
 
     //get items on blacklist of current store
     async getItems(){
-        let temp = await fetch(`https://${serveoname}/blacklist/list?store=${encodeURIComponent(this.state.storeName)}`, {
+        let temp = await fetch(`https://${serveoname}/blacklist?store=${encodeURIComponent(this.state.storeName)}`, {
             method: 'get',
         })
         let json = await temp.json()
-        this.setState({items:json.res.sort()})
+        if (json.res.length == 0){
+            this.setState({loginMessage: 'THIS STORE DOES NOT EXIST'})
+        }
+        else{
+            this.setState({valid: 1, loginMessage: '', items:json.res.sort()})
+        }
     }
 
     //conditional render - step1 for enter store, step2 for doing stuff
@@ -149,11 +176,15 @@ class Blacklist extends Component {
                 <br/>
                 <p>The following items are currently on the blacklist.</p>
                 <p>If these items are returned, they will not be made available immediately for resale, and will be eventually shipped back to the distributor.</p>
+                <br/>
+                <p>{this.state.loginMessage}</p>
                 <div>
                     {this.state.items.map((curr, index) => (
                     <p>{index + 1} - {curr}</p>
                     ))}
                 </div>
+                <br/><br/><br/><br/><br/>
+                <button onClick = {this.restart}>RESTART</button>
             </div>
             )
         }

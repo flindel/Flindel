@@ -88,4 +88,4 @@ function getDateDifference(d1,d2){
     return diffDays;
 }
 
-module.exports = {clearExpiredItems, clearExpiredOrders, getCurrentDate}
+module.exports = {clearExpiredItems, clearExpiredOrders, getCurrentDate, getDateDifference}

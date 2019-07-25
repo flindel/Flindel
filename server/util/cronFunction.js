@@ -30,9 +30,9 @@ async function mainReport(dbIn){
         //update inventory for accepted items
     await updateInventory(acceptedList, dbIn)
         //sort items, ultimately send email to brand about what new items were received today
-    //mainHelper.sortNewItems(acceptedList, dbIn)
+    mainHelper.sortNewItems(acceptedList, dbIn)
         //sort items, ultimately send email to brand about who they need to refund
-    //mainHelper.sortRefundItems(refundList, dbIn)   
+    mainHelper.sortRefundItems(refundList, dbIn)   
 }
 
 //notify of all items marked returning so we know when to send shipments back

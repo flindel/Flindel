@@ -182,6 +182,7 @@ class IdentifyApp extends Component {
             returnlist: [],
             shopName:'',
             orderNum:'',
+            existReturn: false,
             errorMessage:'',})
             this.returnItemList = [];
     }
@@ -368,6 +369,12 @@ class IdentifyApp extends Component {
                         })      
                 }
             }
+            else {
+                    //show they made an incorrect attempt  
+                        this.setState({
+                            errorMessage:"The order number, email, or phone number you entered didn't match our records."
+                        })      
+                }
 }
     
     /*

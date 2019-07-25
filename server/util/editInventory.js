@@ -1,5 +1,6 @@
 const rp = require('request-promise');
 const { api_link } = require('../default-shopify-api.json');
+const expired = require('./expiredHelper')
 
 //edit inventory in shopify
 async function editInventory(change, store, varID, torontoLocation, dbIn){
@@ -25,8 +26,29 @@ async function getAccessToken(dbIn, store){
 }
 
 //when a full table is set up, this will find corresponding GIT ID to update that inventory. empty for now, waiting on structure
-async function gitID(){
+async function regularToGit(store, idIn, db){
+    return gitId
+}
 
+async function gitToRegular(store, idIn, db){
+    return varId
+}
+
+//remove from flindel inventory database. not used yet, triggered by webhook
+async function sellReturnItem(varId, db, store){
+    myRef = db.collection('items')
+    let tempDate = ('12/31/9999')
+    let tempRef = ''
+    let query = await myRef.where('status','==','reselling').where('store','==',store).where('variantid','==',varId).get()
+    await query.forEach(async doc=>{
+        let itemDate = expired.getCurrentDate()
+        let difference = expired.getDateDifference(tempDate, itemDate)
+        if (difference < 0){
+            tempDate = itemDate
+            tempRef = doc.ref
+        }
+    })
+    let deleteDoc = myRef.delete(tempRef)
 }
 
 //get inventory ID and product ID
