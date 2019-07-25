@@ -7,11 +7,12 @@ export async function postInstallTime(data){
   })
 }
 
-export async function postProduct(data){
+export async function postProduct(data, callback = doNothing){
   var temp;
   temp = await fetch(`${serveo_name}/firestore/product/git/?body=${encodeURIComponent(JSON.stringify(data))}`, {
     method: 'post',
   })
+  callback(data);
 }
 
 export async function getGitProduct(gitID, callback = doNothing, args = []){

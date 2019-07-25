@@ -173,7 +173,7 @@ export function postGitVariant(product_id, variants, update, callback = doNothin
       console.log("Formatted Body: ", out);
       postProduct(out);
       */
-      getGitProduct(update.git.id, postGitVariantToFirestore, [update, data.variant.id]);
+      getGitProduct(update.git.id, postGitVariantToFirestore, [update, data.variant.id, callback]);
     })
     .catch((error) => console.log(error))
 }
@@ -182,13 +182,13 @@ function postGitVariantToFirestore(json, args){
   console.log("Firestore JSON: ", json);
   let update = args[0];
   let newVariantId = args[1];
-
+  let callback = args[2];
   for (let i = 0; i < json.variants.length; i++){
     if(!json.variants[i].git_var){
       json.variants[i].git_var = newVariantId;
     }
   }
-  postProduct(json);
+  postProduct(json, callback);
 }
 
 //Adds product to shopify and adds original and GIT IDs to FIRESTORE
