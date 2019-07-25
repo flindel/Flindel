@@ -1,10 +1,6 @@
 const dotenv = require("dotenv");
 const turf = require("@turf/turf");
 dotenv.config();
-const {
-  receiveWebhook,
-  registerWebhook
-} = require("@shopify/koa-shopify-webhooks");
 const GOOGLE_GEO_API_KEY = process.env.GOOGLE_GEO_API_KEY;
 const serveo_name = "suus";
 
@@ -43,46 +39,12 @@ function sendEmail(json) {
     .catch(error => console.log("error", error));
 }
 
-function cancelOrder() {}
-
 function warehouseOrder() {
   fetch(`https://${serveo_name}.serveo.net/dbcall/warehouse_order`, {
     method: "post"
   });
 }
 
-function setupWebhooks(accessToken, shop) {
-  const registration = registerWebhook({
-    address: "https://suus.serveo.net/hookendpoint",
-    topic: "FULFILLMENTS_CREATE",
-    accessToken,
-    shop
-  });
-  // const registration = await registerWebhook({
-  //   address: "https://suus.serveo.net/hookendpoint",
-  //   topic: "PRODUCTS_CREATE",
-  //   accessToken,
-  //   shop
-  // });
-  if (registration.success) {
-    console.log("webhooks registered");
-  } else {
-    console.log("Failed to webhook ", registration.result);
-  }
-  const registration1 = registerWebhook({
-    address: "https://suus.serveo.net/hookorderendpoint",
-    topic: "ORDERS_CREATE",
-    accessToken,
-    shop
-  });
-  if (registration1.success) {
-    console.log("webhooks registered");
-  } else {
-    console.log("Failed to webhook ", registration1.result);
-  }
-}
-
-module.exports.setupWebhooks = setupWebhooks;
 module.exports.warehouseOrder = warehouseOrder;
 module.exports.calculateDistance = calculateDistance;
 module.exports.sendEmail = sendEmail;
