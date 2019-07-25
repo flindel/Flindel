@@ -7,15 +7,12 @@ const router = Router({
     prefix: '/blacklist'
 });
 
-router.post('/new', async ctx => {
+router.put('/', async ctx => {
     db = ctx.db
     store = ctx.query.store
-    id = ctx.query.id
-    data = {
-        store:store,
-        productid: id
-    }
-    let setDoc = db.collection('blacklist').doc().set(data)
+    items = await JSON.parse(ctx.query.items)
+    let docToUpdate = db.collection('blacklist').doc(store)
+    updateFields = docToUpdate.update({items:items})
     ctx.body = {'success':true}
 });
 
@@ -24,23 +21,11 @@ router.get('/list', async ctx => {
     let store = ctx.query.store
     let products = []
     myRef = db.collection('blacklist')
-    let query = await myRef.where('store','==',store).get()
-    await query.forEach(async doc =>{
-        products.push(doc._fieldsProto.productid.stringValue)
-    })
+    let query = await myRef.doc(store).get()
+    for (var i = 0;i<query._fieldsProto.items.arrayValue.values.length;i++){
+        products.push(query._fieldsProto.items.arrayValue.values[i].stringValue)
+    }
     ctx.body = {'res':products}
-})
-
-router.delete('/', async ctx =>{
-    db = ctx.db
-    store = ctx.query.store
-    id = ctx.query.id
-    myRef = db.collection('blacklist')
-    let query = await myRef.where('store','==',store).where('productid','==',id).get()
-    await query.forEach(async doc =>{
-        doc.ref.delete()
-    })
-    ctx.body = {'success':true}
 })
 
 

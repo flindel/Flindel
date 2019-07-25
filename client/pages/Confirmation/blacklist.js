@@ -61,10 +61,11 @@ class Blacklist extends Component {
         else{
             this.setState({errorMessage:'This item is already on the blacklist.'})
         }
+        let itemString = JSON.stringify(tempList)
         //save to db
         this.setState({items:tempList})
-        fetch(`https://${serveoname}/blacklist/new?id=${encodeURIComponent(toAdd)}&store=${encodeURIComponent(this.state.storeName)}`, {
-            method: 'post',
+        fetch(`https://${serveoname}/blacklist?items=${encodeURIComponent(itemString)}&store=${encodeURIComponent(this.state.storeName)}`, {
+            method: 'put',
         })
     }
 
@@ -87,10 +88,11 @@ class Blacklist extends Component {
         if(found == false){
             this.setState({errorMessage:'This item is not currently on the blacklist.'})
         }
+        let itemString = JSON.stringify(tempList)
+        //save to db
         this.setState({items:tempList})
-        //submit to database
-        fetch(`https://${serveoname}/blacklist?id=${encodeURIComponent(toDelete)}&store=${encodeURIComponent(this.state.storeName)}`, {
-            method: 'DELETE',
+        fetch(`https://${serveoname}/blacklist?items=${encodeURIComponent(itemString)}&store=${encodeURIComponent(this.state.storeName)}`, {
+            method: 'put',
         })
     }
 

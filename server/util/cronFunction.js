@@ -30,9 +30,9 @@ async function mainReport(dbIn){
         //update inventory for accepted items
     await updateInventory(acceptedList, dbIn)
         //sort items, ultimately send email to brand about what new items were received today
-    mainHelper.sortNewItems(acceptedList, dbIn)
+    //mainHelper.sortNewItems(acceptedList, dbIn)
         //sort items, ultimately send email to brand about who they need to refund
-    mainHelper.sortRefundItems(refundList, dbIn)   
+    //mainHelper.sortRefundItems(refundList, dbIn)   
 }
 
 //notify of all items marked returning so we know when to send shipments back
@@ -99,16 +99,18 @@ async function updateInventory(items, dbIn){
 //check to see if item is on blacklist
 async function checkBlacklist(productId, dbIn, store){
     db = dbIn
-    myRef = db.collection('blacklist')
     //productID comes in as integer, database only responds to string
     const target = productId.toString(10)
-    let query = await myRef.where('productid','==',target).where('store','==',store).get()
-    if (query.empty){
-        return false
+    //let query = await myRef.where('productid','==',target).where('store','==',store).get()
+    myRef = db.collection('blacklist')
+    let query = await myRef.doc(store).get()
+    let found = false
+    for (var i = 0;i<query._fieldsProto.items.arrayValue.values.length;i++){
+        if (target == query._fieldsProto.items.arrayValue.values[i].stringValue){
+            found = true
+        }
     }
-    else{
-        return true
-    }
+    return found
 }
 
 //add item to items database
