@@ -7,10 +7,22 @@ const { verifyRequest } = require("@shopify/koa-shopify-auth");
 const session = require("koa-session");
 const bodyParser = require("koa-bodyparser");
 const {
+  calculateDistance,
+  getLatLng,
+  sendEmail,
+  warehouseOrder,
+  setupWebhooks
+} = require("./serverFunctions");
+const {
   receiveWebhook,
   registerWebhook
 } = require("@shopify/koa-shopify-webhooks");
 dotenv.config();
+
+const cron = require("cron");
+const { CronJob } = cron;
+
+new CronJob("* * */23 * * *", warehouseOrder, null, true);
 
 const port = parseInt(process.env.PORT, 10) || 3000;
 const dev = process.env.NODE_ENV !== "production";
@@ -30,20 +42,6 @@ admin.initializeApp({
 });
 
 const db = admin.firestore();
-
-function sendEmail(json) {
-  const serveo_name = "suus";
-  fetch(
-    `https://${serveo_name}.serveo.net/sendEmail?package=${encodeURIComponent(
-      JSON.stringify(json)
-    )}`,
-    {
-      method: "post"
-    }
-  )
-    //.then(data => console.log("Data: ", data))
-    .catch(error => console.log("error", error));
-}
 
 const { SHOPIFY_API_SECRET_KEY, SHOPIFY_API_KEY } = process.env;
 
@@ -67,6 +65,7 @@ app.prepare().then(() => {
         "read_products",
         "write_products",
         "read_orders",
+        "write_orders",
         "write_fulfillments",
         "read_fulfillments",
         "read_inventory",
@@ -87,23 +86,7 @@ app.prepare().then(() => {
         }
         ctx.redirect("/");
 
-        // const registration = await registerWebhook({
-        //   address: "https://suus.serveo.net/hookendpoint",
-        //   topic: "FULFILLMENTS_CREATE",
-        //   accessToken,
-        //   shop
-        // });
-        const registration = await registerWebhook({
-          address: "https://suus.serveo.net/hookendpoint",
-          topic: "PRODUCTS_CREATE",
-          accessToken,
-          shop
-        });
-        if (registration.success) {
-          console.log("webhooks registered");
-        } else {
-          console.log("Failed to webhook ", registration.result);
-        }
+        await setupWebhooks(accessToken, shop);
       }
     })
   );
@@ -112,22 +95,62 @@ app.prepare().then(() => {
       path: "/hookendpoint",
       secret: SHOPIFY_API_SECRET_KEY,
       async onReceived(ctx) {
-        //  console.log("received webhook: ", ctx.state.webhook);
-        //  console.log("AAAAAAA", ctx.request.body);
         ctx.response.status = 200; //tell shopify that we got payload
         ctx.body = "OK";
-        //  ctx.response.body = "ok";
-        var hookload = ctx.request.body;
-        // console.log(hookload);
-        for (var i = 0; i < hookload.variants.length; i++) {
+
+        let hookload = ctx.request.body;
+
+        for (let i = 0; i < hookload.variants.length; i++) {
           //instead of variants it should be line_items
           if (hookload.variants[i].fulfillment_service == "flindel") {
             console.log("found flindel");
-            var fJSON = ctx.request.body.variants;
+            let fJSON = ctx.request.body.variants;
             sendEmail(fJSON);
+            fetch(
+              `https://${serveo_name}.serveo.net/dbcall/update_order_database?items=${fJSON}&id=${encodeURIComponent(
+                JSON.stringify(hookload.order_id)
+              )}`,
+              {
+                method: "post"
+              }
+            );
           } else {
             console.log("not found");
           }
+        }
+      }
+    })
+  );
+  server.use(
+    receiveWebhook({
+      path: "/hookorderendpoint",
+      secret: SHOPIFY_API_SECRET_KEY,
+      async onReceived(ctx) {
+        ctx.response.status = 200;
+
+        let hookload = ctx.request.body;
+
+        let address =
+          hookload.shipping_address.address1 +
+          "," +
+          hookload.shipping_address.city +
+          "," +
+          hookload.shipping_address.province;
+
+        let latlng = await getLatLng(address);
+        latlng = latlng.results[0].geometry.location;
+        let validLocation = calculateDistance(latlng);
+        //console.log(distance);
+        if (validLocation == false) {
+          console.log("TOO FAR");
+          fetch(
+            `https://${serveo_name}.serveo.net/orders/cancel?id=${encodeURIComponent(
+              JSON.stringify(hookload.id)
+            )}`,
+            {
+              method: "post"
+            }
+          );
         }
       }
     })

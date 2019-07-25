@@ -22,10 +22,10 @@ router.post("/", async ctx => {
         {
           to: [
             {
-              email: "cengizsirlan.cs@gmail.com"
+              email: "someEmail@gmail.com"
             }
           ],
-          subject: "APLLLLLLLLL"
+          subject: "GIT ITEMS"
         }
       ],
       from: {

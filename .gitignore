@@ -6,3 +6,4 @@ node_modules/
 .secret/
 client/pages/config.js
 client/pages/DuplicateItems/TestStore.js
+firebase_dev.json

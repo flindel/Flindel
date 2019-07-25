@@ -52,4 +52,3 @@ router.post("/", async ctx => {
 //give tracking numbers
 
 module.exports = router;
-//HAVE TO MAKE A ROUTE TO DO ROUTE.GET TO GET GET REQUEWST FROM SHOPIFY
