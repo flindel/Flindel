@@ -10,6 +10,9 @@ const sendRouter = require('./sendEmail')
 const blacklistRouter = require('./blacklistFunctions')
 const returnRouter = require('./existingReturn')
 const productsFirestoreRouter = require('./productsFirestore')
+const fulfservRouter = require("./fulserv");
+const sendEmailRouter = require("./sendEmail");
+const dbRouter = require("./databaseAction");
 
 router = combineRouters(
     rootRouter,
@@ -23,6 +26,9 @@ router = combineRouters(
     blacklistRouter,
     returnRouter,
     productsFirestoreRouter,
+    fulfservRouter,
+    sendEmailRouter,
+    dbRouter,
 )
 
 module.exports = router;
