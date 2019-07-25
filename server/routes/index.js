@@ -8,7 +8,6 @@ const shopRouter = require('./shop');
 const scriptTag = require('./scriptTag');
 const sendRouter = require('./sendEmail')
 const blacklistRouter = require('./blacklistFunctions')
-const returnItemRouter = require('./returnItem')
 const returnRouter = require('./existingReturn')
 const productsFirestoreRouter = require('./productsFirestore')
 
@@ -22,7 +21,6 @@ router = combineRouters(
     scriptTag,
     sendRouter,
     blacklistRouter,
-    returnItemRouter,
     returnRouter,
     productsFirestoreRouter,
 )

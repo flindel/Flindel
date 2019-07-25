@@ -1,6 +1,7 @@
 const inv = require ('./editInventory')
 const rp = require('request-promise');
 
+//clear orders from requestedReturns that have expired
 async function clearExpiredOrders(dbIn){
     db = dbIn
     //batch for efficiency
@@ -10,8 +11,9 @@ async function clearExpiredOrders(dbIn){
     let query = await myRef.get()
     await query.forEach(async doc => {
         let orderDate = doc._fieldsProto.createdDate.stringValue
+        //get time elapsed since return was requested
         diffDays = getDateDifference(currentDate, orderDate)
-        //if there's a 7 day difference, order is expired
+        //if there's a 7 day difference, return is expired
         if (diffDays >= 7){
             //copy items over
             data = {
@@ -44,6 +46,7 @@ async function clearExpiredOrders(dbIn){
     batch.commit()
 }
 
+//pull items off reselling if they've been there for 7 days
 async function clearExpiredItems(dbIn){
     db = dbIn
     //batch for efficiency
@@ -69,12 +72,14 @@ async function clearExpiredItems(dbIn){
     batch.commit()
 }
 
+//returns current date (MM/DD/YYYY)
 function getCurrentDate(){
     let currentDate = ''
     currentDate += (new Date().getMonth()+1)+'/'+ new Date().getDate() + '/'+  new Date().getFullYear()
     return currentDate
 }
 
+//calculates and returns difference between two dates (time elapsed)
 function getDateDifference(d1,d2){
     const date2 = new Date(d2)
     const date1 = new Date(d1)

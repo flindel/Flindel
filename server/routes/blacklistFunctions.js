@@ -7,20 +7,6 @@ const router = Router({
     prefix: '/blacklist'
 });
 
-router.get('/exists', async ctx => {
-    db = ctx.db
-    id = ctx.query.id
-    store = ctx.query.store
-    myRef = db.collection('blacklist')
-    let query = await myRef.where('productid','==',id).where('store','==',store).get()
-    if (query.empty){
-        ctx.body = { "blacklist":false}
-    }
-    else{
-        ctx.body = { "blacklist":true}
-    }  
-});
-
 router.post('/new', async ctx => {
     db = ctx.db
     store = ctx.query.store

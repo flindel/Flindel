@@ -1,5 +1,6 @@
 emailHelper = require('./emailHelper')
 
+//get items that have been processed and are in pending
 async function getItems(dbIn){
     let itemList = []
     db = dbIn
@@ -17,7 +18,8 @@ async function getItems(dbIn){
     return itemList
 }
 
-async function breakdown(items, dbIn){
+//split items into accepted, return, refund lists
+async function breakdown(items){
     let acceptedList = []
     let refundList = []
     let returningList = []
@@ -50,6 +52,7 @@ async function breakdown(items, dbIn){
     return {acceptedList, refundList, returningList}
 }
 
+//combine items in list so that there's only one entry per item and higher quantities
 async function combine(items){
     for (var i = 0;i<items.length;i++){
         for (var j = i+1;j<items.length;j++){
@@ -63,7 +66,8 @@ async function combine(items){
     return items;
 }
 
-async function sortRefund(items){
+//sort items that need to be refunded by store and order, send email to various stores
+async function sortRefundItems(items){
     let currList = []
     let storeItems = []
         while (items.length>0){
@@ -102,6 +106,7 @@ async function sortRefund(items){
         }
 }
 
+//sort items that were received by store, send email to various stores
 async function sortNewItems(items, dbIn){
     while (items.length>0){
         let currList = []
@@ -114,20 +119,20 @@ async function sortNewItems(items, dbIn){
                 i--
             }
         }
-    sendItemEmail(items, currStore, dbIn)
+    sendItemEmail(currList, currStore, dbIn)
     }
 }
 
 //send email to brand about items that are going to be put up for resale
 async function sendItemEmail(listIn, store, db) {
-    let email = emailHelper.getEmail(db, store)
-    //emailHelper.sendItemEmail(listIn, email)
+    let email = await emailHelper.getStoreEmail(db, store)
+    emailHelper.sendItemEmail(listIn, email)
 }
 
 //send email to brand about which customers/orders need to be refunded because we accepted the item
 async function sendRefundEmail(listIn, store, db){
-    let email = emailHelper.getEmail(db, store)
-    //emailHelper.sendRefundEmail(listIn, email)
+    let email = await emailHelper.getStoreEmail(db, store)
+    emailHelper.sendRefundEmail(listIn, email)
 }
 
-module.exports = {getItems, breakdown, combine, sortRefund, sortNewItems}
+module.exports = {getItems, breakdown, combine, sortRefundItems, sortNewItems}

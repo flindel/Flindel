@@ -31,14 +31,6 @@ router.get('/returnPolicy', async ctx =>{
     })
 })
 
-router.get('/email', async ctx =>{
-  db = ctx.db
-    store = ctx.query.store
-    myRef = db.collection('shop_tokens').doc(store)
-    let query = await myRef.get()
-    ctx.body = {'email':query._fieldsProto.email.stringValue}
-})
-
 router.post('/install_time/', async ctx =>{
   ctx.set('Access-Control-Allow-Origin', '*');
   ctx.set('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept');

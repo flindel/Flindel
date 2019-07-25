@@ -1,6 +1,7 @@
 const rp = require('request-promise');
 const { api_link } = require('../default-shopify-api.json');
 
+//edit inventory in shopify
 async function editInventory(change, store, varID, torontoLocation, dbIn){
     if (torontoLocation != ''){
         increment(change, torontoLocation, varID, store)
@@ -13,6 +14,7 @@ async function editInventory(change, store, varID, torontoLocation, dbIn){
     }
 }
 
+//get access token and toronto location from databse (expand later)
 async function getAccessToken(dbIn, store){
     db = dbIn
     myRefToken = db.collection('shop_tokens').doc(store);
@@ -22,10 +24,12 @@ async function getAccessToken(dbIn, store){
     return {accessToken, torontoLocation}
 }
 
+//when a full table is set up, this will find corresponding GIT ID to update that inventory. empty for now, waiting on structure
 async function gitID(){
 
 }
 
+//get inventory ID and product ID
 async function getInvID(store, varID, accessToken){
     let option = {
         url: `https://${store}/${api_link}/variants/${varID}.json`,
@@ -36,10 +40,11 @@ async function getInvID(store, varID, accessToken){
         }
     let temp = await rp(option);
     let invId = temp.variant.inventory_item_id
-    let productID = temp.variant.inventory_id
-    return {invId, productID}
+    let productId = temp.variant.product_id
+    return {invId, productId}
 }
 
+//actually increment inventory
 async function increment(quantity, torontoLocation, invId, store){
     let option2 = {
         method: 'POST',
@@ -58,4 +63,4 @@ async function increment(quantity, torontoLocation, invId, store){
         await rp(option2)
 }
 
-module.exports = {editInventory, getInvID, getAccessToken}
+module.exports = {editInventory, getInvID, getAccessToken, increment}
