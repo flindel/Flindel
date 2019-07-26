@@ -3,7 +3,7 @@ const rp = require('request-promise');
 //get email of store to know who to send to
 async function getStoreEmail(dbIn, store){
     db = dbIn
-    myRef = db.collection('shop_tokens').doc(store)
+    myRef = db.collection('store').doc(store)
     let query = await myRef.get()
     const email = query._fieldsProto.email.stringValue
     return email

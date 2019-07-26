@@ -102,11 +102,11 @@ async function checkBlacklist(productId, dbIn, store){
     //productID comes in as integer, database only responds to string
     const target = productId.toString(10)
     //let query = await myRef.where('productid','==',target).where('store','==',store).get()
-    myRef = db.collection('blacklist')
+    myRef = db.collection('store')
     let query = await myRef.doc(store).get()
     let found = false
-    for (var i = 0;i<query._fieldsProto.items.arrayValue.values.length;i++){
-        if (target == query._fieldsProto.items.arrayValue.values[i].stringValue){
+    for (var i = 0;i<query._fieldsProto.blacklist.arrayValue.values.length;i++){
+        if (target == query._fieldsProto.blacklist.arrayValue.values[i].stringValue){
             found = true
         }
     }

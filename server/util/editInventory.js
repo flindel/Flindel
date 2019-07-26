@@ -21,7 +21,9 @@ async function getAccessToken(dbIn, store){
     myRefToken = db.collection('shop_tokens').doc(store);
     getToken = await myRefToken.get()
     let accessToken = getToken._fieldsProto.token.stringValue //access token stored here
-    let torontoLocation = getToken._fieldsProto.torontoLocation.stringValue
+    myRefLocation = db.collection('store').doc(store);
+    getLocation = await myRefLocation.get()
+    let torontoLocation = getLocation._fieldsProto.torontoLocation.stringValue
     return {accessToken, torontoLocation}
 }
 

@@ -16,9 +16,9 @@ router.get('/id/', async ctx => {
 router.get('/returnPolicy', async ctx =>{
     const { shop, accessToken } = getShopHeaders(ctx);
     db = ctx.db
-    myRef = db.collection('returnPolicy')
+    myRef = db.collection('store')
     let query = await myRef.doc(shop).get()
-    ctx.body = {'res': query._fieldsProto.special, 'default':query._fieldsProto.default}
+    ctx.body = {'res': query._fieldsProto.returnPolicy, 'default':query._fieldsProto.defaultReturn}
 })
 
 router.post('/install_time/', async ctx =>{

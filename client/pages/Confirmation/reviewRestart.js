@@ -36,11 +36,11 @@ class ReviewRestart extends Component {
                     <br/><br/>
                     <p>If you would like to delete your current return and create a new return for Order #{this.state.orderNum}, please click the delete button below:</p>
                     <br/>
-                    <button className = 'r2'onClick={this.togglePopup}>DELETE</button>
+                    <button className = 'r2'onClick={this.togglePopup}>DELETE + RESTART</button>
                     <br/><br/><br/><br/><br/><br/><br/><br/>
                     <p>Or, to make a return for a different order, please click below to be redirected to the beginning of the return portal.</p>
                     <br/>
-                    <button className = 'r2Home'onClick = {this.props.restart}>RESTART</button>
+                    <button className = 'r2Home'onClick = {this.props.restart}>BACK</button>
                 </div>
                     {
                     this.state.showPop ?
