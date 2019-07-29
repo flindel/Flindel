@@ -92,7 +92,9 @@ class InsertModal extends React.Component {
         Do you want to proceed?
         </div>
         <div style={btnPosition}>
+        //press yes to delete a modal and show a Plugin App on a screen
         <Button primary><Link href='/apps/return-with-flindel/Confirmation/IdentifyApp2'><a style={yesStyle}>Yes, please proceed</a></Link></Button>
+        //press no to redirect back to a return policy webpage
         <Button><Link href='/pages/returns-and-exchanges'><a style={noStyle}>No</a></Link></Button>
         </div>
         </div>
