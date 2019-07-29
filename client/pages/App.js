@@ -19,6 +19,7 @@ class App extends React.Component {
     this.getData();
   }
 
+  //a modal will be inserted here
   render() {
     return (
       <div className="App">
