@@ -19,6 +19,7 @@ function HACK_removeMinimizeOptionFromCssLoaders(config) {
   });
 }
 
+//added some code here to add prefix for loading _next.js files on a page
 module.exports = withCSS({
   assetPrefix: isProd ? '' : 'https://primo.serveo.net',
   webpack(config) {
