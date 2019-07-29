@@ -1,8 +1,23 @@
+/*Import font.................................................*/
+@import url('https://fonts.googleapis.com/css?family=Roboto:400,500,700');
+*{
+  font-family: 'Roboto', sans-serif;
+  text-align: center;
+}
+p {
+  font-family: 'Roboto', sans-serif;
+  text-align: center;
+  font-weight: bold; 
+}
+*:focus {
+  outline:none;
+}
 /*Navbar.......................................................*/
 /*Store name order portal*/
 h1.top{
-  font-size:250%;
+  font-size:180%;
   text-align: center;
+  padding-bottom: 10px
 }
 .containerPB {
   margin: auto;
@@ -83,44 +98,94 @@ p.headerLogo{
 /*First Page (Find Order)................................................*/
 /*Submit button stuff*/
 button.Submit1{
-  background-color: #50B83C;
+  background-color:#000000;
   color: white;
-  padding: 3% 10%;
   cursor: pointer;
   margin: auto;
   text-align: center;
-  border-radius: 15%;
+  border-radius: 3px;
   display: block;
   border: none;
+  padding: 15px 45px;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  font-size: 13px;
+  font-weight: 700;
 }
 button.Submit1:hover{
-  background-color: #108043;
+  background-color: #555555;
 }
 button.Submit1:active {
-  background-color:#108043;
-  box-shadow: 0 0.125em #666666;
-  transform: translateY(-0.25em);
+  background-color:#555555;
+  /* box-shadow: 0 0.125em #666666;
+  transform: translateY(-0.25em); */
 }
 button.Blackout1{
-  background-color: grey;
+  background-color: #555555;
   color:white;
-  padding: 3% 10%;
+  /* padding: 3% 10%; */
   margin: auto;
   text-align: center;
-  border-radius: 15%;
+  border-radius: 3px;
   display: block;
   pointer-events: none;
   border: none;
-  
+  padding: 15px 45px;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  font-size: 13px;
+  font-weight: 700;
 }
 
 /*input fields(text boxes)*/
-input.p1[type=text]{
+/* input.p1[type=text]{
   padding: 12px 20px;
   box-sizing: border-box;
   margin: auto;
   display: block;
   border-radius: 2%
+} */
+.Search-block{
+  display: inline-block;
+  position: relative;
+  /* overflow: hidden; */
+  width: 100%;
+  margin-bottom: 10px
+}
+
+.Search-block input{
+  text-align: left;
+  height: 37px;
+  font-size: 120%;
+  border: 0.5px solid black;
+  width: 100%;
+  border-radius: 3px;
+  padding-left: 20px;
+}
+
+.Search-block span{
+  position: absolute;
+  height: 37px;
+  margin-left: -35px;
+  top: 8px
+}
+
+.Search-block img{
+  margin: auto;
+  width: 70%
+}
+
+.Search-block p{
+  font-size: 0.85em;
+  margin-top: 5px;
+  margin-bottom: 15px;
+  color: #555555;
+}
+
+::placeholder{
+  text-align: left;
+  color: #d1cfcf;
+  font-size: 1em;
 }
 /*Order number/email label text*/
 p.label{
@@ -129,8 +194,8 @@ p.label{
 /*Box around form*/
 fieldset.page1 { 
   margin: auto;
-  max-width:300px;
-  border: 2px groove (internal value);
+  max-width:700px;
+  border: 0;
   border-color: white;
   border-radius: 10%
 }
@@ -139,7 +204,7 @@ fieldset.page1 {
 /*Second Page (Item Select)...................................................*/
 /*submit button stuff*/
 button.Submit2{
-  background-color: #50B83C;
+  background-color: #555555;
   color: white;
   padding: 0.7% 2%;
   cursor: pointer;
@@ -150,11 +215,10 @@ button.Submit2{
   border: none;
 }
 button.Submit2:hover{
-  background-color:  #108043;
+  background-color:  #555555;
 }
 button.Submit2:active {
-  background-color:#108043;
-  box-shadow: 0 0.125em #666666;
+  background-color:#000000;
   transform: translateY(-0.25em);
 }
 button.Blackout2{

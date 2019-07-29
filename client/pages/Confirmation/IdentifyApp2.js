@@ -28,6 +28,7 @@ class IdentifyApp extends Component {
             errorMessage:'',
             returnPolicy: [],
             defaultReturn: '',
+            shopDomain: ''
         };
         this.returnItemList= []
         this.identifyItems=this.identifyItems.bind(this) 
@@ -66,7 +67,15 @@ class IdentifyApp extends Component {
             method: 'get',
         })
         let json = await temp.json()
+        //console.log("json----"+JSON.stringify(json))
         this.setState({step:1,returnPolicy: json.res.mapValue.fields, defaultReturn: json.default.stringValue})
+        let domainTemp = await fetch(`https://${serveoname}/shop/domain`, {
+            method: 'get',
+        })
+        let domainJson = await domainTemp.json()
+        this.setState({
+            shopDomain: `https://${domainJson.domain}`
+        })
     }
 
     //generate usable unique codes
@@ -87,6 +96,10 @@ class IdentifyApp extends Component {
           if(unique == false){
               this.generateID() 
           }
+    }
+
+    async backtoHomePage(){
+
     }
 
     //view second page (item select)
@@ -183,7 +196,9 @@ class IdentifyApp extends Component {
             shopName:'',
             orderNum:'',
             existReturn: false,
-            errorMessage:'',})
+            errorMessage:'',
+            shopDomain: ''
+        })
             this.returnItemList = [];
     }
 
@@ -385,11 +400,11 @@ class IdentifyApp extends Component {
         if (this.state.step == 0){
             return(
                 <div>
-                    <NB
-                    shopName = {this.state.shopName}/>
+                    {/* {<NB
+                    shopName = {this.state.shopName}/>} */}
                     <br/><br/><br/>
                     <div className = 'loading'>
-                        <p>Loading.......</p>
+                        <p><img src = 'https://drive.google.com/uc?id=1sdUC8q-XdCViXV-xKYC-XakSsqFDFEEd' /></p>
                     </div>
                 </div>
             )
@@ -400,7 +415,8 @@ class IdentifyApp extends Component {
                 return (
                     <div>
                        <NB
-                       shopName = {this.state.shopName}/>
+                       shopName = {this.state.shopName}
+                       shopDomain = {this.state.shopDomain}/>
                        <Review 
                         restart = {this.restart.bind(this)} 
                         code={this.state.code}
@@ -419,7 +435,8 @@ class IdentifyApp extends Component {
                     step2={''}
                     step3={''}
                     show = {false}
-                    shopName = {this.state.shopName}/>
+                    shopName = {this.state.shopName}
+                    shopDomain = {this.state.shopDomain}/>
                     <p className = 'errorMessage'>{this.state.errorMessage}</p>
                       <Search 
                       identifyCustomerID={this.identifyCustomerID} 
@@ -501,7 +518,8 @@ class IdentifyApp extends Component {
                 step2={''}
                 step3={''}
                 show = {false}
-                shopName = {this.state.shopName}/> 
+                shopName = {this.state.shopName}
+                shopDomain = {this.state.shopDomain}/> 
                 <ConfirmationPage
                 serveoname = {serveoname}
                 code = {this.state.code} 

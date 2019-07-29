@@ -15,12 +15,13 @@ class universalNavBar extends Component{
                     <br/>
                     <br/>
                     {/*change this logo to live generated later*/}
-                    <img className = 'headerLogo' src = 'https://files.slack.com/files-pri/TA3MUJWBG-FLDRX2PT3/pomelo-logo-square.jpg'/>
+                    <img className = 'headerLogo' src = 'https://anya23blog.files.wordpress.com/2016/11/pomelo-logo-square.jpg?w=820&h=312&crop=1'/>
                     <br/>
                     <br/>
                     </p>
                     <br/><br/>
-                    <h1 className='top'>Return Form</h1>
+                    <h1 className='top'>Returns</h1>
+                    
                     <br/><br/>
                     <div className = 'containerPB'>  
                         <ul className="progressbar">
@@ -40,13 +41,17 @@ class universalNavBar extends Component{
                 <p className = 'headerLogo'>
                 <br/>
                 <br/>
-                <img className = 'headerLogo' src = 'https://files.slack.com/files-pri/TA3MUJWBG-FLDRX2PT3/pomelo-logo-square.jpg'/>
+                <a href={this.props.shopDomain}>
+                <img className = 'headerLogo' 
+                    src = 'https://anya23blog.files.wordpress.com/2016/11/pomelo-logo-square.jpg?w=820&h=312&crop=1' />
+                </a>
                 <br/>
                 <br/>
                 </p>
                 <br/><br/>
-                <h1 className='top'>Return Form</h1>
-                <br/><br/>
+                <h1 className='top'>Returns</h1>
+                <p>Please enter your order details to begin</p>
+                <br/>
             </div>
             )
         }
