@@ -253,6 +253,8 @@ class IdentifyApp extends Component {
                 productID: listIn[i].productID,
                 variantid:listIn[i].variantid,
                 name:listIn[i].name,
+                title:listIn[i].title,
+                variantTitle:listIn[i].variantTitle,
                 value:listIn[i].value,
                 quantity:listIn[i].quantity,
                 reason:listIn[i].reason,
@@ -357,6 +359,8 @@ class IdentifyApp extends Component {
                                         variantID:item.variant_id,
                                         productID: item.product_id,
                                         name: item.name,
+                                        title: item.title,
+                                        variantTitle: item.variant_title,
                                         quantity: item.quantity,
                                         price: item.price,
                                     }
@@ -366,6 +370,8 @@ class IdentifyApp extends Component {
                                         variantID:item.variant_id,
                                         productID: item.product_id,
                                         name: item.name,
+                                        title: item.title,
+                                        variantTitle: item.variant_title,
                                         quantity: 0,
                                         price: item.price,
                                     }

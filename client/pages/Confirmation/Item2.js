@@ -10,6 +10,8 @@ class Item extends Component {
             productid: this.props.item.productID,
             variantid: this.props.item.variantID,
             name: this.props.item.name,
+            title: this.props.item.title,
+            variantTitle: this.props.item.variantTitle,
             value: "0",  //the quantity that user wants to return
             src:"",
             price: this.props.item.price,
@@ -44,7 +46,8 @@ class Item extends Component {
           });
         this.setState({
             value:option.value
-        },()=>this.props.handleSelect(this.state.productid, this.state.variantid, this.state.name,
+        },()=>this.props.handleSelect(this.state.productid, this.state.variantid, this.state.name, 
+            this.state.title, this.state.variantTitle,
             this.state.value, this.state.src, this.state.quantity, this.state.price, this.state.reason))
 
     }
@@ -111,43 +114,45 @@ class Item extends Component {
             //quantity == 0: black out item, can't select it, don't display quantity bar
             if (this.state.quantity == 0){
                 return (
-                    <div>
+                    <div className="itemContainer"> 
                         {/*<hr className = 'hl4'></hr> */}
                         <div className = 'container1Grey'>
                             <img className = 'item2' src={this.state.src} />
                         </div>
                         {/* dropdown menu to choose return quantity */}
                         <div className = 'container2Grey'>
-                            <br/>
-                            <p className = 'item2'><strong>{this.props.item.name}</strong></p>
+                            
+                            <p className = 'item2 title'>{this.props.item.title}</p>
+                            <p className = 'item2 variantTitle'>{this.props.item.variantTitle}</p>
                         </div>
                         <div className = 'container3Grey'>
-                            <br/>
+                            
                             <p className = 'item2'>This item is past store return policy and can't be returned.</p>
                         </div>
-                        <br/>
+                        
                     </div>
                 );
             }
             else{
                 //quantity > 0 ... selectable, display normal with quantity dropdown
                 return (
-                    <div>
+                    <div className="itemContainer">
                         {/*<hr className = 'hl4'></hr> */}
                         <div className = 'container1'>
                             <img className = 'item2' src={this.state.src} />
                         </div>
                         {/* dropdown menu to choose return quantity */}
                         <div className = 'container2'>
-                            <br/>
-                            <p className = 'item2'><strong>{this.props.item.name}</strong></p>
+                            
+                            <p className = 'item2 title'>{this.props.item.title}</p>
+                            <p className = 'item2 variantTitle'>{this.props.item.variantTitle}</p>
                         </div>
                         <div className = 'container3'>
                         <label >Quantity for Return: </label>
                             <Select className = 'qty' placeholder = {'0'}value={this.state.activeQuantity} onChange={this.handleQuantityChange} options = {this.state.quantities}>
                             </Select>
                         </div>
-                        <br/>
+                      
                     </div>
                 );
             }
@@ -155,14 +160,15 @@ class Item extends Component {
         //second trip through of item ... select reason
         else if (this.props.step == 2){
             return (
-                <div>
+                <div className="itemContainer">
                     <div className = 'container1'>
                         <img className = 'item2' src={this.state.src} />
                     </div>
                     <div className = 'container2'>
-                        <p className = 'item2'><strong>{this.props.item.name}</strong></p>
-                        <br/>
-                        <p className = 'item2'><strong>QTY: </strong> {this.props.item.value}</p>
+                        <p className = 'item2 title'>{this.props.item.title}</p>
+                        <p className = 'item2 variantTitle'>{this.props.item.variantTitle}</p>
+                      
+                        <p className = 'item2'>QTY:  {this.props.item.value}</p>
                     </div>
                     <div className = 'container3'>
                         {/* dropdown menu to choose return reason */}
@@ -177,28 +183,29 @@ class Item extends Component {
         //third time through item - display confirmation, no dropdown
         else if (this.props.step == 3){
             return(
-                <div>
+                <div className="itemContainer">
                     <div className ='container1'>
                         <img className = 'item2' src={this.state.src} />
                     </div>
                     <div className ='container2'>
-                        <p className = 'item2'><strong>{this.props.item.name}</strong></p>
-                        <br/>
-                        <p className = 'item2'><strong>QTY:</strong> {this.props.item.value}</p>
+                        <p className = 'item2 title'>{this.props.item.title}</p>
+                        <p className = 'item2 variantTitle'>{this.props.item.variantTitle}</p>
+                       
+                        <p className = 'item2'>QTY: {this.props.item.value}</p>
                     </div>
                     <div className ='container3'>
-                        <br/>
-                        <p className = 'item2'><strong>Reason:</strong> {this.props.item.reason}</p>
+                        
+                        <p className = 'item2'>Reason:{this.props.item.reason}</p>
                     </div>
-                    <br/>
+                   
                 </div>
             );
         }
         //this method used by sorting centre to display
         else if (this.props.step == 4){
             return(
-                <div>
-                    <p className = 'item' >{this.props.item.name} --- {this.props.item.variantid} --- {this.props.item.reason}</p>
+                <div className="itemContainer">
+                    <p className = 'item' >{this.props.item.title}??{this.props.item.variantTitle} --- {this.props.item.variantid} --- {this.props.item.reason}</p>
                     <label className="dropdown">Reason for return:
                         <select value={this.state.status} onChange={this.handleStatusChange}>
                         <option value="submitted">Submitted</option>

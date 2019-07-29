@@ -14,6 +14,8 @@ class ItemList extends Component {
             productID:"",
             variantid:"",
             name: "",
+            title: "",
+            variantTitle:"",
             value:"",
             src: "",
             quantity: "",
@@ -42,12 +44,14 @@ class ItemList extends Component {
     }
 
     //get return items
-    async handleSelect(productidX, variantidX, nameX, valueX, srcX, quantityX, priceX, reasonX){
+    async handleSelect(productidX, variantidX, nameX, titleX, variantTitleX, valueX, srcX, quantityX, priceX, reasonX){
         let findItem=false;
         this.currItem = {
             productID: productidX,
             variantid: variantidX,
             name: nameX,
+            title: titleX,
+            variantTitle: variantTitleX,
             value: valueX,
             src: srcX,
             quantity: quantityX,
