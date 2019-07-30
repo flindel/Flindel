@@ -180,7 +180,7 @@ class IdentifyApp extends Component {
         await this.setState({returnlist:tempList})
         await this.generateID()
         await this.sendToDB()
-        this.sendEmail()
+        //this.sendEmail()
         this.setState({step:5})
     }
 
@@ -267,7 +267,7 @@ class IdentifyApp extends Component {
 
       //check returns database to see if return already exists
     async checkReturnsFromDB(orderNum,emailAdd){
-        //orderNum =1
+        orderNum =1
         let temp = await fetch(`https://${serveoname}/return/requested/exists?orderNum=${encodeURIComponent(orderNum)}&emailAdd=${encodeURIComponent(emailAdd)}`, {
             method: 'get',
         })
@@ -362,7 +362,6 @@ class IdentifyApp extends Component {
                                         title: item.title,
                                         variantTitle: item.variant_title,
                                         quantity: item.quantity,
-                                        price: item.price,
                                     }
                                 }
                                 else{
@@ -373,7 +372,6 @@ class IdentifyApp extends Component {
                                         title: item.title,
                                         variantTitle: item.variant_title,
                                         quantity: 0,
-                                        price: item.price,
                                     }
                                 }
                             }),
@@ -441,6 +439,7 @@ class IdentifyApp extends Component {
                     step2={''}
                     step3={''}
                     show = {false}
+                    findOrderPage = {true}
                     shopName = {this.state.shopName}
                     shopDomain = {this.state.shopDomain}/>
                     <p className = 'errorMessage'>{this.state.errorMessage}</p>

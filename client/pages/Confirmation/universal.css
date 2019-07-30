@@ -320,7 +320,10 @@ fieldset.page2{
   display: flex;
   max-height: 170px;
   padding: 15px 0;
-  align-items: center
+  align-items: center;
+  border-bottom: 0.5px solid #999;
+  border-top: 0.5px solid #999;
+  margin-bottom: -1px;
 }
 
 p.item2{
@@ -346,6 +349,10 @@ p.variantTitle{
   }
   p.variantTitle{
     font-size: 1.0em
+  }
+  p.noReturnMsg {
+    font-size: 0.8em;
+    padding-left: 0px
   }
 }
 /*End Second Page.........................................................*/
@@ -400,43 +407,88 @@ h3.pageTitle4{
 /*End fourth page.....................................................*/
 /*Fifth Page (Confirmation)...........................................*/
 div.centre{
-  text-align: center
+  text-align: center;
+  width: 80%;
+  max-width: 570px;
+  margin: 0 auto;
+}
+.confirmTitle {
+  font-size: 180%;
+  padding-bottom: 30px;
+}
+.confirmCode {
+  padding-bottom:10px
+}
+.centre p{
+  margin-bottom:20px;
 }
 div.confirmation1{
-  width:33%;
-  float:left;
+  width:80%;
+  max-width: 570px;
+  margin:0 auto;
   text-align:center;
   padding-top: 20px;
 }
+
+
+.instructions p {
+  text-align: left;
+  padding-bottom: 10px
+}
 div.confirmation2{
-  width: 34%;
-  float:left;
+  width: 80%;
+  max-width:570px;
+  margin: 0 auto;
   text-align:center;
   padding-top: 20px;
 }
 div.confirmation3{
-  width:30%;
+  width:40%;
   float: right;
   padding-top: 20px;
   text-align:center;
 }
 h2.confirmation{
   text-align:center;
-  font-size: 150%;
-  font-weight: bold
+  font-size: 170%;
 }
 div.instructions{
   text-align:left;
   margin-left: 10px
 }
-img.confirmationMap{
-  max-width: 100%;
-  width: auto;
-  height: auto;
+.dropLocations{
+  display:flex
+}
+.confirmation2 h2{
+  padding-bottom:25px
+}
+.dropAdd{
+  margin-left:300px
+}
+.dropAddress{
+  text-align:left;
+  margin-bottom:10px
 }
 .mapContainer{
-  width: 100px;
-  height: 100px;
+  position: absolute;
+  width: 800px;
+  height: 100%;
+}
+@media only screen and (max-width: 700px){
+  .dropLocations{
+    display: flex;
+    flex-wrap: wrap;
+  }
+  .mapContainer {
+    position: absolute;
+    width: 220%;
+    height: 100%;
+  }
+  .dropAdd{
+    width:100%;
+    margin-top:338px;
+    margin-left:0px
+  }
 }
 /*End fifth page......................................................*/
 

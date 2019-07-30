@@ -19,25 +19,32 @@ async function getItems(dbIn){
 }
 
 //split items into accepted, return, refund lists
-async function breakdown(items){
+async function breakdown(db, items){
     let acceptedList = []
     let refundList = []
     let returningList = []
     for (var i = 0; i<items.length;i++){
         let tempItem = {
             name: items[i].name.stringValue,
-            variantid: items[i].variantid.stringValue,
-            price: items[i].price.stringValue,
-            status: items[i].status.stringValue,
-            quantity: 1,
-            store: items[i].store
-        //item is created twice as a deep-copy substitute. it doesn't work without this
-        }
-        let tempItem2 = {
-            name: items[i].name.stringValue,
-            variantid: items[i].variantid.stringValue,
             store: items[i].store,
             order: items[i].order,
+            status: items[i].status.stringValue,
+            variantid: items[i].variantid.stringValue,
+            variantidGIT: items[i].variantidGIT.stringValue,
+            productid: items[i].productid.stringValue,
+            productidGIT: items[i].productidGIT.stringValue,
+            quantity: 1,
+        }
+        //item is created twice as a deep-copy substitute. it doesn't work without this
+        let tempItem2 = {
+            name: items[i].name.stringValue,
+            store: items[i].store,
+            order: items[i].order,
+            status: items[i].status.stringValue,
+            variantid: items[i].variantid.stringValue,
+            variantidGIT: items[i].variantidGIT.stringValue,
+            productid: items[i].productid.stringValue,
+            productidGIT: items[i].productidGIT.stringValue,
             quantity: 1
         }
         if (tempItem.status == 'accepted'){
@@ -50,6 +57,45 @@ async function breakdown(items){
         }
     }
     return {acceptedList, refundList, returningList}
+}
+
+async function getGITInformation(db, variantid, productid){
+    let productid_original ='1'
+    let productid_git ='2'
+    let variantid_original = '3'
+    let variantid_git = '4'
+    myRef = db.collection('products')
+    let query = await myRef.where('orig_id','==',productid).get()
+    if (query.empty){
+        let query2 = await myRef.where('git_id','==',productid).get()
+        await query2.forEach(async doc=>{
+            //item coming in is already a GIT item, has git var id
+            productid_original = productid
+            productid_git = doc._fieldsProto.git_id.stringValue
+            for (var i =0;i <doc._fieldsProto.variants.arrayValue.values.length;i++){
+                let temp = doc._fieldsProto.variants.arrayValue.values[i].mapValue.fields.git_var.integerValue.toString()
+                if (temp == variantid){
+                    variantid_original = doc._fieldsProto.variants.arrayValue.values[i].mapValue.fields.orig_var.integerValue.toString()
+                }
+            }
+            variantid_git = variantid
+        })
+    }
+    else{
+        await query.forEach(async doc=>{
+            //item coming in is an original id
+            productid_original = doc._fieldsProto.orig_id.stringValue
+            productid_git = productid
+            for (var i =0;i < doc._fieldsProto.variants.arrayValue.values.length;i++){
+                let temp = doc._fieldsProto.variants.arrayValue.values[i].mapValue.fields.orig_var.integerValue.toString()
+                if (temp == variantid){
+                    variantid_git = doc._fieldsProto.variants.arrayValue.values[i].mapValue.fields.git_var.integerValue.toString()
+                }
+            }
+            variantid_original = variantid
+        })
+    }
+    return [productid_original, productid_git, variantid_original, variantid_git]
 }
 
 //combine items in list so that there's only one entry per item and higher quantities
@@ -135,4 +181,4 @@ async function sendRefundEmail(listIn, store, db){
     emailHelper.sendRefundEmail(listIn, email)
 }
 
-module.exports = {getItems, breakdown, combine, sortRefundItems, sortNewItems}
+module.exports = {getItems, breakdown, combine, sortRefundItems, sortNewItems,getGITInformation}

@@ -87,7 +87,7 @@ class ItemList extends Component {
                 <p className = 'errorMessage'>{this.state.errorMessage}</p>
                 <div className = 'itemList'>
                     <fieldset className = 'page2'>
-                        <p className = 'orderHeader'>Order Number: {this.props.orderNum}</p>
+                        {/* <p className = 'orderHeader'>Order Number: {this.props.orderNum}</p> */}
                         {this.props.items.map((item)=>{
                             return <Item item={item} serveoname={this.props.serveoname} step = {1} key={item.variantID} handleSelect={this.handleSelect.bind(this)}/>
                         })}

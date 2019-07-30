@@ -2,6 +2,7 @@ import React, {Component} from 'react';
 import Item from './Item2'
 import Blacklist from './blacklist'
 import {serveo_name} from '../config'
+import './sorting.css'
 const sname = serveo_name
 const serveoname = sname.substring(8)
 
@@ -16,6 +17,7 @@ class sortingCentre extends Component{
             email: '',
             orderNum:'',
             createdDate:'',
+            confirmList:[],
         }
         this.handleSubmit = this.handleSubmit.bind(this)
         this.handlecCode = this.handlecCode.bind(this)
@@ -25,6 +27,43 @@ class sortingCentre extends Component{
         this.finalCheck = this.finalCheck.bind(this)
         this.sendEmail = this.sendEmail.bind(this)
         this.sendToDB = this.sendToDB.bind(this)
+        this.dailyConfirm = this.dailyConfirm.bind(this)
+        this.loadConfirmList = this.loadConfirmList.bind(this)
+    }
+
+    async dailyConfirm(){
+        this.setState({step:5})
+        await this.loadConfirmList()
+    }
+
+    async loadConfirmList(){
+        let items = await fetch(`https://${serveoname}/return/pending/itemList`, 
+        {
+            method: 'get',
+        })
+        let itemList = []
+        let itemsJSON = await items.json()
+        for (var i = 0;i<itemsJSON.length;i++){
+            let tempItem = {
+                variantid:itemsJSON[i].variantid.stringValue,
+                productid: itemsJSON[i].productid.stringValue,
+                quantity: 1,
+                name: itemsJSON[i].name.stringValue,
+                store: itemsJSON[i].store,
+                value: 0
+            }
+            itemList.push(tempItem)
+        }
+        for (var i = 0;i<itemList.length;i++){
+            for (var j = i+1;j<itemList.length;j++){
+                if (itemList[i].variantid == itemList[j].variantid && itemList[i].store == itemList[j].store){
+                    itemList[i].quantity++
+                    itemList.splice(j,1)
+                    j--
+                }
+            }
+        }
+        await this.setState({confirmList:itemList})
     }
 
     //accept initial input
@@ -106,6 +145,21 @@ class sortingCentre extends Component{
         await this.setState({itemList:tempList})
     }
 
+    handleQuantityChange(numIn, varID){
+        let tempList = this.state.confirmList
+        for (var i =0;i<tempList.length;i++){
+            if (varID == tempList[i].variantid){
+                if (numIn == ''){
+                    tempList[i].value = numIn
+                }
+                else if (numIn.match("-?(0|[1-9]\\d*)")){
+                    tempList[i].value = parseInt(numIn)
+                }
+            }
+        }
+        this.setState({confirmList:tempList})
+    }
+
     //submit the changing of reasons, finish process and send to db
     async handleSubmit2(){
         let items = await JSON.stringify(this.state.itemList)
@@ -114,6 +168,7 @@ class sortingCentre extends Component{
             method: 'PUT',
         })
         this.setState({step:4})
+        this.finalCheck()
     }
 
     //handle initial submit, load items for order
@@ -131,64 +186,114 @@ class sortingCentre extends Component{
                 variantid: t2.res.items.arrayValue.values[i].mapValue.fields.variantid.stringValue,
                 reason: t2.res.items.arrayValue.values[i].mapValue.fields.reason.stringValue,
                 status:t2.res.items.arrayValue.values[i].mapValue.fields.status.stringValue,
-                price:t2.res.items.arrayValue.values[i].mapValue.fields.price.stringValue
+                productid:t2.res.items.arrayValue.values[i].mapValue.fields.productid.stringValue,
+                store:t2.res.shop.stringValue,
+                variantidGIT: t2.res.items.arrayValue.values[i].mapValue.fields.variantidGIT.stringValue,
+                productidGIT: t2.res.items.arrayValue.values[i].mapValue.fields.productidGIT.stringValue
             }
             tempList.push(tempItem)
         }
+        console.log(tempList)
         await this.setState({itemList:tempList,step:3})
         }
         else{
             this.setState({step: 2})
+            this.setState({cCode:''})
         }
     }
 
     render(){
         if(this.state.step == 1){
             return(
-                <div>
-                    <h1>SORTING CENTRE APP</h1>
+                <div className = 'sc1'>
+                    <h1 className = 'scHeader'>FLINDEL SORTING CENTRE</h1>
+                    <br/><br/><br/>
                     <p>Enter return code below:</p>
                     <label>     
                     <input type="cCode" value={this.state.cCode} onChange={this.handlecCode} />
                     </label>
                     <button onClick = {this.handleSubmit}>SUBMIT</button>
-                    <br/><br/>
+                    <br/><br/><br/><br/><br/>
+                    <p>
+                        Click below for the once-a-day confirmation to confirm all inventory is accounted for.
+                    </p>
+                    <button onClick = {this.dailyConfirm}>CHECK OVER</button>
                 </div>
             )
         }
         else if (this.state.step == 2){
             return(
-                <div>
-                    <h1>SORTING CENTRE APP</h1>
-                    <p>Enter return code below:</p>
-                    <label>     
+                <div className = 'sc1'>
+                    <h1 className = 'scHeader'>FLINDEL SORTING CENTRE</h1>
+                    <br/>
+                    <p className = 'errorMessage'>No return exists under that code.</p>
+                    <br/>
+                    <p>Enter return code below:</p>  
+                    <label>   
                     <input type="cCode" value={this.state.cCode} onChange={this.handlecCode} />
                     </label>
                     <button onClick = {this.handleSubmit}>SUBMIT</button>
-                    <br/>
-                    <p>no order found. please try again</p>
+                    <br/><br/><br/><br/><br/>
+                    <p>
+                        Click below for the once-a-day confirmation to confirm all inventory is accounted for.
+                    </p>
+                    <button onClick = {this.dailyConfirm}>CHECK OVER</button>
                 </div>
             )
         }
         else if (this.state.step == 3){
             return(
                 <div>
-                    <h1>SORTING CENTRE APP</h1>
-                    <h3>Order Code: {this.state.cCode}</h3>
-                    {this.state.itemList.map((item)=>{
-                    return <Item item={item} step = {4} key={item.variantid} handleSelect={this.handleReasonChange.bind(this)}/>
-                })}
+                    <div className = 'sc1'>
+                        <h1 className = 'scHeader'>FLINDEL SORTING CENTRE</h1>
+                        <br/>
+                        <h3 className = 'subHeader'>Order Code: {this.state.cCode}</h3>
+                        <br/>
+                    </div>
+                    <fieldset className = 'page2'>
+                        {this.state.itemList.map((item)=>{
+                        return <Item item={item} serveoname = {serveoname} step = {4} key={item.variantid} handleSelect={this.handleReasonChange.bind(this)}/>
+                        })}
+                    </fieldset>
+                    <div className = 'sc1'>
+                        <br/>   
                         <button onClick = {this.handleSubmit2}>SUBMIT</button>
+                    </div>
                 </div>
             )
         }
         else if(this.state.step == 4){
-            this.finalCheck()
+            return(
+                <div className = 'sc1'>
+                    <h1 className = 'scHeader'>SORTING CENTRE APP</h1>
+                    <br/>
+                    <h3>Update Successful</h3>
+                    <br/>
+                    <button onClick = {this.resetAll}>REFRESH</button>
+                </div>
+            )
+        }
+        else if (this.state.step == 5){
             return(
                 <div>
-                    <h1>SORTING CENTRE APP</h1>
-                    <p>Update Successful</p>
-                    <button onClick = {this.resetAll}>REFRESH</button>
+                    <div className = 'sc1'>
+                        <h1 className = 'scHeader'>SORTING CENTRE APP</h1>
+                        <br/>
+                        <br/>
+                    </div>
+                    <fieldset className = 'page2'>
+                        <hr/>
+                        {this.state.confirmList.map((item)=>{
+                        return <Item handleQuantityChange = {this.handleQuantityChange.bind(this)} item={item} serveoname = {serveoname} step = {5} key={item.variantid} handleSelect={this.handleReasonChange.bind(this)}/>
+                        })}
+                        <hr/>
+                    </fieldset>
+                    <div className = 'sc1'>
+                        <br/><br/>
+                        <button onClick = {this.submitConfirmation}>CONFIRM</button>
+                        <br/><br/><br/><br/>
+                        <button onClick = {this.resetAll}>BACK</button>
+                    </div>
                 </div>
             )
         }
