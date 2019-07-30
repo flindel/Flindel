@@ -1,0 +1,22 @@
+h1.scHeader{
+    padding-top: 25px;
+    font-size:180%;
+    font-weight:bold;
+}
+
+div.sc1{
+    text-align:center;
+}
+
+p.errorMessage{
+    color:red;
+}
+
+h3.subHeader{
+    font-size: 130%;
+    font-weight: bold;
+}
+
+input.numInput{
+    max-width: 40px;
+}

@@ -20,7 +20,7 @@ async function mainReport(dbIn){
         //pull all the items from pending
     let items = await mainHelper.getItems(dbIn)
         //break down items into items being resold and items being refunded (not mutually exclusive)
-    let {acceptedList, refundList, returningList} = await mainHelper.breakdown(items)
+    let {acceptedList, refundList, returningList} = await mainHelper.breakdown(db, items)
         //write any items directly to returning
     for (var i =0;i<returningList.length;i++){
         addItem(returningList[i],'returning',db)
@@ -30,9 +30,9 @@ async function mainReport(dbIn){
         //update inventory for accepted items
     await updateInventory(acceptedList, dbIn)
         //sort items, ultimately send email to brand about what new items were received today
-    mainHelper.sortNewItems(acceptedList, dbIn)
+    //mainHelper.sortNewItems(acceptedList, dbIn)
         //sort items, ultimately send email to brand about who they need to refund
-    mainHelper.sortRefundItems(refundList, dbIn)   
+    //mainHelper.sortRefundItems(refundList, dbIn)   
 }
 
 //notify of all items marked returning so we know when to send shipments back
@@ -77,13 +77,13 @@ async function updateInventory(items, dbIn){
     db = dbIn
     for (var i = 0;i<items.length;i++){
         //get information for active item
-        let idActive = items[i].variantid
+        let idActive = items[i].variantidGIT
         let storeActive = items[i].store
         //get access token for specific store
         let {accessToken, torontoLocation} = await inv.getAccessToken(db,storeActive)
-        let {invId, productId} = await inv.getInvID(storeActive, idActive, accessToken)
+        let invId = await inv.getInvID(storeActive, idActive, accessToken)
         //switch to git somewhere in here
-        let blacklist = await checkBlacklist(productId, db, storeActive)
+        let blacklist = await checkBlacklist(items[i].productid, db, storeActive)
         if (blacklist == true){
             addItem(items[i], 'returning', db)
         }
@@ -122,6 +122,9 @@ async function addItem(item, status, dbIn){
     let data = {
         name: item.name,
         variantid: item.variantid,
+        variantidGIT: item.variantidGIT,
+        productid: item.productid,
+        productidGIT: item.productidGIT,
         store: item.store,
         status: status,
         dateProcessed: currentDate,
