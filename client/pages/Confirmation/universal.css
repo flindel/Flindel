@@ -1,47 +1,73 @@
+/*Import font.................................................*/
+@import url('https://fonts.googleapis.com/css?family=Roboto:400,500,700');
+*{
+  font-family: 'Roboto', sans-serif;
+  text-align: center;
+}
+
+body{
+  background-color: #fafafa !important; 
+}
+p {
+  font-family: 'Roboto', sans-serif;
+  text-align: center;
+  font-weight: bold; 
+}
+*:focus {
+  outline:none;
+}
 /*Navbar.......................................................*/
 /*Store name order portal*/
 h1.top{
-  font-size:250%;
+  font-size:180%;
   text-align: center;
+  padding-bottom: 10px
 }
 .containerPB {
   margin: auto;
-  max-width:400px;
-  background-color:yellowgreen;
+  max-width:600px;
+  background-color:#000000;
 }
 .progressbar {
   counter-reset: step;
+  margin-left: -30px
+}
+
+.progressbar span{
+  font-weight: 400;
+  color: #000000;
 }
 .progressbar li {
   list-style-type: none;
   width: 33.33333%;
   float: left;
-  font-size: 12px;
+  font-size: 14px;
   position: relative;
   text-align: center;
   text-transform: uppercase;
-  color: black;
+  font-weight: 700;
+  color: #ffffff;
 }
 .progressbar li:before {
-  width: 30px;
-  height: 30px;
+  width: 20px;
+  height: 20px;
   content: counter(step);
   counter-increment: step;
-  line-height: 30px;
-  border: 2px solid #7d7d7d;
+  line-height: 20px;
+  /* border: 2px solid #7d7d7d; */
   display: block;
   text-align: center;
   margin: 0 auto 10px auto;
   border-radius: 50%;
-  background-color: white;
+  background-color: #999
 }
 .progressbar li:after {
   width: 100%;
-  height: 2px;
+  height: 7px;
   content: '';
   position: absolute;
-  background-color: #7d7d7d;
-  top: 15px;
+  background-color: #999;
+  top: 6px;
   left: -50%;
   z-index: -1;
 }
@@ -49,22 +75,22 @@ h1.top{
   content: none;
 }
 .progressbar li.active {
-  color: black;
+  color:#ffffff;
 }
 
 /*CIRCLE*/
 .progressbar li.active:before {
-  border-color: #BBE5B3;
-  background-color: #BBE5B3;
+  border-color: #000000;
+  background-color: #000000;
 }
 .progressbar li.live:before{
-  border-color:#50BB3C;
-  background-color:#50BB3C;
+  border-color:#999;
+  background-color:#999;
 }
 
 /*LINE*/
 .progressbar li.active + li:after {
-  background-color:  #50BB3C;
+  background-color:  #000000;
 }
 img.headerLogo{
   background-color:black;
@@ -83,44 +109,94 @@ p.headerLogo{
 /*First Page (Find Order)................................................*/
 /*Submit button stuff*/
 button.Submit1{
-  background-color: #50B83C;
+  background-color:#000000;
   color: white;
-  padding: 3% 10%;
   cursor: pointer;
   margin: auto;
   text-align: center;
-  border-radius: 15%;
+  border-radius: 3px;
   display: block;
   border: none;
+  padding: 15px 45px;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  font-size: 13px;
+  font-weight: 700;
 }
 button.Submit1:hover{
-  background-color: #108043;
+  background-color: #555555;
 }
 button.Submit1:active {
-  background-color:#108043;
-  box-shadow: 0 0.125em #666666;
-  transform: translateY(-0.25em);
+  background-color:#555555;
+  /* box-shadow: 0 0.125em #666666;
+  transform: translateY(-0.25em); */
 }
 button.Blackout1{
-  background-color: grey;
+  background-color: #555555;
   color:white;
-  padding: 3% 10%;
+  /* padding: 3% 10%; */
   margin: auto;
   text-align: center;
-  border-radius: 15%;
+  border-radius: 3px;
   display: block;
   pointer-events: none;
   border: none;
-  
+  padding: 15px 45px;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  font-size: 13px;
+  font-weight: 700;
 }
 
 /*input fields(text boxes)*/
-input.p1[type=text]{
+/* input.p1[type=text]{
   padding: 12px 20px;
   box-sizing: border-box;
   margin: auto;
   display: block;
   border-radius: 2%
+} */
+.Search-block{
+  display: inline-block;
+  position: relative;
+  /* overflow: hidden; */
+  width: 100%;
+  margin-bottom: 10px
+}
+
+.Search-block input{
+  text-align: left;
+  height: 37px;
+  font-size: 120%;
+  border: 0.5px solid black;
+  width: 100%;
+  border-radius: 3px;
+  padding-left: 20px;
+}
+
+.Search-block span{
+  position: absolute;
+  height: 37px;
+  margin-left: -35px;
+  top: 8px
+}
+
+.Search-block img{
+  margin: auto;
+  width: 70%
+}
+
+.Search-block p{
+  font-size: 0.85em;
+  margin-top: 5px;
+  margin-bottom: 15px;
+  color: #555555;
+}
+
+::placeholder{
+  text-align: left;
+  color: #d1cfcf;
+  font-size: 1em;
 }
 /*Order number/email label text*/
 p.label{
@@ -129,8 +205,8 @@ p.label{
 /*Box around form*/
 fieldset.page1 { 
   margin: auto;
-  max-width:300px;
-  border: 2px groove (internal value);
+  max-width:700px;
+  border: 0;
   border-color: white;
   border-radius: 10%
 }
@@ -139,34 +215,41 @@ fieldset.page1 {
 /*Second Page (Item Select)...................................................*/
 /*submit button stuff*/
 button.Submit2{
-  background-color: #50B83C;
+  background-color:#000000;
   color: white;
-  padding: 0.7% 2%;
   cursor: pointer;
   margin: auto;
   text-align: center;
-  border-radius: 15%;
+  border-radius: 3px;
   display: block;
   border: none;
+  padding: 15px 45px;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  font-size: 13px;
+  font-weight: 700;
 }
 button.Submit2:hover{
-  background-color:  #108043;
+  background-color:  #555555;
 }
 button.Submit2:active {
-  background-color:#108043;
-  box-shadow: 0 0.125em #666666;
-  transform: translateY(-0.25em);
+  background-color:#555555;
 }
 button.Blackout2{
-  background-color: grey;
-  color: white;
-  padding: 0.7% 2%;
-  pointer-events: none;
+  background-color: #555555;
+  color:white;
+  /* padding: 3% 10%; */
   margin: auto;
   text-align: center;
-  border-radius: 15%;
+  border-radius: 3px;
   display: block;
-  border:none;
+  pointer-events: none;
+  border: none;
+  padding: 15px 45px;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  font-size: 13px;
+  font-weight: 700;
 }
 p.errorMessage{
   color:red;
@@ -176,43 +259,43 @@ Select.qty{
   max-width: 10%
 }
 div.container1{
-  width:20%;
-  float:left;
-  height:100px;
+  width:30%;
+  /* float:left; */
+  /* height:150px; */
   text-align:center;
 }
 div.container2{
-  width: 40%;
-  height: 100px;
-  float:left;
+  width: 45%;
+  /* height: 150px; */
+  /* float:left; */
   text-align:center;
 }
 div.container3{
-  width:40%;
-  float: right;
-  height: 100px;
+  width:25%;
+  /* float: right; */
+  /* height: 150px; */
   text-align:center;
 }
 div.container1Grey{
-  width:20%;
-  float:left;
-  height:100px;
+  width:30%;
+  /* float:left; */
+  /* height:150px; */
   text-align:center;
-  background-color: grey
+  color: #999
 }
 div.container2Grey{
-  width: 40%;
-  height: 100px;
-  float:left;
+  width: 45%;
+  /* height: 150px; */
+  /* float:left; */
   text-align:center;
-  background-color:grey;
+  color: #999
 }
 div.container3Grey{
-  width:40%;
-  float: right;
-  height: 100px;
+  width:25%;
+  /* float: right; */
+  /* height: 150px; */
   text-align:center;
-  background-color:grey;
+  color: #999
 }
 img.item2{
   object-fit: contain;
@@ -220,7 +303,6 @@ img.item2{
    max-height: 100%;
    width: auto;
    height: auto;
-   padding-bottom: 10px;
 }
 fieldset.page2{
   margin: auto;
@@ -234,10 +316,37 @@ fieldset.page2{
   margin-right: 25%;
   border-color: white; 
 }*/
+.itemContainer{
+  display: flex;
+  max-height: 170px;
+  padding: 15px 0;
+  align-items: center
+}
+
 p.item2{
   vertical-align: middle;
-  line-height: normal
+  line-height: normal;
+  text-align:left;
+  padding-right:20px;
+  padding-left:15px
+}
 
+p.title {
+  font-weight: 400;
+  font-size:1.5em
+}
+
+p.variantTitle{
+  font-weight: 400;
+  font-size:1.2em
+}
+@media only screen and (max-width: 600px){
+  p.title{
+    font-size: 1.2em   
+  }
+  p.variantTitle{
+    font-size: 1.0em
+  }
 }
 /*End Second Page.........................................................*/
 /*Third Page (Reason Select)..............................................*/
