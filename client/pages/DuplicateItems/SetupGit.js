@@ -1,6 +1,6 @@
 
 import React, { Component } from 'react';
-import {postCollection, getShopID, postScriptTag} from './Shopify';
+import {postCollection, getShopID, postScriptTag, postFulfillmentService} from './Shopify';
 import {postInstallTime} from './Firestore';
 import {script_tag_url, script_tag_url_returnPortal} from '../config'
 
@@ -16,6 +16,7 @@ class SetupGit extends Component {
     this.state = {
       isGitCollectSetup: props.gitCollectionId != 0,
       isOrigCollectSetup: props.origCollectionId != 0,
+      isFulfillSetup: false,
       extSetState: props.extSetState,
       shop_id: null,
       install_time: null,
@@ -75,9 +76,7 @@ class SetupGit extends Component {
         }
       }, this.callbackOrig)
     }
-
-    postScriptTag(script_tag_url);
-    postScriptTag(script_tag_url_returnPortal);
+    postFulfillmentService();
   }
 
   callbackGit(data){
@@ -124,19 +123,6 @@ class SetupGit extends Component {
         {bottom}
       </div>
     )
-    /*
-    return(
-      <div>
-      <MuiThemeProvider>
-        <DateTimePicker
-          onChange={this.setDate}
-          DatePicker={DatePickerDialog}
-          TimePicker={TimePickerDialog}
-        />
-      </MuiThemeProvider>
-      </div>
-    )
-    */
   }
 }
 export default SetupGit;

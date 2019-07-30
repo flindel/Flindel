@@ -37,55 +37,79 @@ class Blacklist extends Component {
     handleChangeDelete(e){
         this.setState({deleteIn:e.target.value})
     }
+    //add item to blacklist (on submit of add)
     addToBlacklist(){
+        if (this.state.valid){
+        //make sure previous error message goes away
         this.setState({errorMessage:''})
         let toAdd = this.state.addIn;
         this.setState({addIn: ''})
         let tempList = this.state.items
+        //make sure item doesn't exist so we're not making a duplicate
         if (tempList.indexOf(toAdd)==-1){
             tempList.push(toAdd)
             tempList.sort()
         }
+        //show error message if they enter duplicate
         else{
             this.setState({errorMessage:'This item is already on the blacklist.'})
         }
+        let itemString = JSON.stringify(tempList)
+        //save to db
         this.setState({items:tempList})
-        fetch(`${serveo_name}/blacklist/add?id=${encodeURIComponent(toAdd)}&store=${encodeURIComponent(this.state.storeName)}`, {
-            method: 'get',
+        fetch(`${serveo_name}/blacklist?items=${encodeURIComponent(itemString)}&store=${encodeURIComponent(this.state.storeName)}`, {
+            method: 'put',
         })
+        }
     }
+    //delete an item from blacklist (on submit of delete)
     deleteFromBlacklist(){
+        if (this.state.valid){
+            //make sure previous error message goes away
         this.setState({errorMessage:''})
         let toDelete = this.state.deleteIn;
         this.setState({deleteIn:''})
         let found = false
         let tempList = this.state.items
+        //make sure there's something there to delete
         for (var i = 0;i<tempList.length;i++){
             if (tempList[i]==toDelete){
                 found = true
                 tempList.splice(i,1)
             }
         }
+        //show error message if they make mistake
         if(found == false){
             this.setState({errorMessage:'This item is not currently on the blacklist.'})
         }
+        let itemString = JSON.stringify(tempList)
+        //save to db
         this.setState({items:tempList})
-        fetch(`${serveo_name}/blacklist/delete?id=${encodeURIComponent(toDelete)}&store=${encodeURIComponent(this.state.storeName)}`, {
-            method: 'get',
+        fetch(`${serveo_name}/blacklist?items=${encodeURIComponent(itemString)}&store=${encodeURIComponent(this.state.storeName)}`, {
+            method: 'put',
         })
+        }
     }
+
     async handleSubmit(storeName){
         const temp = storeName.shop_id
         console.log("storeName:", temp);
         await this.setState({storeName:temp.toLowerCase(),step:2})
         this.getItems()
     }
+
+    //get items on blacklist of current store
     async getItems(){
-        let temp = await fetch(`${serveo_name}/blacklist/load?store=${encodeURIComponent(this.state.storeName)}`, {
+        let temp = await fetch(`https://${serveoname}/blacklist?store=${encodeURIComponent(this.state.storeName)}`, {
             method: 'get',
         })
         let json = await temp.json()
-        this.setState({items:json.res.sort()})
+        if (json.res.length == 0){
+            this.setState({loginMessage: 'THIS STORE DOES NOT EXIST'})
+        }
+        else{
+            this.setState({valid: 1, loginMessage: '', items:json.res.sort()})
+        }
     }
 
     render() {
