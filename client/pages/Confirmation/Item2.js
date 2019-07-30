@@ -127,7 +127,7 @@ class Item extends Component {
                         </div>
                         <div className = 'container3Grey'>
                             
-                            <p className = 'item2'>This item is past store return policy and can't be returned.</p>
+                            <p className = 'item2 noReturnMsg'>This item is past store return policy and can't be returned.</p>
                         </div>
                         
                     </div>
@@ -195,7 +195,7 @@ class Item extends Component {
                     </div>
                     <div className ='container3'>
                         
-                        <p className = 'item2'>Reason:{this.props.item.reason}</p>
+                        <p className = 'item2 '>Reason:{this.props.item.reason}</p>
                     </div>
                    
                 </div>

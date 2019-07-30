@@ -48,9 +48,13 @@ class universalNavBar extends Component{
                 <br/>
                 </p>
                 <br/><br/>
-                <h1 className='top'>Returns</h1>
+                {/* if on comfirmation page, don't show returns, please enter your order details to begin */}
+                {
+                    this.props.findOrderPage? (<span><h1 className='top'>Returns</h1>
                 <p>Please enter your order details to begin</p>
-                <br/>
+                <br/></span>):null
+                }
+                
             </div>
             )
         }

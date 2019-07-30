@@ -441,6 +441,7 @@ class IdentifyApp extends Component {
                     step2={''}
                     step3={''}
                     show = {false}
+                    findOrderPage = {true}
                     shopName = {this.state.shopName}
                     shopDomain = {this.state.shopDomain}/>
                     <p className = 'errorMessage'>{this.state.errorMessage}</p>
