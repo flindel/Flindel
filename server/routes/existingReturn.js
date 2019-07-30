@@ -3,6 +3,7 @@ const rp = require('request-promise');
 const errors = require('request-promise/errors');
 const { api_link } = require('../default-shopify-api.json');
 const { getShopHeaders } = require('../util/shop-headers');
+const itemList = require ('../util/mainHelper')
 const router = Router({
     prefix: '/return'
 });
@@ -76,6 +77,11 @@ router.put('/requested/orderStatus', async ctx=>{
         ctx.body = {'success':true}
 })
 
+router.get('/pending/itemList', async ctx=>{
+    let fullList = await itemList.getItems(ctx.db);
+    ctx.body = fullList
+})
+
 router.post('/requested/new', async ctx=>{
         db = ctx.db
         const { shop, accessToken } = getShopHeaders(ctx);
@@ -129,7 +135,7 @@ router.post('/pending/new', async ctx=>{
         for (var i = 0;i<itemsJSON.length;i++){
             //write item status with the sorting centre status (correct)
             let myStatus = itemsJSON[i].status
-            data.items.push({"name":itemsJSON[i].name, "price":itemsJSON[i].price, "reason":itemsJSON[i].reason, "variantid":itemsJSON[i].variantid.toString(),"status": myStatus})
+            data.items.push({"name":itemsJSON[i].name, "flag":0, "price":itemsJSON[i].price, "reason":itemsJSON[i].reason, "variantid":itemsJSON[i].variantid.toString(),"status": myStatus})
         }
         //pull from requested returns and then write to pending
             data.order_status = 'pending'
@@ -158,7 +164,8 @@ router.post('/pending/new', async ctx=>{
                 name: temp.mapValue.fields.name.stringValue,
                 variantid: temp.mapValue.fields.variantid.stringValue,
                 reason: temp.mapValue.fields.reason.stringValue,
-                status: temp.mapValue.fields.status.stringValue
+                status: temp.mapValue.fields.status.stringValue,
+                flag: 1
             }
         }
         //actually write

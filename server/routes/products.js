@@ -8,6 +8,7 @@ const router = Router({
 });
 
 router.get('/', async ctx => {
+    ctx.body = false
   const productid = ctx.query.id;
   const { cookies } = ctx;
   const shop = cookies.get('shop_id');
@@ -34,6 +35,22 @@ router.get('/', async ctx => {
       }
   }
 });
+
+router.get('/variant/productID', async ctx=>{
+const { cookies } = ctx;
+const varID = ctx.query.id
+  const shop = cookies.get('shop_id');
+  const accessToken = cookies.get('accessToken');
+  const option = {
+      method: 'GET',
+      url: `https://${shop}/${api_link}/variants/${varID}.json`,
+      headers: {
+        'X-Shopify-Access-Token': accessToken
+      },
+      json: true,
+    }
+      ctx.body = await rp(option);
+})
 
 router.get('/ids/', async ctx => {
   const { cookies } = ctx;
@@ -63,7 +80,6 @@ router.get('/ids/', async ctx => {
 });
 
 router.get('/img', async ctx => {
-
     // Get product img src
     const productid = ctx.query.id;
     const { cookies } = ctx;

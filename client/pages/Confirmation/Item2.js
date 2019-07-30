@@ -32,6 +32,7 @@ class Item extends Component {
         this.handleReasonChange = this.handleReasonChange.bind(this);
         this.handleQuantityChange=this.handleQuantityChange.bind(this);
         this.handleStatusChange=this.handleStatusChange.bind(this)
+        this.handleQuantityChangeSortingCenter=this.handleQuantityChangeSortingCenter.bind(this)
     }
 
     //handle selecting a change in quantity
@@ -46,7 +47,6 @@ class Item extends Component {
             value:option.value
         },()=>this.props.handleSelect(this.state.productid, this.state.variantid, this.state.name,
             this.state.value, this.state.src, this.state.quantity, this.state.price, this.state.reason))
-
     }
 
     //handle inputting the reason for return
@@ -70,11 +70,22 @@ class Item extends Component {
         },()=> this.props.handleSelect(this.props.item.variantid, this.state.status, old))
      }
 
+     handleQuantityChangeSortingCenter(e){
+        this.props.handleQuantityChange(e.target.value, this.props.item.variantid)
+     }
+
      //on mount, get important information including image source to show the display picture
-    componentWillMount(){
-        if(this.props.step !=4){
-            fetch(`https://${this.props.serveoname}/products/img?id=${encodeURIComponent(this.props.item.productID)}`, {
-            method: 'GET',})
+    async componentWillMount(){
+        var imageID = this.props.item.productID
+        if (this.props.step == 4 || this.props.step == 5){ 
+            let temp = await fetch(`https://${this.props.serveoname}/products/variant/productID?id=${encodeURIComponent(this.props.item.variantid)}`, {
+            method: 'get',
+            })
+            let tJSON = await temp.json()
+            imageID = tJSON.variant.product_id
+        }
+        fetch(`https://${this.props.serveoname}/products/img?id=${encodeURIComponent(imageID)}`, {
+        method: 'GET',})
         .then(response => response.json())
         .then(resData=>{
         if(resData.product){
@@ -85,7 +96,6 @@ class Item extends Component {
             }
           }
         });
-        }
         //push quantity array
         let quantityArr = [];
             for(let i=0; i<=this.state.quantity; i++){
@@ -198,15 +208,51 @@ class Item extends Component {
         else if (this.props.step == 4){
             return(
                 <div>
-                    <p className = 'item' >{this.props.item.name} --- {this.props.item.variantid} --- {this.props.item.reason}</p>
-                    <label className="dropdown">Reason for return:
-                        <select value={this.state.status} onChange={this.handleStatusChange}>
-                        <option value="submitted">Submitted</option>
-                            <option value="accepted">Accepted - Resell</option>
-                            <option value="returning">Accepted - No Resell</option>
-                            <option value="rejected">Rejected</option>
-                        </select>
-                    </label>
+                    <div className ='container1'>
+                        <img className = 'item2' src = {this.state.src}/>
+                    </div>
+                    <div className ='container2'>
+                        <p className = 'item' >{this.props.item.name}: {this.props.item.variantid} </p>
+                        <br/>
+                        <p className = 'item'>Reason: {this.props.item.reason}</p>
+                    </div>
+                    <div className ='container3'>
+                        <br/>
+                        <label>Change Status:
+                            <select value={this.state.status} onChange={this.handleStatusChange}>
+                                <option value="submitted">Submitted</option>
+                                <option value="accepted">Accepted - Resell</option>
+                                <option value="returning">Accepted - No Resell</option>
+                                <option value="rejected">Rejected</option>
+                            </select>
+                        </label>
+                    </div>
+                </div>
+            )
+        }
+        else if (this.props.step == 5){
+            return(
+                <div>
+                    <div className ='container1'>
+                        <img className = 'item2' src = {this.state.src}/>
+                    </div>
+                    <div className ='container2'>
+                        <br/>
+                        <p className = 'item' >{this.props.item.name}: {this.props.item.variantid} </p>
+                        <br/>
+                    </div>
+                    <div className ='container3'>
+                        <p className = 'item'>Expected Quantity: {this.props.item.quantity}</p>
+                        <br/>
+                        <p className = 'item'>Received Quantity: 
+                        <label>     
+                            <input className = 'numInput' value={this.props.item.value} onChange={this.handleQuantityChangeSortingCenter} />
+                        </label>
+                        </p>
+                    </div>
+                    <br/>
+                    <hr/>
+                    <br/>
                 </div>
             )
         }
