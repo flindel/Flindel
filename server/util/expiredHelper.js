@@ -32,10 +32,13 @@ async function clearExpiredOrders(dbIn){
                     name: temp.mapValue.fields.name.stringValue,
                     variantid: temp.mapValue.fields.variantid.stringValue,
                     reason: temp.mapValue.fields.reason.stringValue,
-                    status: temp.mapValue.fields.status.stringValue
+                    status: temp.mapValue.fields.status.stringValue,
+                    productid: temp.mapValue.fields.productid.stringValue,
+                    variantidGIT: temp.mapValue.fields.variantidGIT.stringValue,
+                    productidGIT: temp.mapValue.fields.productidGIT.stringValue
                 }
             }
-            //copy to history, mark expired, delete from req return to prevent cloggin
+            //copy to history, mark expired, delete from req return to prevent clogging
             data.items.push(tempItem)
             let set = db.collection('history').doc()
             batch.set(set,data)
@@ -63,7 +66,7 @@ async function clearExpiredItems(dbIn){
             //mark item with status returning, write to batch
             batch.update(doc.ref, {status:'returning'})
             let store = doc._fieldsProto.store.stringValue
-            let varID = doc._fieldsProto.variantid.stringValue
+            let varID = doc._fieldsProto.variantidGIT.stringValue
             //decrement inventory
             inv.editInventory(-1, store, varID, '', db)
         }

@@ -3,6 +3,7 @@ const rp = require('request-promise');
 const errors = require('request-promise/errors');
 const { api_link } = require('../default-shopify-api.json');
 const { getShopHeaders } = require('../util/shop-headers');
+const getAccessToken = require('../util/editInventory')
 const router = Router({
     prefix: '/products'
 });
@@ -39,8 +40,8 @@ router.get('/', async ctx => {
 router.get('/variant/productID', async ctx=>{
 const { cookies } = ctx;
 const varID = ctx.query.id
-  const shop = cookies.get('shop_id');
-  const accessToken = cookies.get('accessToken');
+  const shop = ctx.query.store
+  const {accessToken, torontoLocation} = await getAccessToken.getAccessToken(ctx.db,shop)
   const option = {
       method: 'GET',
       url: `https://${shop}/${api_link}/variants/${varID}.json`,

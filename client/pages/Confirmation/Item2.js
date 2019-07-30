@@ -81,7 +81,7 @@ class Item extends Component {
     async componentWillMount(){
         var imageID = this.props.item.productID
         if (this.props.step == 4 || this.props.step == 5){ 
-            let temp = await fetch(`https://${this.props.serveoname}/products/variant/productID?id=${encodeURIComponent(this.props.item.variantid)}`, {
+            let temp = await fetch(`https://${this.props.serveoname}/products/variant/productID?store=${encodeURIComponent(this.props.item.store)}&id=${encodeURIComponent(this.props.item.variantid)}`, {
             method: 'get',
             })
             let tJSON = await temp.json()
@@ -214,7 +214,7 @@ class Item extends Component {
         //this method used by sorting centre to display
         else if (this.props.step == 4){
             return(
-                <div>
+                <div className = "itemContainer">
                     <div className ='container1'>
                         <img className = 'item2' src = {this.state.src}/>
                     </div>
@@ -239,14 +239,14 @@ class Item extends Component {
         }
         else if (this.props.step == 5){
             return(
-                <div>
+                <div className = 'itemContainer'>
                     <div className ='container1'>
                         <img className = 'item2' src = {this.state.src}/>
                     </div>
                     <div className ='container2'>
-                        <br/>
                         <p className = 'item' >{this.props.item.name}: {this.props.item.variantid} </p>
                         <br/>
+                        <p className = 'item'> Store: {this.props.item.store}</p>
                     </div>
                     <div className ='container3'>
                         <p className = 'item'>Expected Quantity: {this.props.item.quantity}</p>
@@ -258,7 +258,6 @@ class Item extends Component {
                         </p>
                     </div>
                     <br/>
-                    <hr/>
                     <br/>
                 </div>
             )

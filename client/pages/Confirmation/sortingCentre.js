@@ -46,9 +46,10 @@ class sortingCentre extends Component{
         for (var i = 0;i<itemsJSON.length;i++){
             let tempItem = {
                 variantid:itemsJSON[i].variantid.stringValue,
+                productid: itemsJSON[i].productid.stringValue,
                 quantity: 1,
                 name: itemsJSON[i].name.stringValue,
-                store: itemsJSON.store,
+                store: itemsJSON[i].store,
                 value: 0
             }
             itemList.push(tempItem)
@@ -185,10 +186,14 @@ class sortingCentre extends Component{
                 variantid: t2.res.items.arrayValue.values[i].mapValue.fields.variantid.stringValue,
                 reason: t2.res.items.arrayValue.values[i].mapValue.fields.reason.stringValue,
                 status:t2.res.items.arrayValue.values[i].mapValue.fields.status.stringValue,
-                price:t2.res.items.arrayValue.values[i].mapValue.fields.price.stringValue
+                productid:t2.res.items.arrayValue.values[i].mapValue.fields.productid.stringValue,
+                store:t2.res.shop.stringValue,
+                variantidGIT: t2.res.items.arrayValue.values[i].mapValue.fields.variantidGIT.stringValue,
+                productidGIT: t2.res.items.arrayValue.values[i].mapValue.fields.productidGIT.stringValue
             }
             tempList.push(tempItem)
         }
+        console.log(tempList)
         await this.setState({itemList:tempList,step:3})
         }
         else{
@@ -237,7 +242,6 @@ class sortingCentre extends Component{
             )
         }
         else if (this.state.step == 3){
-            console.log(this.state.itemList)
             return(
                 <div>
                     <div className = 'sc1'>
@@ -282,6 +286,7 @@ class sortingCentre extends Component{
                         {this.state.confirmList.map((item)=>{
                         return <Item handleQuantityChange = {this.handleQuantityChange.bind(this)} item={item} serveoname = {serveoname} step = {5} key={item.variantid} handleSelect={this.handleReasonChange.bind(this)}/>
                         })}
+                        <hr/>
                     </fieldset>
                     <div className = 'sc1'>
                         <br/><br/>

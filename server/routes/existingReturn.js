@@ -104,7 +104,8 @@ router.post('/requested/new', async ctx=>{
         //all items start submitted
         const myStatus = 'submitted'
         for (var i = 0;i<itemsJSON.length;i++){
-            data.items.push({"name":itemsJSON[i].name, "price":itemsJSON[i].price, "reason":itemsJSON[i].reason, "variantid":itemsJSON[i].variantid.toString(),"status": myStatus})
+            let [originalID, gitID, originalVarID, gitVarID] = await itemList.getGITInformation(ctx.db, itemsJSON[i].variantid.toString(), itemsJSON[i].productID.toString())
+            data.items.push({"name":itemsJSON[i].name, "productid":originalID, "productidGIT":gitID, "reason":itemsJSON[i].reason, "variantid":originalVarID, "variantidGIT": gitVarID, "status": myStatus})
         }
         //write to requested returns
         setDoc = db.collection('requestedReturns').doc(code).set(data)
@@ -135,8 +136,9 @@ router.post('/pending/new', async ctx=>{
         for (var i = 0;i<itemsJSON.length;i++){
             //write item status with the sorting centre status (correct)
             let myStatus = itemsJSON[i].status
-            data.items.push({"name":itemsJSON[i].name, "flag":0, "price":itemsJSON[i].price, "reason":itemsJSON[i].reason, "variantid":itemsJSON[i].variantid.toString(),"status": myStatus})
+            data.items.push({"name":itemsJSON[i].name, "productid":itemsJSON[i].productid, "productidGIT":itemsJSON[i].productidGIT, "variantidGIT":itemsJSON[i].variantidGIT, "flag":0, "reason":itemsJSON[i].reason, "variantid":itemsJSON[i].variantid.toString(),"status": myStatus})
         }
+        let itemsCopy = data.items
         //pull from requested returns and then write to pending
             data.order_status = 'pending'
             setDoc = db.collection('pending').doc().set(data)
@@ -149,32 +151,17 @@ router.post('/pending/new', async ctx=>{
             code: doc._fieldsProto.code.stringValue,
             email: doc._fieldsProto.email.stringValue,
             shop: doc._fieldsProto.shop.stringValue,
-            items: [],
+            items: itemsCopy,
             order_status: 'complete',
             order: doc._fieldsProto.order.stringValue,
             createdDate:doc._fieldsProto.createdDate.stringValue,
             receivedDate: receiveDate,
             processedDate : processDate,
         }
-        //copy over items
-        for (var i = 0;i<doc._fieldsProto.items.arrayValue.values.length;i++){
-            let temp = doc._fieldsProto.items.arrayValue.values[i]
-            tempItem = {
-                price: temp.mapValue.fields.price.stringValue,
-                name: temp.mapValue.fields.name.stringValue,
-                variantid: temp.mapValue.fields.variantid.stringValue,
-                reason: temp.mapValue.fields.reason.stringValue,
-                status: temp.mapValue.fields.status.stringValue,
-                flag: 1
-            }
-        }
-        //actually write
-        data.items.push(tempItem)
         //write to history if also writing to pending as it'll end up there anyways. delete from req returns
         let set = db.collection('history').doc().set(data)
-        let deleteDoc = db.collection('requestedReturns').doc(code).delete();
-          
-          ctx.body = 'success'
+        let deleteDoc = db.collection('requestedReturns').doc(code).delete();   
+        ctx.body = 'success'
 })
 
 
