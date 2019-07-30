@@ -21,13 +21,12 @@ class universalNavBar extends Component{
                     </p>
                     <br/><br/>
                     <h1 className='top'>Returns</h1>
-                    
-                    <br/><br/>
+
                     <div className = 'containerPB'>  
                         <ul className="progressbar">
-                            <li className = {this.props.step1} onClick = {this.props.viewPage2}>Select</li>
-                            <li className = {this.props.step2} onClick = {this.props.viewPage3}>Review</li>
-                            <li className = {this.props.step3}>Confirm</li>
+                            <li className = {this.props.step1} onClick = {this.props.viewPage2}><span>Select</span></li>
+                            <li className = {this.props.step2} onClick = {this.props.viewPage3}><span>Review</span></li>
+                            <li className = {this.props.step3}><span>Confirm</span></li>
                         </ul>
                     </div>
                     <br/><br/><br/><br/>
