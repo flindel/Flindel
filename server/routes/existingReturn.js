@@ -105,6 +105,7 @@ router.post('/requested/new', async ctx=>{
         const myStatus = 'submitted'
         for (var i = 0;i<itemsJSON.length;i++){
             let [originalID, gitID, originalVarID, gitVarID] = await itemList.getGITInformation(ctx.db, itemsJSON[i].variantid.toString(), itemsJSON[i].productID.toString())
+            console.log(originalID + '-' + gitID)
             data.items.push({"name":itemsJSON[i].name, "productid":originalID, "productidGIT":gitID, "reason":itemsJSON[i].reason, "variantid":originalVarID, "variantidGIT": gitVarID, "status": myStatus})
         }
         //write to requested returns

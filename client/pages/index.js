@@ -15,21 +15,21 @@ class Index extends React.Component{
        </div>
      )
    }
-   if (ui == 1){
+   else if (ui == 1){
      return (
        <div>
          <SC />
        </div>
      )
    }
-   if (ui == 2){
+   else if (ui == 2){
      return (
        <div>
          <IdentifyApp />
        </div>
      )
    }
-   if (ui == 3){
+   else if (ui == 3){
      return(
        <div>
          <Blacklist/>

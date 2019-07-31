@@ -69,7 +69,6 @@ router.post('/update', async ctx=>{
   
 })
 router.post('/confirmation', async ctx=>{
-  console.log('sending email')
   const email = ctx.query.email
   const code = ctx.query.code
   const option = {
