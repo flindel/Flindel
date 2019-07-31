@@ -307,7 +307,7 @@ img.item2{
 fieldset.page2{
   margin: auto;
   max-width:750px;
-  min-width:400px;
+  min-width:360px;
   overflow-x:auto;
   border:0
 }
@@ -490,6 +490,12 @@ div.instructions{
     margin-left:0px
   }
 }
+@media only screen and (max-width: 640px){
+  div.centre{
+    max-width: 95%;
+  }
+}
+
 /*End fifth page......................................................*/
 
 /*UTIL*/
@@ -516,16 +522,39 @@ body{
 }
 .popup_inner {
   position: absolute;
-  left: 0%;
-  right: 0%;
-  top: 30vh;
-  bottom: 40vh;
+  left: 12%;
+  right: 12%;
+  top: 20vh;
+  bottom: 20vh;
   margin: auto;
   background: white;
+  display: flex;
+}
+.popup_content{
+  max-width:440px;
+  width: 90%;
+  margin:auto;
+}
+h2.r2.popup_title{
+  font-weight:400;
+  font-size:2.0em;
+  text-transform: uppercase;
 }
 h2.r2{
   font-size:150%;
   font-weight:thick;
+}
+.reviewInfo p{
+  padding-top:20px
+}
+p.reviewInfo2{
+  margin-top:20px;
+  margin-bottom:15px;
+  text-align:left;
+}
+button.Submit2.Small{
+  padding: 10px 30px;
+  font-size: 12px
 }
 button.r2{
   background-color: #50B83C;
