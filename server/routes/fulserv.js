@@ -24,7 +24,7 @@ router.post("/", async ctx => {
     body: {
       fulfillment_service: {
         name: "Flindel",
-        callback_url: "https://suus.serveo.net/dbcall",
+        callback_url: process.env.serveo_name+"/dbcall",
         inventory_management: false,
         tracking_support: false,
         requires_shipping_method: true,

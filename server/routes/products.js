@@ -172,8 +172,7 @@ router.post('/variant/', async ctx => {
 
 router.delete('/variant/', async ctx => {
   const product_id = ctx.query.id;
-  const variant_id = ctx.quert.variant_id
-  console.log("productID:---------"+product_id)
+  const variant_id = ctx.query.variant_id
   const { cookies } = ctx;
   const shop = cookies.get('shop_id');
   const accessToken = cookies.get('accessToken');
