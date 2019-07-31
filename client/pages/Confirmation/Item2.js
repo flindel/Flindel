@@ -200,8 +200,11 @@ class Item extends Component {
                     <div className ='container2'>
                         <p className = 'item2 title'>{this.props.item.title}</p>
                         <p className = 'item2 variantTitle'>{this.props.item.variantTitle}</p>
-                       
-                        <p className = 'item2'>QTY: {this.props.item.value}</p>
+                    {
+                        //show item.quantity as QTY in review page, show item.value as QTY in confirmation page
+                        this.props.review?(<p className = 'item2'>QTY: {this.props.item.quantity}</p>):(<p className = 'item2'>QTY: {this.props.item.value}</p>)
+                    }
+                        
                     </div>
                     <div className ='container3'>
                         

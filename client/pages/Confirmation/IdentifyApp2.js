@@ -63,12 +63,14 @@ class IdentifyApp extends Component {
 
     //load return policy - have to expand this to multiple stores once we load
     async componentDidMount(){
+        //get return policy from db
         let temp = await fetch(`https://${serveoname}/shop/returnPolicy`, {
             method: 'get',
         })
         let json = await temp.json()
         //console.log("json----"+JSON.stringify(json))
         this.setState({step:1,returnPolicy: json.res.mapValue.fields, defaultReturn: json.default.stringValue})
+        //get shop domain from db
         let domainTemp = await fetch(`https://${serveoname}/shop/domain`, {
             method: 'get',
         })
@@ -96,10 +98,6 @@ class IdentifyApp extends Component {
           if(unique == false){
               this.generateID() 
           }
-    }
-
-    async backtoHomePage(){
-
     }
 
     //view second page (item select)
@@ -267,7 +265,7 @@ class IdentifyApp extends Component {
 
       //check returns database to see if return already exists
     async checkReturnsFromDB(orderNum,emailAdd){
-        orderNum =1
+        //orderNum =1
         let temp = await fetch(`https://${serveoname}/return/requested/exists?orderNum=${encodeURIComponent(orderNum)}&emailAdd=${encodeURIComponent(emailAdd)}`, {
             method: 'get',
         })
@@ -276,7 +274,9 @@ class IdentifyApp extends Component {
             //set information if it already does
             const returnInfo = {'code':json.code,
                                 'email': emailAdd,
-                                'orderNum': orderNum,}
+                                'orderNum': orderNum,
+                                'items': json.items,
+                            }
             return returnInfo
          }
          else{ return false }
@@ -345,7 +345,8 @@ class IdentifyApp extends Component {
                                 'code':returnInfo.code,
                                 'email': returnInfo.email,
                                 'orderNum': returnInfo.orderNum,
-                                'existReturn': true
+                                'existReturn': true,
+                                'returnList': returnInfo.items
                             })
                         }else{
                         this.setState({
@@ -426,6 +427,8 @@ class IdentifyApp extends Component {
                         code={this.state.code}
                         email = {this.state.email} 
                         orderNum = {this.state.orderNum} 
+                        items = {this.state.returnList}
+                        serveoname = {serveoname}
                         restartReturn = {this.restartReturn}/>
                    </div>
                 )
