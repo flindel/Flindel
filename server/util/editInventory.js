@@ -4,15 +4,9 @@ const expired = require('./expiredHelper')
 
 //edit inventory in shopify
 async function editInventory(change, store, varID, torontoLocation, dbIn){
-    if (torontoLocation != ''){
-        increment(change, torontoLocation, varID, store)
-    }
-    else{
-        let {accessToken, torontoLocation} = await getAccessToken(dbIn, store)
-        //get gitID here when we actually have duplicates
-        let invId = await getInvID(store, varID, accessToken)
-        increment(change, torontoLocation, invId, store)
-    }
+    let {accessToken, torontoLocation} = await getAccessToken(dbIn, store)
+    let invId = await getInvID(store, varID, accessToken)
+    increment(change, torontoLocation, invId, store)
 }
 
 //get access token and toronto location from databse (expand later)
@@ -25,23 +19,6 @@ async function getAccessToken(dbIn, store){
     getLocation = await myRefLocation.get()
     let torontoLocation = getLocation._fieldsProto.torontoLocation.stringValue
     return {accessToken, torontoLocation}
-}
-
-//remove from flindel inventory database. not used yet, triggered by webhook
-async function sellReturnItem(varId, db, store){
-    myRef = db.collection('items')
-    let tempDate = ('12/31/9999')
-    let tempRef = ''
-    let query = await myRef.where('status','==','reselling').where('store','==',store).where('variantid','==',varId).get()
-    await query.forEach(async doc=>{
-        let itemDate = expired.getCurrentDate()
-        let difference = expired.getDateDifference(tempDate, itemDate)
-        if (difference < 0){
-            tempDate = itemDate
-            tempRef = doc.ref
-        }
-    })
-    let deleteDoc = myRef.delete(tempRef)
 }
 
 //get inventory ID
@@ -60,6 +37,7 @@ async function getInvID(store, varID, accessToken){
 
 //actually increment inventory
 async function increment(quantity, torontoLocation, invId, store){
+    console.log('hello')
     let option2 = {
         method: 'POST',
         url: `https://${store}/${api_link}/inventory_levels/adjust.json`,

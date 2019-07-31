@@ -77,7 +77,8 @@ async function updateInventory(items, dbIn){
     db = dbIn
     for (var i = 0;i<items.length;i++){
         //get information for active item
-        let idActive = items[i].variantidGIT
+            //let idActive = items[i].variantidGIT CHANGE IT TO THIS ONE WHEN WE ACTUALLY HAVE DUPLICATES
+        let idActive = items[i].variantid
         let storeActive = items[i].store
         //get access token for specific store
         let {accessToken, torontoLocation} = await inv.getAccessToken(db,storeActive)

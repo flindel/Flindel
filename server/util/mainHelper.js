@@ -70,8 +70,8 @@ async function getGITInformation(db, variantid, productid){
         let query2 = await myRef.where('git_id','==',productid).get()
         await query2.forEach(async doc=>{
             //item coming in is already a GIT item, has git var id
-            productid_original = productid
-            productid_git = doc._fieldsProto.git_id.stringValue
+            productid_original = doc._fieldsProto.orig_id.stringValue
+            productid_git = productid
             for (var i =0;i <doc._fieldsProto.variants.arrayValue.values.length;i++){
                 let temp = doc._fieldsProto.variants.arrayValue.values[i].mapValue.fields.git_var.integerValue.toString()
                 if (temp == variantid){
@@ -84,8 +84,8 @@ async function getGITInformation(db, variantid, productid){
     else{
         await query.forEach(async doc=>{
             //item coming in is an original id
-            productid_original = doc._fieldsProto.orig_id.stringValue
-            productid_git = productid
+            productid_original = productid
+            productid_git = doc._fieldsProto.git_id.stringValue
             for (var i =0;i < doc._fieldsProto.variants.arrayValue.values.length;i++){
                 let temp = doc._fieldsProto.variants.arrayValue.values[i].mapValue.fields.orig_var.integerValue.toString()
                 if (temp == variantid){
