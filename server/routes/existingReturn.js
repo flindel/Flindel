@@ -32,7 +32,23 @@ router.get('/requested/exists', async ctx=>{
         }
         let querySnapshot = await myRef.where('order','==',order).where('email','==',customerEmail).get()
         if (!querySnapshot.empty){
-            ctx.body = {"exist":true, 'code':querySnapshot.docs[0].id}
+            //data.items is the origianl items Array in db, which may contain repeat items
+            const data = querySnapshot.docs[0].data()
+            //returnItems is the return array without repeated item
+            let returnItems = [data.items[0]]
+            returnItems[0].quantity = 1
+            for(let i = 1; i<data.items.length; i++){
+                if(data.items[i].variantid != returnItems[returnItems.length-1].variantid){
+                    returnItems.push(data.items[i])
+                    returnItems[returnItems.length-1].quantity = 1
+                }else{
+                    returnItems[returnItems.length-1].quantity++
+                }
+            }
+            returnItems.forEach(e =>{
+                e.productID = e.productid
+            })
+            ctx.body = {"exist":true, 'code':data.code, 'items':returnItems}
     }
 })
 
@@ -105,8 +121,7 @@ router.post('/requested/new', async ctx=>{
         const myStatus = 'submitted'
         for (var i = 0;i<itemsJSON.length;i++){
             let [originalID, gitID, originalVarID, gitVarID] = await itemList.getGITInformation(ctx.db, itemsJSON[i].variantid.toString(), itemsJSON[i].productID.toString())
-            console.log(originalID + '-' + gitID)
-            data.items.push({"name":itemsJSON[i].name, "productid":originalID, "productidGIT":gitID, "reason":itemsJSON[i].reason, "variantid":originalVarID, "variantidGIT": gitVarID, "status": myStatus})
+            data.items.push({"name":itemsJSON[i].name, "title":itemsJSON[i].title, "variantTitle":itemsJSON[i].variantTitle, "productid":originalID, "productidGIT":gitID, "reason":itemsJSON[i].reason, "variantid":originalVarID, "variantidGIT": gitVarID, "status": myStatus})
         }
         //write to requested returns
         setDoc = db.collection('requestedReturns').doc(code).set(data)
