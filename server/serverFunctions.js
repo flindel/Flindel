@@ -9,7 +9,7 @@ async function getLatLng(address) {
   const response = await fetch(
     `https://maps.googleapis.com/maps/api/geocode/json?address=${address}&key=${GOOGLE_GEO_API_KEY}`
   );
-  const json = await response.json();
+  let json = await response.json();
   return json;
 }
 
@@ -20,7 +20,8 @@ function calculateDistance(p1) {
       [44.0502601, -79.5312458],
       [43.6535273, -79.9723667],
       [43.38117, -79.9800032],
-      [43.9482713, -79.0184346]
+      [43.9482713, -79.0184346],
+      [44.0502601, -79.5312458]
     ]
   ]);
   return turf.booleanPointInPolygon(pt, poly);
