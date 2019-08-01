@@ -18,6 +18,11 @@ const webhookOrder = receiveWebhook({
   path: "/hookorderendpoint"
 });
 
+const webhookTheme = receiveWebhook({
+  secret: SHOPIFY_API_SECRET_KEY,
+  path: "/hookthemeendpoint"
+});
+
 //listner for fulfilment webhook
 router.post("/hookendpoint", webhookFulfillment, ctx => {
   let hookload = ctx.request.body;
@@ -45,7 +50,7 @@ router.post("/hookendpoint", webhookFulfillment, ctx => {
 });
 
 //listner for order webhook
-router.post("/hookorderendpoint", webhookOrder, ctx => {
+router.post("/hookorderendpoint", webhookOrder, async ctx => {
   let hookload = ctx.request.body;
 
   let address =
@@ -55,7 +60,8 @@ router.post("/hookorderendpoint", webhookOrder, ctx => {
     "," +
     hookload.shipping_address.province;
 
-  let latlng = getLatLng(address);
+  let latlng = await getLatLng(address);
+  console.log("WHY ", latlng);
   latlng = latlng.results[0].geometry.location;
   let validLocation = calculateDistance(latlng);
   //console.log(distance);
@@ -68,10 +74,15 @@ router.post("/hookorderendpoint", webhookOrder, ctx => {
       {
         method: "post"
       }
-    );
+    ).then(function(Response) {
+      //console.log(Response);
+    });
   }
   ctx.response.status = 200;
   ctx.body = "OK";
 });
-
+//listner for theme webhook
+router.post("/hookthemeendpoint", webhookTheme, ctx => {
+  let hookload = ctx.request.body;
+});
 module.exports = router;
