@@ -14,14 +14,14 @@ async function getLatLng(address) {
 }
 
 function calculateDistance(p1) {
-  let pt = turf.point([p1.lat, p1.lng]);
+  let pt = turf.point([p1.lng, p1.lat]);
   let poly = turf.polygon([
     [
-      [44.0502601, -79.5312458],
-      [43.6535273, -79.9723667],
-      [43.38117, -79.9800032],
-      [43.9482713, -79.0184346],
-      [44.0502601, -79.5312458]
+      [-79.4147, 43.6742],
+      [-79.375357964, 43.672409816],
+      [-79.36897, 43.64391],
+      [-79.385437012, 43.64868927],
+      [-79.4147, 43.6742]
     ]
   ]);
   return turf.booleanPointInPolygon(pt, poly);
