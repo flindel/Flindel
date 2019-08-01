@@ -1,145 +1,142 @@
-const serveoname = 'optimo.serveo.net'
+const serveoname = '04071318.serveo.net'
 const rp = require('request-promise');
 const { api_link } = require('../default-shopify-api.json');
-const live = 0
+const emailHelper = require('./emailHelper')
+const expiredHelper = require('./expiredHelper')
+const inv = require ('./editInventory')
+const mainHelper = require('./mainHelper')
 
-
-async function test(){
-  console.log("Test Cron Job");
+//get rid of anything that's been in orders for over 7 days
+async function checkExpired(db){
+    //clear items that have been in warehouse for 7+ days, mark returning and pull inventory
+    expiredHelper.clearExpiredItems(db)
+    //clear return requests that have been in system for 7+ days
+    expiredHelper.clearExpiredOrders(db)
 }
 
-async function sendEmail(listIn) {
-    let LI = await JSON.stringify(listIn)
-        fetch(`https://${serveoname}/send/report?list=${encodeURIComponent(LI)}`,
-        {
-            method: 'POST',
-        })
-        //delete stuff here
-}
-
-async function sendReport(){
-    var temp = await fetch(`https://${serveoname}/dbcall/report`, {
-            method: 'get',
-        })
-        t2 = await temp.json()
-        var acceptedList = []
-        for (var i = 0;i<t2.res.length;i++){
-            let tempItem = {
-                name: t2.res[i].name.stringValue,
-                variantid: t2.res[i].variantid.stringValue,
-                price: t2.res[i].price.stringValue,
-                status: t2.res[i].status.stringValue,
-                quantity: 1,
-                store: t2.res[i].store
-            }
-            if (tempItem.status == 'accepted'){
-                acceptedList.push(tempItem)
-            }
-            else if(tempItem.status == 'returning'){
-                let item = JSON.stringify(tempItem)
-                if (live){
-                    fetch(`https://${serveoname}/dbcall/additem?status=${encodeURIComponent('returning')}&item=${encodeURIComponent(item)}`, {
-                        method: 'get',
-                    })
-                }
-
-            }
-        }
+//main function, gets handles the orders that are in pending
+async function mainReport(dbIn){
+    db = dbIn
+        //pull all the items from pending
+    let items = await mainHelper.getItems(dbIn)
+        //break down items into items being resold and items being refunded (not mutually exclusive)
+    let {acceptedList, refundList, returningList} = await mainHelper.breakdown(db, items)
+        //write any items directly to returning
+    for (var i =0;i<returningList.length;i++){
+        addItem(returningList[i],'returning',db)
+    }
         //cancel duplicates to get accurate quantities
-        for (var i = 0;i<acceptedList.length;i++){
-            for (var j = i+1;j<acceptedList.length;j++){
-                if (acceptedList[i].variantid == acceptedList[j].variantid && acceptedList[i].store == acceptedList[j].store){
-                    acceptedList[i].quantity++
-                    acceptedList.splice(j,1)
-                    j--
-                }
-            }
-        }
-        updateInventory(acceptedList)
-        if(live){
-            sendEmail(acceptedList)
-        }
+    acceptedList = await mainHelper.combine(acceptedList)
+        //update inventory for accepted items
+    await updateInventory(acceptedList, dbIn)
+        //sort items, ultimately send email to brand about what new items were received today
+    //mainHelper.sortNewItems(acceptedList, dbIn)
+        //sort items, ultimately send email to brand about who they need to refund
+    //mainHelper.sortRefundItems(refundList, dbIn)   
 }
 
-async function updateInventory(items){
-    for (var i = 0;i<items.length;i++){
-        let temp = items[i].variantid
-        let t2 = await fetch(`https://${serveoname}/dbcall/checkblacklist?id=${encodeURIComponent(temp)}`, {
-            method: 'get',
-        })
-        t2json = await t2.json()
-        let blacklist = t2json.blacklist
-        if (blacklist == true){
-            //create item status returning
-            let item = JSON.stringify(items[i])
-            if (live){
-                fetch(`https://${serveoname}/dbcall/additem?status=${encodeURIComponent('returning')}&item=${encodeURIComponent(item)}`, {
-                method: 'get',
-            })
+//notify of all items marked returning so we know when to send shipments back
+async function returningReport(dbIn){
+    let returningList = []
+    db = dbIn
+    myRef = db.collection('items')
+    let query = await myRef.get()
+    await query.forEach(async doc => {
+        if (doc._fieldsProto.status.stringValue == 'returning'){
+            tempItem= {
+                variantid: doc._fieldsProto.variantid.stringValue,
+                name : doc._fieldsProto.name.stringValue,
+                store : doc._fieldsProto.store.stringValue,
+                quantity: 1
             }
+            returningList.push(tempItem)
+        }
+    });
+    returningList = mainHelper.combine(returningList)
+    //console.log(returningList)
+    console.log('the list is here:')
+}
+
+
+//wipe pending, everything has been dealt with by this point
+async function clearPending(dbIn){
+    db = dbIn
+    let batch = db.batch()
+    let myRef = db.collection('pending')
+    let query = await myRef.get()
+    await query.forEach(async doc =>{
+        batch.delete(doc.ref)
+    })
+    batch.commit();
+}
+
+////////////////////////////////////////////////////////////////////
+
+//update inv for reselling items
+async function updateInventory(items, dbIn){
+    db = dbIn
+    for (var i = 0;i<items.length;i++){
+        //get information for active item
+            //let idActive = items[i].variantidGIT CHANGE IT TO THIS ONE WHEN WE ACTUALLY HAVE DUPLICATES
+        let idActive = items[i].variantid
+        let storeActive = items[i].store
+        //get access token for specific store
+        let {accessToken, torontoLocation} = await inv.getAccessToken(db,storeActive)
+        let invId = await inv.getInvID(storeActive, idActive, accessToken)
+        //switch to git somewhere in here
+        let blacklist = await checkBlacklist(items[i].productid, db, storeActive)
+        if (blacklist == true){
+            addItem(items[i], 'returning', db)
         }
         else{
             //create item status reselling
-            if(live){
-                let item = JSON.stringify(items[i])
-            fetch(`https://${serveoname}/dbcall/additem?status=${encodeURIComponent('reselling')}&item=${encodeURIComponent(item)}`, {
-                method: 'get',
-            })
-            }
+            addItem(items[i], 'reselling', db)
             //add to shopify inv
-            addInv(items[i].variantid,items[i].store, items[i].quantity)
+            inv.increment(items[i].quantity,torontoLocation,invId,storeActive)
         }
     }
 }
 
-async function addInv(varID, shopname, quantity){
-        //get access token for shop of active item
-        let tokenresponse = await fetch(`https://${serveoname}/dbcall/getToken?name=${encodeURIComponent(shopname)}`, {
-            method: 'get',
-        })
-        let tokenJSON = await tokenresponse.json()
-        const token = tokenJSON.token
-        //get inventory id of active item
-        const option = {
-        url: `https://${shopname}/${api_link}/variants/${encodeURIComponent(varID)}.json`,
-        headers: {
-            'X-Shopify-Access-Token': token
-        },
-        json: true,
+//check to see if item is on blacklist
+async function checkBlacklist(productId, dbIn, store){
+    db = dbIn
+    //productID comes in as integer, database only responds to string
+    const target = productId.toString(10)
+    //let query = await myRef.where('productid','==',target).where('store','==',store).get()
+    myRef = db.collection('store')
+    let query = await myRef.doc(store).get()
+    let found = false
+    for (var i = 0;i<query._fieldsProto.blacklist.arrayValue.values.length;i++){
+        if (target == query._fieldsProto.blacklist.arrayValue.values[i].stringValue){
+            found = true
         }
-        let temp = await rp(option);
-        const invId =  temp.variant.inventory_item_id
-        //update inventory of active item
-        const option2 = {
-            method: 'POST',
-            url: `https://${shopname}/${api_link}/inventory_levels/adjust.json`,
-            headers: {
-                'Authorization': process.env.SHOP_AUTH
-                },
-            json: true,
-            body:{
-                "location_id": 16351690815, ///////////////////////////////////////////////////WHATEVER TORONTO LOCATION IS
-                "inventory_item_id": invId,
-                "available_adjustment": quantity,
-            }
-            }
-            //actually update
-            await rp(option2)
-
-
+    }
+    return found
 }
 
-//get rid of anything that's been in orders for over 7 days
-async function checkExpired(){
-    fetch(`https://${serveoname}/dbcall/expired`, {
-            method: 'get',
-        })
-}
-//wipe pending, everything has been dealt with by this point
-async function clearDB(){
-    fetch(`https://${serveoname}/dbcall/clear`, {
-            method: 'get',
-        })
+//add item to items database
+async function addItem(item, status, dbIn){
+    let currentDate = expiredHelper.getCurrentDate()
+    db = dbIn
+    //efficiency
+    let batch = db.batch()
+    let data = {
+        name: item.name,
+        variantid: item.variantid,
+        variantidGIT: item.variantidGIT,
+        productid: item.productid,
+        productidGIT: item.productidGIT,
+        store: item.store,
+        status: status,
+        dateProcessed: currentDate,
+        };
+        //create multiple copies of item based on quantity
+        for (var i = 0;i<item.quantity;i++){
+            setDoc = db.collection('items').doc()
+            batch.set(setDoc,data)
+        }
+        //commit batch
+    batch.commit()
 }
 
-module.exports = {sendReport, clearDB, checkExpired, test}
+module.exports = {mainReport, clearPending, checkExpired, returningReport}

@@ -1,12 +1,11 @@
 import React, { Component } from 'react';
-import {serveo_name} from '../config';
-import {post, put, get, del, postGIT, postGitVariant} from './Shopify';
+import {serveo_name, published} from '../config';
+import {post, put, get, del, postGIT, postGitVariant, delGitVariant} from './Shopify';
 import {getGitProduct} from './Firestore'
 
 let updates = [];
 let reloadFunction;
 let fixes = 0;
-const butterfly_id = "2114548007009";
 
 const gitPara = {
                   name:["fulfillment_service", "grams", "inventory_management", "weight"],
@@ -30,7 +29,8 @@ class FixIssues extends Component {
     fixes += 1
     console.log("Fixes", fixes)
     if(fixes == updates.length) {
-      console.log("Finished Fixing")
+      console.log("Finished Fixing");
+      fixes = 0;
       reloadFunction();
     }
   }
@@ -59,13 +59,13 @@ class FixIssues extends Component {
         case "\"Get it Today\" version of this product variant does not exist":
           this.fixGitVarDne(updates[i]);
           break;
+        case "\"Original\" version of this \"Get it Today\" product variant does not exist":
+          this.fixNormVarDne(updates[i]);
       }
     }
   }
 
   //PUT REQUEST
-  //Copies the parameters from normal product to GIT product
-  //Does not account for shifting vairants
   fixUnequalParameters(update){
     let gitBody = update.norm;
     gitBody.title = update.norm.title + " - Get it Today";
@@ -82,6 +82,12 @@ class FixIssues extends Component {
     put(update.git.id, body, this.finishedFixing);
   }
 
+  fixNormVarDne(update){
+    const product_id = update.git.id;
+    const variant_id = update.variantIssues[0].gitVar;
+    delGitVariant(product_id, variant_id, update, this.finishedFixing);
+  }
+
   fixGitVarDne(update){
     console.log("fixGitVarDne: ", update.git.variants, update.norm.variants);
     getGitProduct(update.git.id, this.fixGitVarDne2, [update])
@@ -96,7 +102,7 @@ class FixIssues extends Component {
   }
 
   normVarToGitVar(update, fsData){
-    let normVariants = update.norm.variants.map(variant => {return variant});
+    let normVariants = update.norm.variants.slice();
     let newVariants = [];
     for(let i = 0; i < normVariants.length; i++){
       let normVar = normVariants[i];
@@ -113,7 +119,7 @@ class FixIssues extends Component {
         normVar.sku = gitVar.sku;
         normVar.inventory_quantity = gitVar.inventory_quantity;
         normVar.old_inventory_quantity = gitVar.old_inventory_quantity;
-      }else {
+      } else {
         normVar.product_id = update.git.id;
         normVar.inventory_quantity = 0;
         normVar.old_inventory_quantity = 0;
@@ -121,7 +127,7 @@ class FixIssues extends Component {
       newVariants.push(normVar);
     }
     console.log("normVarToGitVar: ", update.git.variants, update.norm.variants);
-    return newVariants;
+    return newVariants.slice();
   }
 
   findGitVarID(fsData, normVarID){
@@ -170,6 +176,7 @@ class FixIssues extends Component {
   fixGitDne(update){
     console.log("fixGitDne", update);
     let gitBody = update.norm;
+    gitBody.published_at = null;
     gitBody.title = update.norm.title + " - Get it Today";
     for(let j = 0; j < update.norm.variants.length; j++){
       gitBody.variants[j].old_inventory_quantity = 0;

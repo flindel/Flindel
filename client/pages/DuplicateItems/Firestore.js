@@ -2,35 +2,22 @@ import {serveo_name} from '../config'
 
 export async function postInstallTime(data){
   var temp;
-  temp = await fetch(`${serveo_name}/dbcallGit/shop_tokens/install_time/?body=${encodeURIComponent(JSON.stringify(data))}`, {
+  temp = await fetch(`${serveo_name}/shop/install_time/?body=${encodeURIComponent(JSON.stringify(data))}`, {
     method: 'post',
   })
 }
 
-export async function getShopToken(shop_id, callback = doNothing, args){
+export async function postProduct(data, callback = doNothing){
   var temp;
-  temp = await fetch(`${serveo_name}/dbcallGit/shop_tokens/?shop_id=${encodeURIComponent(shop_id)}`, {
-    method: 'get',
-  })
-  var json  = await temp.json();
-  if (args == []){
-    return callback(formatJSON(json._fieldsProto))
-  }
-  else {
-    return callback(formatJSON(json._fieldsProto), args)
-  }
-}
-
-export async function postProduct(data){
-  var temp;
-  temp = await fetch(`${serveo_name}/dbcallGit/product/git/?body=${encodeURIComponent(JSON.stringify(data))}`, {
+  temp = await fetch(`${serveo_name}/firestore/product/git/?body=${encodeURIComponent(JSON.stringify(data))}`, {
     method: 'post',
   })
+  callback(data);
 }
 
 export async function getGitProduct(gitID, callback = doNothing, args = []){
   var temp;
-  temp = await fetch(`${serveo_name}/dbcallGit/product/git/?gitID=${encodeURIComponent(gitID)}`, {
+  temp = await fetch(`${serveo_name}/firestore/product/git/?gitID=${encodeURIComponent(gitID)}`, {
     method: 'get',
   })
   var json  = await temp.json();
@@ -44,14 +31,14 @@ export async function getGitProduct(gitID, callback = doNothing, args = []){
 
 export async function delProduct(gitID){
   var temp;
-  temp = await fetch(`${serveo_name}/dbcallGit/product/git/?gitID=${encodeURIComponent(gitID)}`, {
+  temp = await fetch(`${serveo_name}/firestore/product/git/?gitID=${encodeURIComponent(gitID)}`, {
     method: 'delete',
   })
 }
 
 export async function getOrigProduct(orig_id, callback = doNothing){
  var temp;
- temp = await fetch(`${serveo_name}/dbcallGit/product/orig/?origID=${encodeURIComponent(orig_id)}`, {
+ temp = await fetch(`${serveo_name}/firestore/product/orig/?origID=${encodeURIComponent(orig_id)}`, {
    method: 'get',
  })
  var json  = await temp.json();

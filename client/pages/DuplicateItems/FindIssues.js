@@ -3,7 +3,7 @@ import DisplayIssue from './DisplayIssue';
 import FixIssues from './FixIssues';
 import {serveo_name} from '../config'
 import {get} from './Shopify'
-import {getGitProduct, getOrigProduct} from './Firestore'
+import {getGitProduct, getOrigProduct, delProduct} from './Firestore'
 
 
 let collection_all_products_id = "97721974881";
@@ -116,7 +116,7 @@ class FindIssues extends Component {
         return product;
       }
     }
-    return {};
+    return null;
   }
 
   findOrig(id){
@@ -125,15 +125,49 @@ class FindIssues extends Component {
         return product;
       }
     }
-    return {};
+    return null;
   }
 
 
   normProductIssuesLoop(data){
-    const product = this.findOrig(data.orig_id);
+    let product = this.findOrig(data.orig_id);
     if (data.git_id !== undefined) {
-      let comparison = this.compareProducts(this.findOrig(data.orig_id), this.findGit(data.git_id), data);
-      if (comparison){this.setState(this.state.updates.concat(comparison));}
+      let gitProduct = this.findGit(data.git_id);
+      if (product == null && gitProduct != null){
+        this.setState({
+          updates: this.state.updates.concat({
+            norm: null,
+            git: gitProduct,
+            name: gitProduct.title,
+            parameterIssues: [],
+            variantIssues: [],
+            issue: "\"Original\" version of this \"Get it Today\" product does not exist",
+            solution: "This product will be deleted"
+          })
+        })
+      }
+      if (product != null && gitProduct == null){
+        delProduct(data.git_id+"");
+        this.setState({
+          updates: this.state.updates.concat({
+            norm: product,
+            git: null,
+            name: product.title,
+            parameterIssues: [],
+            variantIssues: [],
+            issue: "\"Get it Today\" version of this product does not exist",
+            solution: "A \"Get it Today\" version of the product will be created"
+          })
+        })
+      }
+      if (product == null && gitProduct == null){
+        delProduct(data.git_id);
+      }
+      if (product != null && gitProduct != null){
+        console.log("gitProduct", gitProduct);
+        let comparison = this.compareProducts(this.findOrig(data.orig_id), this.findGit(data.git_id), data);
+        if (comparison){this.setState(this.state.updates.concat(comparison));}
+      }
     } else {
       //GIT version of product does not exist
       this.setState({
@@ -230,11 +264,11 @@ class FindIssues extends Component {
   //norm: product, original item
   //git: product, duplicate get it today item
   //Compares all variables that should be the same between the NORM and GIT product
+  //DOES NOT COMPARE OPTIONS, Unknown if this is an issue
   compareProductParameters(norm, git){
     let productIssues = [];
     //doesn't include variants
-    const para = ["options.name", "options.position", "options.values",
-    "product_type", "published_scope", "tags", "template_suffix", "body_html",
+    const para = ["product_type", "published_scope", "tags", "template_suffix", "body_html",
     "vendor"];
     const norm_para = para.map(parameter => "norm."+parameter);
     const git_para = para.map(parameter => "git."+parameter);
@@ -328,18 +362,53 @@ class FindIssues extends Component {
   compareVariantParameters(norm, git, fsPairs){
     const varPairs = fsPairs.variants;
     let variantIssues = [];
-    const para = ["barcode", "compare_at_price", "image_id", "option1",
-     "option2", "option3", "price", "requires_shipping", "taxable",
-     "title", "weight_unit"]
-    for(let i = 0; i < varPairs.length; i++){
-      //FS id -> Shopify id
-      let gitVarID = varPairs[i].git_var;
-      let origVarID = varPairs[i].orig_var;
-      //Find index in shopify variants
-      let gitIndex = this.findVarIndex(git, gitVarID);
-      let origIndex = this.findVarIndex(norm, origVarID);
-
-      if ((origIndex == -1)&&(gitIndex != -1)){ //WHAT IF GIT INDEX AND ORIG INDEX IS -1
+    this.checkNormDne(norm, git, fsPairs);
+    for(let i = 0; i < norm.variants.length; i++){
+      let normVar = norm.variants[i];
+      //find norm variant in fsPairs
+      let varIndex = this.findNormVarFirestore(fsPairs, normVar.id);
+      //if norm var found in firestore-> find git variant pair
+      if (varIndex != -1){
+        let gitVarID = fsPairs.variants[varIndex].git_var;
+        //find git variant
+        let gitVar = this.findGitVarShopify(git, gitVarID);
+        console.log(normVar, gitVar);
+        if (normVar !== undefined && gitVar !== undefined){
+          variantIssues = variantIssues.concat(this.compareVariants(normVar, gitVar));
+        }
+        if (normVar !== undefined && gitVar === undefined) {
+          this.setState({
+            updates: this.state.updates.concat({
+              norm: norm,
+              git: git,
+              name: norm.title,
+              parameterIssues: [],
+              variantIssues: [{
+                title: normVar.title,
+                normVar: normVar,
+              }],
+              issue: "\"Get it Today\" version of this product variant does not exist",
+              solution: "A \"Get it Today\" version of the product variant will be created"
+            })})
+        }
+        if (normVar === undefined && gitVar !== undefined) {
+          this.setState({
+            updates: this.state.updates.concat({
+              norm: norm,
+              git: git,
+              name: norm.title,
+              parameterIssues: [],
+              variantIssues: [{
+                title: gitVar.title,
+                gitVar: gitVar,
+              }],
+              issue: "\"Original\" version of this \"Get it Today\" product variant does not exist",
+              solution: "The \"Get it Today\" product variant will be deleted"
+            })})
+        }
+      //else norm variant not in firestore
+      } else {
+        //add update to create git variant and add ids to firestore
         this.setState({
           updates: this.state.updates.concat({
             norm: norm,
@@ -347,52 +416,89 @@ class FindIssues extends Component {
             name: norm.title,
             parameterIssues: [],
             variantIssues: [{
-              title: git.variants[gitIndex].title,
-              gitVar: git.variants[gitIndex]
+              title: gitVar.title,
+              gitVar: gitVar,
             }],
             issue: "\"Original\" version of this \"Get it Today\" product variant does not exist",
             solution: "The \"Get it Today\" product variant will be deleted"
           })})
       }
-      else if ((gitIndex == -1)&&(origIndex != -1)){
-        this.setState({
-          updates: this.state.updates.concat({
-            norm: norm,
-            git: git,
-            name: norm.title,
-            parameterIssues: [],
-            variantIssues: [{
-              title: norm.variants[origIndex].title,
-              normVar: norm.variants[origIndex]
-            }],
-            issue: "\"Get it Today\" version of this product variant does not exist",
-            solution: "A \"Get it Today\" version of the product variant will be created"
-          })})
-      }
-      else {
-        for(let j = 0; j < para.length; j++){
-          let norm_string = "norm.variants["+origIndex+"]."+para[j];
-          let git_string = "git.variants["+gitIndex+"]."+para[j];
-          if(!(eval(norm_string) === eval(git_string))) {
-            variantIssues.push(
-            {
-              title: norm.variants[origIndex].title,
-              parameter: para[j],
-              norm: eval(norm_string),
-              git: eval(git_string),
-            });
+    }
+    return variantIssues;
+  }
+
+  checkNormDne(norm, git, fsPairs){
+    console.log("CheckNormDne")
+    for(let i = 0; i < fsPairs.variants.length; i++){
+      let fsNormId = fsPairs.variants[i].orig_var
+      console.log("fsNormId", )
+      if(fsNormId !== undefined){
+        console.log("if(fsNormId)")
+        let shopNormId = 0;
+        for(let j = 0; j < norm.variants.length; j++){
+          shopNormId = norm.variants[j].id;
+          console.log("if");
+          if (fsNormId == shopNormId){
+            console.log(fsNormId);
+            break;
+          }else{
+            console.log("else")
+            if(j == norm.variants.length-1){
+              this.setState({
+                updates: this.state.updates.concat({
+                  norm: norm,
+                  git: git,
+                  name: norm.title,
+                  parameterIssues: [],
+                  variantIssues: [{
+                    title: norm.variants[j].title,
+                    gitVar: fsPairs.variants[i].git_var,
+                  }],
+                  issue: "\"Original\" version of this \"Get it Today\" product variant does not exist",
+                  solution: "The \"Get it Today\" product variant will be deleted"
+                })})
+            }
           }
         }
+      }
+    }
+  }
+
+
+  compareVariants(normVar, gitVar){
+    let variantIssues = []
+    const para = ["barcode", "compare_at_price", "image_id", "option1",
+     "option2", "option3", "price", "requires_shipping", "taxable",
+     "title", "weight_unit"]
+    for(let j = 0; j < para.length; j++){
+      let norm_string = "normVar."+para[j];
+      let git_string = "gitVar."+para[j];
+      if(!(eval(norm_string) === eval(git_string))) {
+        variantIssues.push(
+        {
+          title: normVar.title,
+          parameter: para[j],
+          norm: eval(norm_string),
+          git: eval(git_string),
+        });
       }
     }
     return variantIssues;
   }
 
-  findVarIndex(product, varID){
-    for(let i = 0; i < product.variants.length; i++){
-      if(product.variants[i].id+"" == varID){return i;}
+  findNormVarFirestore(fsPairs, varID){
+    for(let i = 0; i < fsPairs.variants.length; i++){
+      if(fsPairs.variants[i].orig_var+"" == varID){return i;}
     }
     return -1;
+  }
+
+  findGitVarShopify(git, varID){
+    for(let i = 0; i < git.variants.length; i++){
+      if(git.variants[i].id+"" == varID+""){
+        return git.variants[i];
+      }
+    }
   }
 
   render() {
@@ -413,6 +519,7 @@ class FindIssues extends Component {
         <h1>{isLoading? "Loading Products" : "Get it Today Product Admin"}</h1>
         {!isLoading&&<h3>{isSync? "Get it Today is syncronized"
         :"Get it Today is not synchronized"}</h3>}
+        <button onClick={() => this.componentDidMount()}>Refresh</button>
         {(!isLoading&&!isSync)&&
           <FixIssues
             updates={this.state.updates}

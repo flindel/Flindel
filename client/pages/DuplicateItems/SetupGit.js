@@ -1,9 +1,8 @@
 
-import DateTime from 'react-datetime';
 import React, { Component } from 'react';
-import {postCollection, getShopID, postScriptTag} from './Shopify';
-import {postInstallTime, getShopToken} from './Firestore';
-import {script_tag_url} from '../config'
+import {postCollection, getShopID, postScriptTag, postFulfillmentService} from './Shopify';
+import {postInstallTime} from './Firestore';
+import {script_tag_url, script_tag_url_returnPortal} from '../config'
 
 import Button from '@material-ui/core/Button';
 import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
@@ -17,6 +16,7 @@ class SetupGit extends Component {
     this.state = {
       isGitCollectSetup: props.gitCollectionId != 0,
       isOrigCollectSetup: props.origCollectionId != 0,
+      isFulfillSetup: false,
       extSetState: props.extSetState,
       shop_id: null,
       install_time: null,
@@ -76,8 +76,7 @@ class SetupGit extends Component {
         }
       }, this.callbackOrig)
     }
-
-    postScriptTag(script_tag_url);
+    postFulfillmentService();
   }
 
   callbackGit(data){
@@ -124,19 +123,6 @@ class SetupGit extends Component {
         {bottom}
       </div>
     )
-    /*
-    return(
-      <div>
-      <MuiThemeProvider>
-        <DateTimePicker
-          onChange={this.setDate}
-          DatePicker={DatePickerDialog}
-          TimePicker={TimePickerDialog}
-        />
-      </MuiThemeProvider>
-      </div>
-    )
-    */
   }
 }
 export default SetupGit;

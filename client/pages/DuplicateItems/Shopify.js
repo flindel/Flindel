@@ -1,5 +1,5 @@
 import {serveo_name} from '../config'
-import {postProduct, delProduct} from './Firestore'
+import {postProduct, delProduct, getGitProduct} from './Firestore'
 
 export function get(product_id, callback = doNothing){
   fetch(`${serveo_name}/products?id=${encodeURIComponent(product_id)}`, {
@@ -136,12 +136,13 @@ export function postGitVariant(product_id, variants, update, callback = doNothin
   let body = null;
   let orig = update.norm;
   let git = update.git;
+  let newVariant = {};
   for (let i = 0; i < variants.length; i++){
     if (variants[i].id == null){
-      body = variants[i];
+      newVariant = variants[i];
     }
   }
-  body = {variant: body}
+  body = {variant: newVariant}
   const options = {
     method: 'post',
     headers: {
@@ -156,21 +157,59 @@ export function postGitVariant(product_id, variants, update, callback = doNothin
       else{throw Error(response.statusText)}
     })
     .then((data) => {
-      console.log('POST Var: ', data);
-      console.log("Git1: ", git)
-      callback(data);
-      for (let i = 0; i < variants.length; i++){
-        if (variants[i].id == null){
-          variants[i].id = data.variant.id;
-        }
-      }
-
-      git.variants = variants;
-      console.log("Git2: ", git);
-      const out = postData({product: git}, {product: orig});
-      postProduct(out);
+      getGitProduct(update.git.id, postGitVariantToFirestore, [update, data.variant, callback]);
     })
     .catch((error) => console.log(error))
+}
+
+export function delGitVariant(product_id, variant_id, update, callback = doNothing){
+  let orig = update.norm;
+  let git = update.git;
+  const options = {
+    method: 'delete',
+    headers: {
+      'Accept': 'application/json, text/plain, */*',
+      'Content-Type': 'application/json'
+    },
+  }
+  fetch(`${serveo_name}/products/variant?id=${encodeURIComponent(product_id)}&variant_id=${encodeURIComponent(variant_id)}`, options)
+    .then((response) => {
+      if(response.ok){return response.json()}
+      else{throw Error(response.statusText)}
+    })
+    .then((data) => {
+      getGitProduct(update.git.id, delGitVariantFromFireStore, [update, callback, variant_id]);
+    })
+    .catch((error) => console.log(error))
+
+}
+
+function delGitVariantFromFireStore(json, args){
+  console.log("Firestore JSON: ", json);
+  let update = args[0];
+  let callback = args[1];
+  let variant_id = args[2]
+  for (let i = 0; i < json.variants.length; i++){
+    if(json.variants[i].git_var == variant_id){
+      json.variants.splice(i, 1);
+      break;
+    }
+  }
+  postProduct(json, callback);
+}
+
+function postGitVariantToFirestore(json, args){
+  console.log("Firestore JSON: ", json);
+  let update = args[0];
+  let newVariant = args[1];
+  let callback = args[2];
+  for (let i = 0; i < json.variants.length; i++){
+    if(json.variants[i].title == newVariant.title ||
+      !json.variants[i].git_var){
+      json.variants[i].git_var = newVariant.id;
+    }
+  }
+  postProduct(json, callback);
 }
 
 //Adds product to shopify and adds original and GIT IDs to FIRESTORE
@@ -191,14 +230,66 @@ export function postGIT(body, orig, callback = doNothing){
     .then((data) => {
       console.log('POST: ', data);
       //variants
-      const out = postData(data, orig);
+      const out = convertToFirestoreData(data, orig);
       postProduct(out);
       callback(data);
     })
     .catch((error) => console.log(error))
 }
 
-function postData(git, orig){
+function doNothing(data){
+  return;
+}
+
+export function postScriptTag(url){
+  const options = {
+    method: 'post',
+    headers: {
+      'Accept': 'application/json, text/plain, */*',
+      'Content-Type': 'application/json'
+    },
+      body: JSON.stringify({
+        "script_tag" :{
+          "event":"onload",
+          "src":url
+        }
+      }),
+  }
+  fetch(`${serveo_name}/scriptTag/`, options)
+    .then((response) => {
+      if(response.ok){return response.json()}
+      else{throw Error(response.statusText)}
+    })
+    .then((data) => {
+      console.log('POST Script Tag: ', data)
+      callback(data);
+    })
+    .catch((error) => console.log(error))
+}
+
+//MOVE to SETUP APP
+export function postFulfillmentService() {
+  const options = {
+    method: "post",
+    headers: {
+      Accept: "application/json, text/plain, */*",
+      "Content-Type": "application/json"
+    }
+  };
+  fetch(`${serveo_name}.net/fulserv`, options)
+    .then(response => {
+      if (response.ok) {
+        console.log("POST Fulfillment Service: ")
+        return response.json();
+      } else {
+        throw Error(response.statusText);
+      }
+    })
+    .then(data => console.log("Data: ", data))
+    .catch(error => console.log("error"));
+}
+
+function convertToFirestoreData(git, orig){
   console.log("POST DATA: ", git, orig);
   let out = {};
   if (JSON.stringify(orig) !== "{}"){
@@ -243,34 +334,4 @@ function postData(git, orig){
     }
   }
   return out;
-}
-
-function doNothing(data){
-  return;
-}
-
-export function postScriptTag(url){
-  const options = {
-    method: 'post',
-    headers: {
-      'Accept': 'application/json, text/plain, */*',
-      'Content-Type': 'application/json'
-    },
-      body: JSON.stringify({
-        "script_tag" :{
-          "event":"onload",
-          "src":url
-        }
-      }),
-  }
-  fetch(`${serveo_name}/scriptTag/`, options)
-    .then((response) => {
-      if(response.ok){return response.json()}
-      else{throw Error(response.statusText)}
-    })
-    .then((data) => {
-      console.log('POST Script Tag: ', data)
-      callback(data);
-    })
-    .catch((error) => console.log(error))
 }
