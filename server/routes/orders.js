@@ -46,12 +46,11 @@ router.post("/cancel", async ctx => {
     method: "POST",
     url: `https://databasecommunicationtest.myshopify.com/${api_link}/orders/${order_id}/cancel.json`,
     headers: headers,
-    json: true
+    json: true,
+    body: { note: "INVALID ADDRESS", reason: "INVALID ADDRESS" }
   };
   try {
-    //console.log("what DDDDDDDDDDD: ", option.url);
     ctx.body = await rp(option);
-    console.log("CANCEL " + JSON.stringify(ctx.body));
   } catch (err) {
     if (err instanceof errors.StatusCodeError) {
       ctx.status = err.statusCode;

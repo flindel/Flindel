@@ -27,11 +27,11 @@ const webhookTheme = receiveWebhook({
 router.post("/hookendpoint", webhookFulfillment, ctx => {
   let hookload = ctx.request.body;
 
-  for (let i = 0; i < hookload.variants.length; i++) {
+  for (let i = 0; i < hookload.line_items.length; i++) {
     //instead of variants it should be line_items
-    if (hookload.variants[i].fulfillment_service == "flindel") {
+    if (hookload.line_items[i].fulfillment_service == "flindel") {
       console.log("found flindel");
-      let fJSON = ctx.request.body.variants;
+      let fJSON = ctx.request.body.line_items;
       sendEmail(fJSON);
       fetch(
         `https://${SERVEO_NAME}.serveo.net/dbcall/update_order_database?items=${fJSON}&id=${encodeURIComponent(

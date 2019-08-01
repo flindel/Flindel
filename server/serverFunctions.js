@@ -5,7 +5,6 @@ const GOOGLE_GEO_API_KEY = process.env.GOOGLE_GEO_API_KEY;
 const serveo_name = "suus";
 
 async function getLatLng(address) {
-  console.log(GOOGLE_GEO_API_KEY);
   const response = await fetch(
     `https://maps.googleapis.com/maps/api/geocode/json?address=${address}&key=${GOOGLE_GEO_API_KEY}`
   );
