@@ -20,3 +20,79 @@ h3.subHeader{
 input.numInput{
     max-width: 40px;
 }
+/*ITEM DISPLAY*/
+div.container1SC{
+    width:13.4%;
+    text-align:center;
+    height: 120px;
+    padding-top: 10px;
+    padding-bottom: 10px;
+  }
+div.container1SCHeader{
+    width:13.4%;
+    text-align:center;
+}
+
+div.container2SC{
+    width:15.8%;
+    text-align:center;
+    height: 120px;
+    padding-top: 10px;
+    padding-bottom: 10px;
+  }
+div.container2SCHeader{
+    width:15.8%;
+    text-align:center;
+}
+
+hr.horiz{
+    padding-bottom: 2px;
+    margin-left: -5%;
+    margin-right: -5%;
+    background-color: black;
+      background-color: black;
+      color:black;
+      border-color: black;
+      border: none; 
+}
+
+div.vert{
+    width:1%
+}
+
+  div.itemContainerSC{
+    display: flex;
+    align-items: center;
+  }
+
+  p.itemHeader{
+      font-size: 125%;
+      font-weight: bold
+  }
+
+  fieldset.SC{
+      margin-left:5%;
+      margin-right:5%;
+  }
+
+  hr.vert{
+      margin-left:40%;
+      margin-top:-8px;
+      width:20%;
+      height: 120px;
+      background-color: black;
+      background-color: black;
+      color:black;
+      border-color: black;
+      border: none;
+  }
+  hr.vertHeader{
+    margin-left:40%;
+      margin-top:-8px;
+      width:20%;
+      height: 30px;
+      background-color: black;
+      color:black;
+      border-color: black;
+      border: none;
+  }

@@ -18,6 +18,7 @@ class sortingCentre extends Component{
             orderNum:'',
             createdDate:'',
             confirmList:[],
+            store:'',
         }
         this.handleSubmit = this.handleSubmit.bind(this)
         this.handlecCode = this.handlecCode.bind(this)
@@ -179,7 +180,7 @@ class sortingCentre extends Component{
         let t2 = await temp.json()
         if(t2.valid == true){
             let tempList = []
-            this.setState({email:t2.res.email.stringValue,orderNum:t2.res.order.stringValue, createdDate: t2.res.createdDate.stringValue})
+            this.setState({email:t2.res.email.stringValue,orderNum:t2.res.order.stringValue, store: t2.res.shop.stringValue, createdDate: t2.res.createdDate.stringValue})
             for (var i = 0;i<t2.res.items.arrayValue.values.length;i++){
             let tempItem = {
                 name: t2.res.items.arrayValue.values[i].mapValue.fields.name.stringValue,
@@ -193,7 +194,6 @@ class sortingCentre extends Component{
             }
             tempList.push(tempItem)
         }
-        console.log(tempList)
         await this.setState({itemList:tempList,step:3})
         }
         else{
@@ -247,10 +247,51 @@ class sortingCentre extends Component{
                     <div className = 'sc1'>
                         <h1 className = 'scHeader'>FLINDEL SORTING CENTRE</h1>
                         <br/>
-                        <h3 className = 'subHeader'>Order Code: {this.state.cCode}</h3>
+                        <h3 className = 'subHeader'>Order Code: {this.state.cCode} . Store: {this.state.store}. Created on {this.state.createdDate}.</h3>
                         <br/>
                     </div>
-                    <fieldset className = 'page2'>
+                    <fieldset className = 'SC'>
+                        <div className = 'itemContainerSC'>
+                            <div className ='container1SCHeader'>
+                                <p className = 'itemHeader'>IMAGE</p>
+                            </div>
+                            <div className = 'vert'>
+                                <hr className = 'vertHeader'/>
+                            </div>
+                            <div className ='container1SCHeader'>
+                                <p className = 'itemHeader' > NAME  </p>   
+                            </div>
+                            <div className = 'vert'>
+                                <hr className = 'vertHeader'/>
+                            </div>
+                            <div className = 'container1SCHeader'>
+                                <p className = 'itemHeader'>VARIANT ID</p>
+                            </div>
+                            <div className = 'vert'>
+                                <hr className = 'vertHeader'/>
+                            </div>
+                            <div className = 'container1SCHeader'>
+                                <p className = 'itemHeader'>PRODUCT ID</p>
+                            </div>
+                            <div className = 'vert'>
+                                <hr className = 'vertHeader'/>
+                            </div>
+                            <div className = 'container1SCHeader'>
+                                <p className = 'itemHeader'>REASON FOR RETURN</p>
+                            </div>
+                            <div className = 'vert'>
+                                <hr className = 'vertHeader'/>
+                            </div>
+                            <div className ='container1SCHeader'>
+                                <p className = 'itemHeader'>STATUS</p>
+                            </div>
+                            <div className = 'vert'>
+                                <hr className = 'vertHeader'/>
+                            </div>
+                            <div className = 'container1SCHeader'>
+                                <p className = 'itemHeader'>NEW ITEM (varID)</p>
+                            </div>
+                        </div>
                         {this.state.itemList.map((item)=>{
                         return <Item item={item} serveoname = {serveoname} step = {4} key={item.variantid} handleSelect={this.handleReasonChange.bind(this)}/>
                         })}
@@ -258,6 +299,8 @@ class sortingCentre extends Component{
                     <div className = 'sc1'>
                         <br/>   
                         <button onClick = {this.handleSubmit2}>SUBMIT</button>
+                        <br/><br/><br/><br/><br/><br/>
+                        <button onClick = {this.resetAll}>BACK</button>
                     </div>
                 </div>
             )
@@ -273,6 +316,7 @@ class sortingCentre extends Component{
                 </div>
             )
         }
+        //CHECK OVER
         else if (this.state.step == 5){
             return(
                 <div>
@@ -281,12 +325,45 @@ class sortingCentre extends Component{
                         <br/>
                         <br/>
                     </div>
-                    <fieldset className = 'page2'>
-                        <hr/>
+                    <fieldset className = 'SC'>
+                        <div className = 'itemContainerSC'>
+                            <div className ='container2SCHeader'>
+                                <p className = 'itemHeader'>IMAGE</p>
+                            </div>
+                            <div className = 'vert'>
+                                <hr className = 'vertHeader'/>
+                            </div>
+                            <div className ='container2SCHeader'>
+                                <p className = 'itemHeader' > STORE  </p>   
+                            </div>
+                            <div className = 'vert'>
+                                <hr className = 'vertHeader'/>
+                            </div>
+                            <div className ='container2SCHeader'>
+                                <p className = 'itemHeader' > NAME  </p>   
+                            </div>
+                            <div className = 'vert'>
+                                <hr className = 'vertHeader'/>
+                            </div>
+                            <div className = 'container2SCHeader'>
+                                <p className = 'itemHeader'>VARIANT ID</p>
+                            </div>
+                            <div className = 'vert'>
+                                <hr className = 'vertHeader'/>
+                            </div>
+                            <div className = 'container2SCHeader'>
+                                <p className = 'itemHeader'>PRODUCT ID</p>
+                            </div>
+                            <div className = 'vert'>
+                                <hr className = 'vertHeader'/>
+                            </div>
+                            <div className ='container2SCHeader'>
+                                <p className = 'itemHeader'>QUANTITY</p>
+                            </div>
+                        </div>
                         {this.state.confirmList.map((item)=>{
                         return <Item handleQuantityChange = {this.handleQuantityChange.bind(this)} item={item} serveoname = {serveoname} step = {5} key={item.variantid} handleSelect={this.handleReasonChange.bind(this)}/>
                         })}
-                        <hr/>
                     </fieldset>
                     <div className = 'sc1'>
                         <br/><br/>
