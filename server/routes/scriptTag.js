@@ -7,7 +7,7 @@ const { getShopHeaders } = require('../util/shop-headers');
 const router = Router({
     prefix: '/scriptTag'
 });
- 
+
  //!!!!!!!!import should change this to '/shopify after finish'
   router.post('/', async ctx => {
       // post a scripttag to shopify
@@ -18,7 +18,7 @@ const router = Router({
       } else {
           headers['X-Shopify-Access-Token'] = accessToken;
       }
-      
+
       const option = {
           method: 'POST',
           url: `https://${shop}/${api_link}/script_tags.json`,
@@ -123,7 +123,39 @@ const router = Router({
         let deleteDoc = db.collection('scripttag').doc(shop).delete()
         ctx.body = {'success':true}
     })
-    
+
   })
+
+
+  //getting all scriptTag id. !!!!!TESTING function for Aug 1st meeting
+   router.get('/getallids', async ctx =>{
+           // get all scripTag ids
+           //console.log(“get all scriptags”)
+           const { shop, accessToken } = getShopHeaders(ctx);
+           const headers = {}
+           if (process.env.DEBUG) {
+               headers['Authorization'] = process.env.SHOP_AUTH;
+           } else {
+               headers['X-Shopify-Access-Token'] = accessToken;
+           }
+           const option = {
+               url: `https://${shop}/${api_link}/script_tags.json`,
+               headers: headers,
+               json: true,
+           }
+           try {
+               ctx.body = await rp(option);
+               //console.log(JSON.stringify(ctx.body))
+           } catch (err) {
+               console.log(err.message);
+               if (err instanceof errors.StatusCodeError) {
+                   ctx.status = err.statusCode;
+                   ctx.message = err.message;
+               } else if (err instanceof errors.RequestError) {
+                   ctx.status = 500;
+                   ctx.message = err.message;
+               }
+           }
+   })
 
 module.exports = router;

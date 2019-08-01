@@ -57,7 +57,9 @@ router.get("/", async ctx => {
     method: "GET",
     url: `https://${shop}/${api_link}/fulfillment_services.json?scope=all`,
     headers: {
-      "X-Shopify-Access-Token": accessToken
+      "X-Shopify-Access-Token": accessToken,
+      'Accept': 'application/json',
+      'Content-Type': 'application/json',
     },
     json: true
   };

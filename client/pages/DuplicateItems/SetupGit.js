@@ -1,7 +1,6 @@
 import React, { Component } from 'react';
-import {postCollection, getShopID, postScriptTag, postFulfillmentService} from './Shopify';
+import {postCollection, getShopID, postFulfillmentService} from './Shopify';
 import {postInstallTime} from './Firestore';
-import {script_tag_url, script_tag_url_returnPortal} from '../config';
 
 
 import Button from '@material-ui/core/Button';
@@ -77,8 +76,6 @@ class SetupGit extends Component {
       }, this.callbackOrig)
     }
     postFulfillmentService();
-    postScriptTag(script_tag_url);
-    postScriptTag(script_tag_url_returnPortal);
   }
 
   callbackGit(data){

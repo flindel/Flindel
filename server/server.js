@@ -77,7 +77,9 @@ app.prepare().then(() => {
         "read_inventory",
         "write_inventory",
         "read_themes",
-        "write_themes"
+        "write_themes",
+        "read_script_tags",
+        "write_script_tags",
       ],
       async afterAuth(ctx) {
         const { shop, accessToken } = ctx.session;
