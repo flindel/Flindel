@@ -164,7 +164,6 @@ class FindIssues extends Component {
         delProduct(data.git_id);
       }
       if (product != null && gitProduct != null){
-        console.log("gitProduct", gitProduct);
         let comparison = this.compareProducts(this.findOrig(data.orig_id), this.findGit(data.git_id), data);
         if (comparison){this.setState(this.state.updates.concat(comparison));}
       }
@@ -372,7 +371,6 @@ class FindIssues extends Component {
         let gitVarID = fsPairs.variants[varIndex].git_var;
         //find git variant
         let gitVar = this.findGitVarShopify(git, gitVarID);
-        console.log(normVar, gitVar);
         if (normVar !== undefined && gitVar !== undefined){
           variantIssues = variantIssues.concat(this.compareVariants(normVar, gitVar));
         }
@@ -428,21 +426,15 @@ class FindIssues extends Component {
   }
 
   checkNormDne(norm, git, fsPairs){
-    console.log("CheckNormDne")
     for(let i = 0; i < fsPairs.variants.length; i++){
       let fsNormId = fsPairs.variants[i].orig_var
-      console.log("fsNormId", )
       if(fsNormId !== undefined){
-        console.log("if(fsNormId)")
         let shopNormId = 0;
         for(let j = 0; j < norm.variants.length; j++){
           shopNormId = norm.variants[j].id;
-          console.log("if");
           if (fsNormId == shopNormId){
-            console.log(fsNormId);
             break;
           }else{
-            console.log("else")
             if(j == norm.variants.length-1){
               this.setState({
                 updates: this.state.updates.concat({

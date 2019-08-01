@@ -100,7 +100,7 @@ class Blacklist extends Component {
 
     //get items on blacklist of current store
     async getItems(){
-        let temp = await fetch(`https://${serveoname}/blacklist?store=${encodeURIComponent(this.state.storeName)}`, {
+        let temp = await fetch(`${serveo_name}/blacklist?store=${encodeURIComponent(this.state.storeName)}`, {
             method: 'get',
         })
         let json = await temp.json()

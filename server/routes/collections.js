@@ -93,35 +93,33 @@ router.get('/', async ctx => {
         }
     }
   });
-/*
-  router.get('/all/', async ctx => {
-      //Gets products all products from a collection
-      const collectionid = ctx.query.id;
-      console.log("collectAll:---------")
-      const { cookies } = ctx;
-      const shop = cookies.get('shop_id');
-      const accessToken = cookies.get('accessToken');
-      const option = {
-          url: `https://${shop}/${api_link}/collects.json`,
-          headers: {
-              'X-Shopify-Access-Token': accessToken
-          },
-          json: true,
-      }
 
-      try {
-          ctx.body = await rp(option);
-          //console.log("body..."+JSON.stringify(ctx.body));
-      } catch (err) {
-          console.log(err.message);
-          if (err instanceof errors.StatusCodeError) {
-              ctx.status = err.statusCode;
-              ctx.message = err.message;
-          } else if (err instanceof errors.RequestError) {
-              ctx.status = 500;
-              ctx.message = err.message;
-          }
-      }
-      });
-*/
+  router.delete('/', async ctx => {
+    const smart_collection_id = ctx.query.id;
+    console.log("collection ID:---------"+smart_collection_id)
+    const { cookies } = ctx;
+    const shop = cookies.get('shop_id');
+    const accessToken = cookies.get('accessToken');
+    const option = {
+        method: 'delete',
+        url: `https://${shop}/${api_link}/smart_collections/${smart_collection_id}.json`,
+        headers: {
+            'X-Shopify-Access-Token': accessToken
+        },
+        json: true,
+    }
+    try {
+        ctx.body = await rp(option);
+        //console.log("body..."+JSON.stringify(ctx.body));
+    } catch (err) {
+        console.log(err.message);
+        if (err instanceof errors.StatusCodeError) {
+            ctx.status = err.statusCode;
+            ctx.message = err.message;
+        } else if (err instanceof errors.RequestError) {
+            ctx.status = 500;
+            ctx.message = err.message;
+        }
+    }
+  });
 module.exports = router;

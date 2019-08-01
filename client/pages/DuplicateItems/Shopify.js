@@ -276,17 +276,21 @@ export function postFulfillmentService() {
       "Content-Type": "application/json"
     }
   };
-  fetch(`${serveo_name}.net/fulserv`, options)
+  fetch(`${serveo_name}/fulserv`, options)
     .then(response => {
       if (response.ok) {
-        console.log("POST Fulfillment Service: ")
         return response.json();
       } else {
         throw Error(response.statusText);
       }
     })
-    .then(data => console.log("Data: ", data))
-    .catch(error => console.log("error"));
+    .then(data => {
+      console.log("POST Fulfillment Service: ", data)
+      fetch(`${serveo_name}/fulserv/firestore/id?body=${encodeURIComponent(JSON.stringify({"fulfillment_service": data.fulfillment_service.id}))}`, {
+        method: 'post',
+      })
+    })
+    .catch(error => console.log(error));
 }
 
 function convertToFirestoreData(git, orig){

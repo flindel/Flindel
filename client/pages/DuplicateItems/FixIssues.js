@@ -76,7 +76,6 @@ class FixIssues extends Component {
   fixUnequalVariants(fsData, args){
     let update = args[0];
     let gitBody = args[1];
-    console.log("fixUnequalVariants",fsData, update);
     gitBody.variants = this.normVarToGitVar(update, fsData);
     const body = {product: gitBody};
     put(update.git.id, body, this.finishedFixing);
@@ -89,14 +88,11 @@ class FixIssues extends Component {
   }
 
   fixGitVarDne(update){
-    console.log("fixGitVarDne: ", update.git.variants, update.norm.variants);
     getGitProduct(update.git.id, this.fixGitVarDne2, [update])
   }
 
   fixGitVarDne2(fsData, args){
     let update = args[0];
-    console.log("FSDATA", fsData);
-    console.log("fixGitVarDne2", update.git.variants, update.norm.variants);
     const variants = this.normVarToGitVar(update, fsData);
     postGitVariant(update.git.id, variants, update, this.finishedFixing);
   }
@@ -116,7 +112,7 @@ class FixIssues extends Component {
       if (gitVar !== undefined){
         normVar.id = gitVar.id;
         normVar.product_id = update.git.id;
-        normVar.sku = gitVar.sku;
+        normVar.sku = gitVar.id;
         normVar.inventory_quantity = gitVar.inventory_quantity;
         normVar.old_inventory_quantity = gitVar.old_inventory_quantity;
       } else {
@@ -126,7 +122,6 @@ class FixIssues extends Component {
       }
       newVariants.push(normVar);
     }
-    console.log("normVarToGitVar: ", update.git.variants, update.norm.variants);
     return newVariants.slice();
   }
 
@@ -174,13 +169,13 @@ class FixIssues extends Component {
   //Creates GIT product with same parameters as NORM
   //DOES NOT ADD SKU NUMBER TO VARIANTS
   fixGitDne(update){
-    console.log("fixGitDne", update);
     let gitBody = update.norm;
     gitBody.published_at = null;
     gitBody.title = update.norm.title + " - Get it Today";
     for(let j = 0; j < update.norm.variants.length; j++){
       gitBody.variants[j].old_inventory_quantity = 0;
       gitBody.variants[j].inventory_quantity = 0;
+      gitBody.variants[j].sku = gitBody.variants[j].id;
       for(let i = 0; i < gitPara.name.length; i++){
         eval("gitBody.variants["+j+"]."+gitPara.name[i]+" = gitPara.value[i]");
       }

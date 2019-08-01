@@ -1,8 +1,8 @@
-
 import React, { Component } from 'react';
 import {postCollection, getShopID, postScriptTag, postFulfillmentService} from './Shopify';
 import {postInstallTime} from './Firestore';
-import {script_tag_url, script_tag_url_returnPortal} from '../config'
+import {script_tag_url, script_tag_url_returnPortal} from '../config';
+
 
 import Button from '@material-ui/core/Button';
 import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
@@ -77,6 +77,8 @@ class SetupGit extends Component {
       }, this.callbackOrig)
     }
     postFulfillmentService();
+    postScriptTag(script_tag_url);
+    postScriptTag(script_tag_url_returnPortal);
   }
 
   callbackGit(data){
@@ -101,14 +103,6 @@ class SetupGit extends Component {
       bottom =
         <div>
           <Button variant="contained" onClick={() => this.setup()} color="primary">Setup Now</Button>
-          <MuiThemeProvider>
-            <DateTimePicker
-              onChange={(dateTime) => this.setDate(dateTime)}
-              value={"Setup Later"}
-              DatePicker={DatePickerDialog}
-              TimePicker={TimePickerDialog}
-            />
-          </MuiThemeProvider>
         </div>;
     }
     return (
