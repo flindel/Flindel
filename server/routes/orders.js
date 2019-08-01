@@ -41,18 +41,18 @@ router.post("/cancel", async ctx => {
   } else {
     headers["X-Shopify-Access-Token"] = accessToken;
   }
+
   const option = {
     method: "POST",
-    url: `https://${shop}/${api_link}/orders/#${order_id}/cancel.json`,
+    url: `https://databasecommunicationtest.myshopify.com/${api_link}/orders/${order_id}/cancel.json`,
     headers: headers,
     json: true
   };
   try {
+    //console.log("what DDDDDDDDDDD: ", option.url);
     ctx.body = await rp(option);
-
     console.log("CANCEL " + JSON.stringify(ctx.body));
   } catch (err) {
-    console.log(err.message);
     if (err instanceof errors.StatusCodeError) {
       ctx.status = err.statusCode;
       ctx.message = err.message;
