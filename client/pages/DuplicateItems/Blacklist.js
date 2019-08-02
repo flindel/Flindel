@@ -37,8 +37,18 @@ class Blacklist extends Component {
     handleChangeDelete(e){
         this.setState({deleteIn:e.target.value})
     }
+    async doesProductExist(ID){
+        let temp = await fetch(`${serveo_name}/products?id=${encodeURIComponent(ID)}`, {
+            method: 'get',
+        })
+        let response = await temp.json()
+        if (response){
+            response = true
+        }
+        return response
+    }
     //add item to blacklist (on submit of add)
-    addToBlacklist(){
+    async addToBlacklist(){
         if (this.state.valid){
         //make sure previous error message goes away
         this.setState({errorMessage:''})
@@ -47,19 +57,25 @@ class Blacklist extends Component {
         let tempList = this.state.items
         //make sure item doesn't exist so we're not making a duplicate
         if (tempList.indexOf(toAdd)==-1){
-            tempList.push(toAdd)
-            tempList.sort()
+            let productExists = await this.doesProductExist(toAdd)
+            if (productExists){
+                tempList.push(toAdd)
+                tempList.sort()
+                let itemString = JSON.stringify(tempList)
+                //save to db
+                this.setState({items:tempList})
+                fetch(`${serveoname}/blacklist?items=${encodeURIComponent(itemString)}&store=${encodeURIComponent(this.state.storeName)}`, {
+                method: 'put',
+                })
+            }
+            else{
+                this.setState({errorMessage:'This ID does not correspond to an actual product.'})
+            }  
         }
         //show error message if they enter duplicate
         else{
             this.setState({errorMessage:'This item is already on the blacklist.'})
         }
-        let itemString = JSON.stringify(tempList)
-        //save to db
-        this.setState({items:tempList})
-        fetch(`${serveo_name}/blacklist?items=${encodeURIComponent(itemString)}&store=${encodeURIComponent(this.state.storeName)}`, {
-            method: 'put',
-        })
         }
     }
     //delete an item from blacklist (on submit of delete)

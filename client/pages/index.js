@@ -3,7 +3,7 @@ import { BrowserRouter, Route } from 'react-router-dom';
 import DuplicateApp from "./DuplicateItems/DuplicateApp";
 import IdentifyApp from "./Confirmation/IdentifyApp2";
 import SC from "./Confirmation/sortingCentre"
-import Blacklist from './Confirmation/blacklist'
+import Blacklist from './Confirmation/blacklistUniversal'
 
 import {ui} from './config'
 class Index extends React.Component{

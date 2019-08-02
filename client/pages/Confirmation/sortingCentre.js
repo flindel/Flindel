@@ -1,6 +1,6 @@
 import React, {Component} from 'react';
 import Item from './Item2'
-import Blacklist from './blacklist'
+import Blacklist from './blacklistUniversal'
 import {serveo_name} from '../config'
 import './sorting.css'
 const sname = serveo_name

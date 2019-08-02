@@ -9,6 +9,7 @@ const router = Router({
 });
 
 router.get('/', async ctx => {
+    ctx.body = false;
   const productid = ctx.query.id;
   const { cookies } = ctx;
   const shop = cookies.get('shop_id');
