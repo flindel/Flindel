@@ -4,6 +4,7 @@ const errors = require('request-promise/errors');
 const { api_link } = require('../default-shopify-api.json');
 const { getShopHeaders } = require('../util/shop-headers');
 const itemList = require ('../util/mainHelper')
+const expiredHelper = require ('../util/expiredHelper')
 const router = Router({
     prefix: '/return'
 });
@@ -106,11 +107,13 @@ router.post('/requested/new', async ctx=>{
         const date = ctx.query.date
         const code = ctx.query.code
         const email = ctx.query.email
+        const emailOriginal = ctx.query.emailOriginal
         let itemsJSON = await JSON.parse(rawItems)
         let data = {
             //base information
             code: code,
             email: email,
+            emailOriginal: emailOriginal,
             shop: shop,
             order: orderNum,
             order_status: 'submitted',
@@ -121,14 +124,88 @@ router.post('/requested/new', async ctx=>{
         const myStatus = 'submitted'
         for (var i = 0;i<itemsJSON.length;i++){
             let [originalID, gitID, originalVarID, gitVarID] = await itemList.getGITInformation(ctx.db, itemsJSON[i].variantid.toString(), itemsJSON[i].productID.toString())
-            data.items.push({"name":itemsJSON[i].name, "title":itemsJSON[i].title, "variantTitle":itemsJSON[i].variantTitle, "productid":originalID, "productidGIT":gitID, "reason":itemsJSON[i].reason, "variantid":originalVarID, "variantidGIT": gitVarID, "status": myStatus})
+            data.items.push({"name":itemsJSON[i].name,"flag":'0', "title":itemsJSON[i].title, "variantTitle":itemsJSON[i].variantTitle, "productid":originalID, "productidGIT":gitID, "reason":itemsJSON[i].reason, "variantid":originalVarID, "variantidGIT": gitVarID, "status": myStatus})
         }
         //write to requested returns
         setDoc = db.collection('requestedReturns').doc(code).set(data)
         ctx.body = 'success'
 })
 
+router.put('/requested/openTime', async ctx=>{
+    code = ctx.query.code
+    db = ctx.db
+    myRef = db.collection('requestedReturns').doc(code)
+    let currTime = await getTime()
+    updateFields = myRef.update({processBegin:currTime})
+    ctx.body = true
+})
+
+router.put('/requested/closeTime', async ctx=>{
+    code = ctx.query.code
+    db = ctx.db
+    myRef = db.collection('requestedReturns').doc(code)
+    let currTime = await getTime()
+    updateFields = myRef.update({processEnd:currTime})
+    ctx.body = true
+})
+
+function getTime(){
+    let now = new Date()
+    let month = now.getMonth()+1
+    let day = now.getDate()
+    let year = now.getFullYear()
+    let hour = now.getHours()
+    let minute = now.getMinutes().toString()
+    if (minute.length != 2){
+        minute = '0' + minute
+    }
+    let second = now.getSeconds().toString()
+    if (second.length !=2){
+        second = '0' + second
+    }
+    currTime = month + '/' + day + '/' + year + '-' + hour + ':' + minute + ':' + second
+    return currTime
+}
+
 router.post('/pending/new', async ctx=>{
+    db = ctx.db
+    const codeIn = ctx.query.code
+    myRef = db.collection('requestedReturns').doc(codeIn)
+    let oldDoc = await myRef.get()
+    let newDate = await expiredHelper.getCurrentDate()
+    let data = {
+        order_status: oldDoc._fieldsProto.order_status.stringValue,
+        email: oldDoc._fieldsProto.order_status.stringValue,
+        processEnd: oldDoc._fieldsProto.processEnd.stringValue,
+        createdDate: oldDoc._fieldsProto.createdDate.stringValue,
+        code: oldDoc._fieldsProto.code.stringValue,
+        emailOriginal: oldDoc._fieldsProto.code.stringValue,
+        order :oldDoc._fieldsProto.order.stringValue,
+        shop: oldDoc._fieldsProto.shop.stringValue,
+        processBegin: oldDoc._fieldsProto.processBegin.stringValue,
+        receivedDate: newDate,
+        items:[]
+    }
+    for (var i = 0;i<oldDoc._fieldsProto.items.arrayValue.values.length;i++){
+        let tempItem = {
+            flag: oldDoc._fieldsProto.items.arrayValue.values[i].mapValue.fields.flag.stringValue,
+            name: oldDoc._fieldsProto.items.arrayValue.values[i].mapValue.fields.name.stringValue,
+            productid: oldDoc._fieldsProto.items.arrayValue.values[i].mapValue.fields.productid.stringValue,
+            productidGIT: oldDoc._fieldsProto.items.arrayValue.values[i].mapValue.fields.productidGIT.stringValue,
+            reason: oldDoc._fieldsProto.items.arrayValue.values[i].mapValue.fields.reason.stringValue,
+            status: oldDoc._fieldsProto.items.arrayValue.values[i].mapValue.fields.status.stringValue,
+            store: oldDoc._fieldsProto.items.arrayValue.values[i].mapValue.fields.store.stringValue,
+            variantid: oldDoc._fieldsProto.items.arrayValue.values[i].mapValue.fields.variantid.stringValue,
+            variantidGIT: oldDoc._fieldsProto.items.arrayValue.values[i].mapValue.fields.variantidGIT.stringValue
+        }
+        data.items.push(tempItem)
+    }
+    let set = db.collection('pending').doc().set(data)
+    let deleteDoc = db.collection('requestedReturns').doc(codeIn).delete();   
+    ctx.body =  true
+})
+
+router.post('/pending/neww', async ctx=>{
     db = ctx.db
     const { shop, accessToken } = getShopHeaders(ctx);
     const rawItems = ctx.query.items
@@ -136,6 +213,7 @@ router.post('/pending/new', async ctx=>{
     const date = ctx.query.date
     const code = ctx.query.code
     const email = ctx.query.email
+    const originalEmail = ctx.query.originalEmail
     const originalDate = ctx.query.originalDate
     let itemsJSON = await JSON.parse(rawItems)
         let data = {
@@ -143,6 +221,7 @@ router.post('/pending/new', async ctx=>{
             code: code,
             email: email,
             shop: shop,
+            originalEmail: originalEmail,
             order: orderNum,
             order_status: 'submitted',
             items: [],
@@ -166,6 +245,7 @@ router.post('/pending/new', async ctx=>{
             data = {
             code: doc._fieldsProto.code.stringValue,
             email: doc._fieldsProto.email.stringValue,
+            emailOriginal: doc._fieldsProto.emailOriginal.stringValue,
             shop: doc._fieldsProto.shop.stringValue,
             items: itemsCopy,
             order_status: 'complete',
