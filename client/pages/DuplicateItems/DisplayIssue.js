@@ -35,6 +35,10 @@ const cellG = {
   backgroundColor: '#99ff75',
 };
 
+const text = {
+  textAlign: 'left',
+}
+
 function DisplayIssue(props){
   if (props.parameterIssues.length == 0
     && props.variantIssues.length == 0
@@ -94,8 +98,8 @@ function DisplayIssue(props){
   return (
     <div>
       <hr />
-      <h4>{props.name}: {props.issue}</h4>
-      <p>Update: {props.solution}</p>
+      <h4 style={text}>{props.name}: {props.issue}</h4>
+      <p style={text}>Update: {props.solution}</p>
       <center>
         {headers}
         {parameter_issues_display}

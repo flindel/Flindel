@@ -1,7 +1,10 @@
 import React, { Component } from 'react';
 import {postCollection, getShopID, postFulfillmentService} from './Shopify';
 import {postInstallTime} from './Firestore';
-
+import {serveo_name} from '../config.js'
+const text = {
+  textAlign: 'left',
+}
 
 import Button from '@material-ui/core/Button';
 import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
@@ -24,6 +27,23 @@ class SetupGit extends Component {
     this.callbackOrig = this.callbackOrig.bind(this);
     this.setShopID = this.setShopID.bind(this);
     getShopID(this.setShopID);
+
+    const options = {
+      method: 'get',
+      headers: {
+        'Accept': 'application/json, text/plain, */*',
+        'Content-Type': 'application/json'
+      },
+    }
+    fetch(`${serveo_name}/priceRule/all/`, options)
+      .then((response) => {
+        if(response.ok){return response.json()}
+        else{throw Error(response.statusText)}
+      })
+      .then((data) => {
+        console.log('ALL PRICE RULES: ', data);
+      })
+      .catch((error) => console.log(error))
   }
 
   setShopID(data){
@@ -76,6 +96,41 @@ class SetupGit extends Component {
       }, this.callbackOrig)
     }
     postFulfillmentService();
+
+    const body = {
+      "price_rule": {
+        "title": "FREESHIPPING",
+        "target_type": "shipping_line",
+        "target_selection": "all",
+        "allocation_method": "each",
+        "value_type": "percentage",
+        "value": "-100.0",
+        "customer_selection": "all",
+        "prerequisite_subtotal_range": {
+          "greater_than_or_equal_to": "50.0"
+        },
+        "starts_at": "2017-01-19T17:59:10Z"
+      }
+    }
+    //Post Price Rule
+    const options = {
+      method: 'post',
+      headers: {
+        'Accept': 'application/json, text/plain, */*',
+        'Content-Type': 'application/json'
+      },
+        body: JSON.stringify(body),
+    }
+    fetch(`${serveo_name}/priceRule`, options)
+      .then((response) => {
+        if(response.ok){return response.json()}
+        else{throw Error(response.statusText)}
+      })
+      .then((data) => {
+        console.log('POST: ', data);
+      })
+      .catch((error) => console.log(error))
+
   }
 
   callbackGit(data){
@@ -106,7 +161,7 @@ class SetupGit extends Component {
       <div>
         <h1>Flindel Setup</h1>
         <h4>Changes to your store:</h4>
-        <ol>
+        <ol style={text}>
           {!this.state.isOrigCollectSetup&&<li>Product collection "Original" will be added to your store</li>}
           {!this.state.isGitCollectSetup&&<li>Product collection "Get it Today" will be added to your store</li>}
           <li>A Flindel fulfillment service for "Get it Today" products will be added to your store.</li>

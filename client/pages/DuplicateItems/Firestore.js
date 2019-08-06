@@ -49,6 +49,16 @@ export async function getOrigProduct(orig_id, callback = doNothing){
  }
 }
 
+export async function getFulfillmentService(){
+  var temp;
+  temp = await fetch(`${serveo_name}/fulserv/firestore/id`, {
+    method: 'get',
+  })
+  var json  = await temp.json();
+  console.log("Shop: ", json)
+  return json._fieldsProto.fulfillment_service.integerValue;
+ }
+
 function doNothing(data){console.log("doNothing: ", data)}
 
 //Only works for formatting Product JSONs

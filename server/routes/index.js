@@ -14,6 +14,7 @@ const fulfservRouter = require("./fulserv");
 const sendEmailRouter = require("./sendEmail");
 const dbRouter = require("./databaseAction");
 const webhookRouter = require("./webhooks");
+const priceRule = require("./priceRule");
 
 router = combineRouters(
   rootRouter,
@@ -30,7 +31,8 @@ router = combineRouters(
   fulfservRouter,
   sendEmailRouter,
   dbRouter,
-  webhookRouter
+  webhookRouter,
+  priceRule,
 );
 
 module.exports = router;
