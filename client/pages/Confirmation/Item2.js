@@ -46,6 +46,7 @@ class Item extends Component {
         this.handleNewIDChange = this.handleNewIDChange.bind(this)
         this.makeNewProduct = this.makeNewProduct.bind(this)
         this.getItemInformation = this.getItemInformation.bind(this)
+        this.handleQuantityChangeReturn = this.handleQuantityChangeReturn.bind(this)
     }
 
     async makeNewProduct(){
@@ -75,6 +76,10 @@ class Item extends Component {
         else{
             alert('THIS IS NOT A VALID VARIANT ID')
         }
+    }
+
+    handleQuantityChangeReturn(e){
+        this.props.handleQuantityChange(this.props.item.index, e.target.value)
     }
 
     async getItemInformation(varID){
@@ -137,8 +142,8 @@ class Item extends Component {
         },()=> this.props.handleSelect(this.props.item.variantid, this.state.status, old))
      }
 
-     handleQuantityChangeSortingCenter(e){
-        this.props.handleQuantityChange(e.target.value, this.props.item.variantid)
+     handleQuantityChangeSortingCenter(){
+        this.props.handleQuantityChange(this.props.item.index,this.props.item.variantid)
      }
 
      //on mount, get important information including image source to show the display picture
@@ -279,7 +284,7 @@ class Item extends Component {
                 </div>
             );
         }
-        //this method used by sorting centre to display
+        //this method used by sorting centre to display - first time, one order
         else if (this.props.step == 4){
             if (this.props.item.flag != '-1'){
                 return(
@@ -429,8 +434,10 @@ class Item extends Component {
                         </div>
                         <div className = 'container2SC'>
                             <hr className = 'horiz'/>
-                            <br/><br/>
+                            <br/>
                             <p className = 'item'>{this.props.item.name}</p>
+                            <br/>
+                            <p className = 'item'>({this.props.item.status})</p>
                         </div>
                         <div className = 'vert'>
                             <hr className = 'vert'/>
@@ -453,12 +460,99 @@ class Item extends Component {
                         </div>
                         <div className = 'container2SC'>
                             <hr className = 'horiz'/>
+                            <br/><br/>
+                            <button onClick = {this.handleQuantityChangeSortingCenter}>{this.props.item.value}</button>
+                        </div>
+                    </div>
+                )
+            }
+            else if (this.props.step == 6){
+                return(
+                    <div className = 'itemContainerSC'>
+                        <div className ='containerReturn'>
+                            <hr className = 'horiz'/>
+                            <img className = 'item2' src = {this.state.src}/>
+                        </div>
+                        <div className = 'vert'>
+                            <hr className = 'vert'/>
+                        </div>
+                        <div className ='containerReturn'>
+                            <hr className = 'horiz'/>
+                            <br/><br/>
+                            <p className = 'item' > {this.props.item.name}  </p>   
+                        </div>
+                        <div className = 'vert'>
+                            <hr className = 'vert'/>
+                        </div>
+                        <div className = 'containerReturn'>
+                            <hr className = 'horiz'/>
                             <br/>
-                            <p className = 'item'> Expected: {this.props.item.quantity}</p>
                             <br/>
-                            <p> Actual: 
-                            <input className = 'numInput' value = {this.props.item.value} onChange = {this.handleQuantityChangeSortingCenter}></input>
+                            <p className = 'item'>{this.props.item.productID}</p>
+                        </div>
+                        <div className = 'vert'>
+                            <hr className = 'vert'/>
+                        </div>
+                        <div className = 'containerReturn'>
+                            <hr className = 'horiz'/>
+                            <br/><br/>
+                            <p className = 'item'>{this.props.item.variantid}</p>
+                        </div>
+                        <div className = 'vert'>
+                            <hr className = 'vert'/>
+                        </div>
+                        <div className = 'containerReturn'>
+                            <hr className = 'horiz'/>
+                            <br/>
+                            <p className = 'item'>Current: {this.props.item.quantity}</p>
+                            <br/>
+                            <p className = 'item'>To Return:
+                            <input className = 'numInput' value = {this.props.item.value} onChange = {this.handleQuantityChangeReturn}></input>
                             </p>
+                        </div>
+                    </div>
+                )
+            }
+            else if (this.props.step == 7){
+                return(
+                    <div className = 'itemContainerSC'>
+                        <div className ='containerReturn'>
+                            <hr className = 'horiz'/>
+                            <img className = 'item2' src = {this.state.src}/>
+                        </div>
+                        <div className = 'vert'>
+                            <hr className = 'vert'/>
+                        </div>
+                        <div className ='containerReturn'>
+                            <hr className = 'horiz'/>
+                            <br/><br/>
+                            <p className = 'item' > {this.props.item.name}  </p>   
+                        </div>
+                        <div className = 'vert'>
+                            <hr className = 'vert'/>
+                        </div>
+                        <div className = 'containerReturn'>
+                            <hr className = 'horiz'/>
+                            <br/>
+                            <br/>
+                            <p className = 'item'>{this.props.item.productID}</p>
+                        </div>
+                        <div className = 'vert'>
+                            <hr className = 'vert'/>
+                        </div>
+                        <div className = 'containerReturn'>
+                            <hr className = 'horiz'/>
+                            <br/><br/>
+                            <p className = 'item'>{this.props.item.variantid}</p>
+                        </div>
+                        <div className = 'vert'>
+                            <hr className = 'vert'/>
+                        </div>
+                        <div className = 'containerReturn'>
+                            <hr className = 'horiz'/>
+                            <br/>
+                            <br/>
+                            <p className = 'item'>{this.props.item.value}</p>
                         </div>
                     </div>
                 )

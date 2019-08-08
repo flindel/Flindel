@@ -44,6 +44,17 @@ div.container2SCHeader{
     width:15.8%;
     text-align:center;
 }
+div.containerReturnHeader{
+    width:19%;
+    text-align:center;
+}
+div.containerReturn{
+    width:19%;
+    text-align:center;
+    height: 120px;
+    padding-top: 10px;
+    padding-bottom: 10px;
+}
 
 hr.horiz{
     padding-bottom: 2px;
@@ -73,6 +84,11 @@ div.vert{
   fieldset.SC{
       margin-left:5%;
       margin-right:5%;
+  }
+
+  fieldset.Return{
+      margin-left:10%;
+      margin-right:10%;
   }
 
   hr.vert{

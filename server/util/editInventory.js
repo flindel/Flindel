@@ -9,6 +9,7 @@ async function editInventory(change, store, varID, torontoLocation, dbIn){
     increment(change, torontoLocation, invId, store)
 }
 
+
 //get access token and toronto location from databse (expand later)
 async function getAccessToken(dbIn, store){
     db = dbIn

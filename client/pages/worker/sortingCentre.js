@@ -19,7 +19,9 @@ class sortingCentre extends Component{
             orderNum:'',
             createdDate:'',
             confirmList:[],
+            fullList: [],
             store:'',
+            type: 'All',
         }
         this.handleSubmit = this.handleSubmit.bind(this)
         this.handlecCode = this.handlecCode.bind(this)
@@ -34,6 +36,96 @@ class sortingCentre extends Component{
         this.addItem = this.addItem.bind(this)
         this.setOpenTime = this.setOpenTime.bind(this)
         this.setCloseTime = this.setCloseTime.bind(this)
+        this.submitConfirmation = this.submitConfirmation.bind(this)
+        this.handleConflicts = this.handleConflicts.bind(this)
+        this.viewReturning = this.viewReturning.bind(this)
+        this.viewAccepted = this.viewAccepted.bind(this)
+        this.viewRejected = this.viewRejected.bind(this)
+        this.viewAll = this.viewAll.bind(this)
+    }
+
+    viewAccepted(){
+        let tempList = []
+        for (var i = 0;i<this.state.fullList.length;i++){
+            if (this.state.fullList[i].status == 'accepted'){
+                tempList.push(this.state.fullList[i])
+            }
+            
+        }
+        for (var j = 0;j<tempList.length;j++){
+            for (var i = 0;i<tempList.length -1;i++){
+                if (tempList[i].flag == '-1' && tempList[i+1].flag!= '-1'){
+                    let tempItem = tempList[i]
+                    tempList[i] = tempList[i+1]
+                    tempList[i+1] = tempItem
+                }
+            }
+        }
+        for (var i = 0;i<tempList.length;i++){
+            tempList[i].index = i
+        }
+        this.setState({type: 'Accepted', confirmList: tempList})
+    }
+
+    viewReturning(){
+        let tempList = []
+        for (var i = 0;i<this.state.fullList.length;i++){
+            if (this.state.fullList[i].status == 'returning'){
+                tempList.push(this.state.fullList[i])
+            }
+        }
+        for (var j = 0;j<tempList.length;j++){
+            for (var i = 0;i<tempList.length -1;i++){
+                if (tempList[i].flag == '-1' && tempList[i+1].flag!= '-1'){
+                    let tempItem = tempList[i]
+                    tempList[i] = tempList[i+1]
+                    tempList[i+1] = tempItem
+                }
+            }
+        }
+        for (var i = 0;i<tempList.length;i++){
+            tempList[i].index = i
+        }
+        this.setState({type: 'Returning', confirmList: tempList})
+    }
+
+    viewRejected(){
+        let tempList = []
+        for (var i = 0;i<this.state.fullList.length;i++){
+            if (this.state.fullList[i].status == 'rejected'){
+                tempList.push(this.state.fullList[i])
+            }
+        }
+        for (var j = 0;j<tempList.length;j++){
+            for (var i = 0;i<tempList.length -1;i++){
+                if (tempList[i].flag == '-1' && tempList[i+1].flag!= '-1'){
+                    let tempItem = tempList[i]
+                    tempList[i] = tempList[i+1]
+                    tempList[i+1] = tempItem
+                }
+            }
+        }
+        for (var i = 0;i<tempList.length;i++){
+            tempList[i].index = i
+        }
+        this.setState({type: 'Rejected', confirmList: tempList})
+    }
+
+    viewAll(){
+        let itemList = this.state.fullList
+        for (var j = 0;j<itemList.length;j++){
+            for (var i = 0;i<itemList.length -1;i++){
+                if (itemList[i].store > itemList[i+1].store ){
+                    let tempItem = itemList[i]
+                    itemList[i] = itemList[i+1]
+                    itemList[i+1] = tempItem
+                }
+            }
+        }
+        for (var i = 0;i<itemList.length;i++){
+            itemList[i].index = i
+        }
+        this.setState({type: 'All', confirmList:itemList})
     }
 
     setOpenTime(){
@@ -50,6 +142,30 @@ class sortingCentre extends Component{
         })
     }
 
+    submitConfirmation(){
+        let tempList = []
+        for (var i = 0;i<this.state.confirmList.length;i++){
+            if (this.state.confirmList[i].value == 0){
+                let conflict = {
+                    variantid: this.state.confirmList[i].variantid,
+                    status: this.state.confirmList[i].status,
+                    difference: -1
+                }
+                tempList.push(conflict)
+            }
+        }
+        this.handleConflicts(tempList)
+        //this.setState({step:4})
+    }
+
+    handleConflicts(conflicts){
+        for (var i = 0;i<conflicts.length;i++){
+            if (conflicts[i].difference < 0){
+                console.log(conflicts[i].variantid+ ' - '+ conflicts[i].status+' - '+'remove')
+            }
+        }
+    }
+
     addItem(newItem, oldItem){
         let tempList = this.state.itemList
         for (var i = 0;i<tempList.length;i++){
@@ -60,7 +176,7 @@ class sortingCentre extends Component{
         tempList.push(newItem)
         for (var j = 0;j<tempList.length;j++){
             for (var i = 0;i<tempList.length -1;i++){
-                if (tempList[i].flag == -1 && tempList[i+1]!= -1){
+                if (tempList[i].flag == '-1' && tempList[i+1].flag!= '-1'){
                     let tempItem = tempList[i]
                     tempList[i] = tempList[i+1]
                     tempList[i+1] = tempItem
@@ -80,29 +196,37 @@ class sortingCentre extends Component{
         {
             method: 'get',
         })
+        //load items
         let itemList = []
         let itemsJSON = await items.json()
         for (var i = 0;i<itemsJSON.length;i++){
-            let tempItem = {
+            if (itemsJSON[i].flag.stringValue == '1' || itemsJSON[i].flag.stringValue == '0'){
+                let tempItem = {
                 variantid:itemsJSON[i].variantid.stringValue,
                 productid: itemsJSON[i].productid.stringValue,
                 quantity: 1,
+                status: itemsJSON[i].status.stringValue,
                 name: itemsJSON[i].name.stringValue,
                 store: itemsJSON[i].store,
                 value: 0
             }
             itemList.push(tempItem)
+            }
         }
-        for (var i = 0;i<itemList.length;i++){
-            for (var j = i+1;j<itemList.length;j++){
-                if (itemList[i].variantid == itemList[j].variantid && itemList[i].store == itemList[j].store){
-                    itemList[i].quantity++
-                    itemList.splice(j,1)
-                    j--
+        //sort
+        for (var j = 0;j<itemList.length;j++){
+            for (var i = 0;i<itemList.length -1;i++){
+                if (itemList[i].store > itemList[i+1].store ){
+                    let tempItem = itemList[i]
+                    itemList[i] = itemList[i+1]
+                    itemList[i+1] = tempItem
                 }
             }
         }
-        await this.setState({confirmList:itemList})
+        for (var i = 0;i<itemList.length;i++){
+            itemList[i].index = i
+        }
+        this.setState({confirmList:itemList, fullList: itemList})
     }
 
     //accept initial input
@@ -183,18 +307,9 @@ class sortingCentre extends Component{
         this.setState({itemList:tempList})
     }
 
-    handleQuantityChange(numIn, varID){
+    handleQuantityChange(index, varID){
         let tempList = this.state.confirmList
-        for (var i =0;i<tempList.length;i++){
-            if (varID == tempList[i].variantid){
-                if (numIn == ''){
-                    tempList[i].value = numIn
-                }
-                else if (numIn.match("-?(0|[1-9]\\d*)")){
-                    tempList[i].value = parseInt(numIn)
-                }
-            }
-        }
+        tempList[index].value = 1 - tempList[index].value
         this.setState({confirmList:tempList})
     }
 
@@ -365,10 +480,19 @@ class sortingCentre extends Component{
             return(
                 <div>
                     <div className = 'sc1'>
-                        <h1 className = 'scHeader'>SORTING CENTRE APP</h1>
+                        <h1 className = 'scHeader'>SORTING CENTRE APP - Checkover</h1>
                         <br/>
                         <br/>
                     </div>
+                    <div>
+                        <button onClick = {this.viewReturning}>RETURNING</button>
+                        <button onClick = {this.viewAccepted}>ACCEPTED</button>
+                        <button onClick = {this.viewRejected}>REJECTED</button>
+                        <button onClick = {this.viewAll}>ALL</button>
+                        <br/><br/>
+                    </div>
+                    <h1 className = 'scHeader'>Currently Viewing: {this.state.type}</h1>
+                    <br/>
                     <fieldset className = 'SC'>
                         <div className = 'itemContainerSC'>
                             <div className ='container2SCHeader'>
@@ -405,15 +529,15 @@ class sortingCentre extends Component{
                                 <p className = 'itemHeader'>QUANTITY</p>
                             </div>
                         </div>
-                        {this.state.confirmList.map((item)=>{
-                        return <Item handleQuantityChange = {this.handleQuantityChange.bind(this)} item={item} serveoname = {serveoname} step = {5} key={item.variantid} handleSelect={this.handleReasonChange.bind(this)}/>
+                        {this.state.confirmList.map((item, index)=>{
+                        return <Item handleQuantityChange = {this.handleQuantityChange.bind(this)} item={item} serveoname = {serveoname} step = {5} key={item.variantid + index} handleSelect={this.handleReasonChange.bind(this)}/>
                         })}
                     </fieldset>
                     <div className = 'sc1'>
                         <br/><br/>
                         <button onClick = {this.submitConfirmation}>CONFIRM</button>
-                        <br/><br/><br/><br/>
                         <button onClick = {this.resetAll}>BACK</button>
+                        <br/><br/>
                     </div>
                 </div>
             )

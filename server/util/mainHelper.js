@@ -10,8 +10,8 @@ async function getItems(dbIn){
         let items = doc._fieldsProto.items.arrayValue.values
         for (var i = 0;i<items.length;i++){
             let tempItem = items[i].mapValue.fields
-            tempItem.store = doc._fieldsProto.shop.stringValue
             tempItem.order = doc._fieldsProto.order.stringValue
+            tempItem.store = doc._fieldsProto.shop.stringValue           
             itemList.push(tempItem)
         }
     });
@@ -34,6 +34,7 @@ async function breakdown(db, items){
             productid: items[i].productid.stringValue,
             productidGIT: items[i].productidGIT.stringValue,
             quantity: 1,
+            flag: items[i].flag.stringValue
         }
         //item is created twice as a deep-copy substitute. it doesn't work without this
         let tempItem2 = {
@@ -45,14 +46,29 @@ async function breakdown(db, items){
             variantidGIT: items[i].variantidGIT.stringValue,
             productid: items[i].productid.stringValue,
             productidGIT: items[i].productidGIT.stringValue,
-            quantity: 1
+            quantity: 1,
+            flag: items[i].flag.stringValue
         }
-        if (tempItem.status == 'accepted'){
+        //item was swapped out, refund to keep consistent with customer information
+        if(tempItem.flag == '-1' && tempItem.status != 'rejected'){
+            refundList.push(tempItem2)
+        }
+        //item was normal, mark accepted and add to list
+        else if (tempItem.flag == '0' && tempItem.status == 'accepted'){
             acceptedList.push(tempItem)
             refundList.push(tempItem2)
         }
-        else if(tempItem.status == 'returning'){
+        //item was normal, mark returning and add to list
+        else if (tempItem.flag == '0' && tempItem.status == 'returning'){
             refundList.push(tempItem2)
+            returningList.push(tempItem2)
+        }
+        //item was added as substitute, mark accepted, but don't refund (covered in first option)
+        else if (tempItem.flag == '1' && tempItem.status == 'accepted'){
+            acceptedList.push(tempItem)
+        }
+        //item was added as substitute, mark returning, but don't refund (covered in first option)
+        else if (tempItem.flag == '1'&& tempItem.status == 'returning'){
             returningList.push(tempItem2)
         }
     }

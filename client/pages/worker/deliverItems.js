@@ -17,7 +17,8 @@ class deliverItems extends Component {
     render() {
         return(
             <div>
-                <p>Deliver Items</p>
+                <h1 className = 'scHeader'>Deliver Items</h1>
+                <br/><br/>
                 <button onClick = {this.props.back}>BACK</button>
             </div>
         )
