@@ -1,5 +1,5 @@
 import React, {Component} from 'react';
-import Item from './Item2'
+import Item from '../Confirmation/Item2'
 import Blacklist from './blacklistUniversal'
 import {serveo_name} from '../config'
 import './sorting.css'
@@ -15,6 +15,7 @@ class sortingCentre extends Component{
             step: 1,
             itemList: [],
             email: '',
+            emailOriginal: '',
             orderNum:'',
             createdDate:'',
             confirmList:[],
@@ -30,6 +31,43 @@ class sortingCentre extends Component{
         this.sendToDB = this.sendToDB.bind(this)
         this.dailyConfirm = this.dailyConfirm.bind(this)
         this.loadConfirmList = this.loadConfirmList.bind(this)
+        this.addItem = this.addItem.bind(this)
+        this.setOpenTime = this.setOpenTime.bind(this)
+        this.setCloseTime = this.setCloseTime.bind(this)
+    }
+
+    setOpenTime(){
+        fetch(`https://${serveoname}/return/requested/openTime?code=${encodeURIComponent(this.state.cCode)}`, 
+        {
+            method: 'PUT',
+        })
+    }
+
+    setCloseTime(){
+        fetch(`https://${serveoname}/return/requested/closeTime?code=${encodeURIComponent(this.state.cCode)}`, 
+        {
+            method: 'PUT',
+        })
+    }
+
+    addItem(newItem, oldItem){
+        let tempList = this.state.itemList
+        for (var i = 0;i<tempList.length;i++){
+            if (oldItem == tempList[i]){
+                tempList[i].flag = '-1'
+            }
+        }
+        tempList.push(newItem)
+        for (var j = 0;j<tempList.length;j++){
+            for (var i = 0;i<tempList.length -1;i++){
+                if (tempList[i].flag == -1 && tempList[i+1]!= -1){
+                    let tempItem = tempList[i]
+                    tempList[i] = tempList[i+1]
+                    tempList[i+1] = tempItem
+                }
+            }
+        }
+        this.setState({itemList:tempList})
     }
 
     async dailyConfirm(){
@@ -85,10 +123,10 @@ class sortingCentre extends Component{
         let acceptList = []
         for (var i = 0;i<this.state.itemList.length;i++){
             let temp = this.state.itemList[i]
-            if(temp.status == 'accepted' || temp.status == 'returning'){
+            if((temp.status == 'accepted' || temp.status == 'returning')&& (temp.flag =='-1' || temp.flag == '0')){
                 acceptList.push(temp)
             }
-            else if (temp.status == 'rejected'){
+            else if (temp.status == 'rejected' && (temp.flag == '-1' || temp.flag == '0')){
                 rejectList.push(temp)
             }
         }
@@ -103,10 +141,9 @@ class sortingCentre extends Component{
     //write to db
     async sendToDB(){
         let currentDate = ''
-        currentDate += (new Date().getMonth()+1)+'/'+ new Date().getDate() + '/'+  new Date().getFullYear()
         let items = JSON.stringify(this.state.itemList)
         //write to pending + history, delete from reqReturns, all one transaction
-        await fetch(`https://${serveoname}/return/pending/new?orderNum=${encodeURIComponent(this.state.orderNum)}&code=${encodeURIComponent(this.state.cCode)}&originalDate=${encodeURIComponent(this.state.createdDate)}&date=${encodeURIComponent(currentDate)}&email=${encodeURIComponent(this.state.email)}&items=${encodeURIComponent(items)}`, {
+        await fetch(`https://${serveoname}/return/pending/new?code=${encodeURIComponent(this.state.cCode)}`, {
             method: 'post',
         })
     }
@@ -129,7 +166,7 @@ class sortingCentre extends Component{
     }
 
     //handle changing status
-    async handleReasonChange(varID, status, oldstatus){
+    handleReasonChange(varID, status, oldstatus){
         let count = 0
         let found = false
         let tempList = this.state.itemList
@@ -143,7 +180,7 @@ class sortingCentre extends Component{
                 count+=1
             }
         }
-        await this.setState({itemList:tempList})
+        this.setState({itemList:tempList})
     }
 
     handleQuantityChange(numIn, varID){
@@ -163,6 +200,7 @@ class sortingCentre extends Component{
 
     //submit the changing of reasons, finish process and send to db
     async handleSubmit2(){
+        this.setCloseTime()
         let items = await JSON.stringify(this.state.itemList)
         //update new reasons
         fetch(`https://${serveoname}/return/requested/itemStatus?code=${encodeURIComponent(this.state.cCode)}&items=${encodeURIComponent(items)}`, {
@@ -179,8 +217,9 @@ class sortingCentre extends Component{
         })
         let t2 = await temp.json()
         if(t2.valid == true){
+            this.setOpenTime()
             let tempList = []
-            this.setState({email:t2.res.email.stringValue,orderNum:t2.res.order.stringValue, store: t2.res.shop.stringValue, createdDate: t2.res.createdDate.stringValue})
+            this.setState({email:t2.res.email.stringValue,emailOriginal: t2.res.emailOriginal.stringValue, orderNum:t2.res.order.stringValue, store: t2.res.shop.stringValue, createdDate: t2.res.createdDate.stringValue})
             for (var i = 0;i<t2.res.items.arrayValue.values.length;i++){
             let tempItem = {
                 name: t2.res.items.arrayValue.values[i].mapValue.fields.name.stringValue,
@@ -190,7 +229,9 @@ class sortingCentre extends Component{
                 productid:t2.res.items.arrayValue.values[i].mapValue.fields.productid.stringValue,
                 store:t2.res.shop.stringValue,
                 variantidGIT: t2.res.items.arrayValue.values[i].mapValue.fields.variantidGIT.stringValue,
-                productidGIT: t2.res.items.arrayValue.values[i].mapValue.fields.productidGIT.stringValue
+                productidGIT: t2.res.items.arrayValue.values[i].mapValue.fields.productidGIT.stringValue,
+                flag: t2.res.items.arrayValue.values[i].mapValue.fields.flag.stringValue,
+
             }
             tempList.push(tempItem)
         }
@@ -218,6 +259,8 @@ class sortingCentre extends Component{
                         Click below for the once-a-day confirmation to confirm all inventory is accounted for.
                     </p>
                     <button onClick = {this.dailyConfirm}>CHECK OVER</button>
+                    <br/><br/><br/><br/>
+                    <button onClick = {this.props.back}>BACK</button>
                 </div>
             )
         }
@@ -238,6 +281,8 @@ class sortingCentre extends Component{
                         Click below for the once-a-day confirmation to confirm all inventory is accounted for.
                     </p>
                     <button onClick = {this.dailyConfirm}>CHECK OVER</button>
+                    <br/><br/><br/><br/>
+                    <button onClick = {this.props.back}>BACK</button>
                 </div>
             )
         }
@@ -293,13 +338,12 @@ class sortingCentre extends Component{
                             </div>
                         </div>
                         {this.state.itemList.map((item)=>{
-                        return <Item item={item} serveoname = {serveoname} step = {4} key={item.variantid} handleSelect={this.handleReasonChange.bind(this)}/>
+                        return <Item item={item} serveoname = {serveoname} step = {4} key={item.variantid} addItem={this.addItem.bind(this)} handleSelect={this.handleReasonChange.bind(this)}/>
                         })}
                     </fieldset>
                     <div className = 'sc1'>
                         <br/>   
                         <button onClick = {this.handleSubmit2}>SUBMIT</button>
-                        <br/><br/><br/><br/><br/><br/>
                         <button onClick = {this.resetAll}>BACK</button>
                     </div>
                 </div>

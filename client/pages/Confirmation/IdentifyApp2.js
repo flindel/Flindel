@@ -28,7 +28,8 @@ class IdentifyApp extends Component {
             errorMessage:'',
             returnPolicy: [],
             defaultReturn: '',
-            shopDomain: ''
+            shopDomain: '',
+            emailOriginal:''
         };
         this.returnItemList= []
         this.identifyItems=this.identifyItems.bind(this) 
@@ -222,7 +223,7 @@ class IdentifyApp extends Component {
         let currentDate = ''
         currentDate += (new Date().getMonth()+1)+'/'+ new Date().getDate() + '/'+  new Date().getFullYear()
         let items = JSON.stringify(this.state.returnlist)
-        fetch(`https://${serveoname}/return/requested/new?date=${encodeURIComponent(currentDate)}&code=${encodeURIComponent(this.state.code)}&orderNum=${encodeURIComponent(this.state.orderNum)}&email=${encodeURIComponent(this.state.email)}&items=${encodeURIComponent(items)}`, {
+        fetch(`https://${serveoname}/return/requested/new?date=${encodeURIComponent(currentDate)}&code=${encodeURIComponent(this.state.code)}&orderNum=${encodeURIComponent(this.state.orderNum)}&emailOriginal=${encodeURIComponent(this.state.emailOriginal)}&email=${encodeURIComponent(this.state.email)}&items=${encodeURIComponent(items)}`, {
             method: 'POST',
         })
     }
@@ -312,7 +313,7 @@ class IdentifyApp extends Component {
                 phoneNum = phoneNum.substring(0,i)+phoneNum.substring(i+1)
             }
         }
-        this.setState({email:emailAdd.toLowerCase()})
+        this.setState({email:emailAdd.toLowerCase(), emailOriginal:emailAdd.toLowerCase()})
         const data = {orderNumber: orderNum, emailAddress:emailAdd};
         //get order fromm shopify db
         let temp = await fetch(`https://${serveoname}/orders?orderNum=${encodeURIComponent(data.orderNumber)}`, {

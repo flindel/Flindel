@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import './universal.css'
+import '../Confirmation/universal.css'
 import {serveo_name} from '../config'
 const sname = serveo_name
 const serveoname = sname.substring(8)
@@ -174,6 +174,8 @@ class Blacklist extends Component {
                     <br/>
                     <br/>
                     <p style = {myStyle}>{this.state.loginMessage}</p>
+                    <br/><br/><br/><br/>
+                    <button onClick = {this.props.back}>BACK</button>
                 </div>
              ); 
         } 

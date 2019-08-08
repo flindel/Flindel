@@ -81,15 +81,17 @@ router.get("/", async ctx => {
 router.delete("/", async ctx => {
   const fulservId = ctx.query.id;
   console.log("fulfillment service id:---------" + fulservId);
-  const { cookies } = ctx;
-  const shop = cookies.get("shop_id");
-  const accessToken = cookies.get("accessToken");
+  const { shop, accessToken } = getShopHeaders(ctx);
+  const headers = {};
+  if (process.env.DEBUG) {
+    headers["Authorization"] = process.env.SHOP_AUTH;
+  } else {
+    headers["X-Shopify-Access-Token"] = accessToken;
+  }
   const option = {
     method: "delete",
     url: `https://${shop}/${api_link}/fulfillment_services/${fulservId}.json`,
-    headers: {
-      "X-Shopify-Access-Token": accessToken
-    },
+    headers: headers,
     json: true
   };
   try {
@@ -123,6 +125,18 @@ router.post("/firestore/id", async ctx => {
   docRef.set(body, { merge: true });
   ctx.body = "success";
 });
+
+router.get('/firestore/id', async ctx => {
+  ctx.set('Access-Control-Allow-Origin', '*');
+  ctx.set('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept');
+  ctx.set('Access-Control-Allow-Methods', 'POST, GET, PUT, DELETE, OPTIONS');
+  db = ctx.db
+  const { shop } = getShopHeaders(ctx);
+  console.log("SHOP:", shop);
+  let myRef = db.collection('store').doc(shop);
+  getDoc = await myRef.get()
+  ctx.body = getDoc;
+})
 
 //next get a listner for webhook that will provide json info of what fullfilment was created and make email to email to us
 //give tracking numbers

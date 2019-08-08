@@ -2,6 +2,10 @@ import React, { Component } from 'react';
 import './universal.css'
 import Select from 'react-select';
 
+const greyStyle={
+    backgroundColor: 'grey'
+}
+
 class Item extends Component {
     //constructor/binding methods
     constructor(props){
@@ -18,8 +22,11 @@ class Item extends Component {
             reason: this.props.item.reason,
             quantity: this.props.item.quantity,//the quantity of a item that user total brought
             status: this.props.item.status,
+            flag: this.props.item.flag,
             activeReason: [],
+            style: greyStyle,
             idNew:'',
+            styleName:'',
             //potential reasons for return
             reasons: [
                 { value: "Broken", label: "Item is broken." },
@@ -29,7 +36,7 @@ class Item extends Component {
               ],
               //potential quantities - this holds single return value, stored like this because it's a different component
             activeQuantity:[],
-            quantities:[]
+            quantities:[],
         };
         this.setState = this.setState.bind(this)
         this.handleReasonChange = this.handleReasonChange.bind(this);
@@ -37,6 +44,57 @@ class Item extends Component {
         this.handleStatusChange=this.handleStatusChange.bind(this)
         this.handleQuantityChangeSortingCenter=this.handleQuantityChangeSortingCenter.bind(this)
         this.handleNewIDChange = this.handleNewIDChange.bind(this)
+        this.makeNewProduct = this.makeNewProduct.bind(this)
+        this.getItemInformation = this.getItemInformation.bind(this)
+    }
+
+    async makeNewProduct(){
+        let [pID, name] = await this.getItemInformation(this.state.idNew)
+        if (pID != 0){
+            let temp = await fetch(`https://${this.props.serveoname}/products/GITinformation?varID=${encodeURIComponent(this.state.idNew)}&productID=${encodeURIComponent(pID)}`, {
+            method: 'get',
+            })
+            let tempJSON = await temp.json()
+            let newItem = {
+            variantid: this.state.idNew,
+            reason: 'Other',
+            store:this.props.item.store,
+            flag: '1',
+            status: this.state.status,
+            name: name,
+            variantidGIT: tempJSON.variant,
+            productidGIT: tempJSON.product,
+            productid: pID.toString()
+        }
+        //get GIT information
+        console.log(newItem)
+        this.setState({idNew:''})
+        //callback to make new product
+        this.props.addItem(newItem, this.props.item)
+        }
+        else{
+            alert('THIS IS NOT A VALID VARIANT ID')
+        }
+    }
+
+    async getItemInformation(varID){
+        let temp = await fetch(`https://${this.props.serveoname}/products/all`, {
+            method: 'get',
+            })
+        let productID = '0'
+        let name = 'name'
+        let productsJSON = await temp.json()
+        for (var i = 0;i<productsJSON.products.length;i++){
+            let tempItem = productsJSON.products[i]
+            for (var j=0;j<tempItem.variants.length;j++){
+                let tempVar = tempItem.variants[j]
+                if (tempVar.id == varID){
+                    productID = tempVar.product_id
+                    name = tempItem.title + ' - ' + tempVar.title
+                }
+            }
+        }
+        return [productID, name]
     }
 
     //handle selecting a change in quantity
@@ -93,6 +151,7 @@ class Item extends Component {
             let tJSON = await temp.json()
             imageID = tJSON.variant.product_id
         }
+
         fetch(`https://${this.props.serveoname}/products/img?id=${encodeURIComponent(imageID)}`, {
         method: 'GET',})
         .then(response => response.json())
@@ -223,122 +282,188 @@ class Item extends Component {
         }
         //this method used by sorting centre to display
         else if (this.props.step == 4){
-            return(
-                <div className = "itemContainerSC">
-                    <div className ='container1SC'>
-                        <hr className = 'horiz'/>
-                        <img className = 'item2' src = {this.state.src}/>
+            if (this.props.item.flag != '-1'){
+                return(
+                    <div className = "itemContainerSC">
+                        <div className ='container1SC'>
+                            <hr className = 'horiz'/>
+                            <img className = 'item2' src = {this.state.src}/>
+                        </div>
+                        <div className = 'vert'>
+                            <hr className = 'vert'/>
+                        </div>
+                        <div className ='container1SC'>
+                            <hr className = 'horiz'/>
+                            <br/><br/>
+                            <p className = 'item' > {this.props.item.name} </p>   
+                        </div>
+                        <div className = 'vert'>
+                            <hr className = 'vert'/>
+                        </div>
+                        <div className = 'container1SC'>
+                            <hr className = 'horiz'/>
+                            <br/><br/>
+                            <p className = 'item'>{this.props.item.variantid}</p>
+                        </div>
+                        <div className = 'vert'>
+                            <hr className = 'vert'/>
+                        </div>
+                        <div className = 'container1SC'>
+                            <hr className = 'horiz'/>
+                            <br/><br/>
+                            <p className = 'item'>{this.props.item.productid}</p>
+                        </div>
+                        <div className = 'vert'>
+                            <hr className = 'vert'/>
+                        </div>
+                        <div className = 'container1SC' >
+                            <hr className = 'horiz'/>
+                            <br/><br/>
+                            <p className = 'item'> {this.props.item.reason}</p>
+                        </div>
+                        <div className = 'vert'>
+                            <hr className = 'vert'/>
+                        </div>
+                        <div className ='container1SC'>
+                            <hr className = 'horiz'/>
+                            <br/><br/>
+                                <select value={this.state.status} onChange={this.handleStatusChange}>
+                                    <option value="submitted">Submitted</option>
+                                    <option value="accepted">Accepted - Resell</option>
+                                    <option value="returning">Accepted - No Resell</option>
+                                    <option value="rejected">Rejected</option>
+                                </select>
+                        </div>
+                        <div className = 'vert'>
+                            <hr className = 'vert'/>
+                        </div>
+                        <div className = 'container1SC'>
+                            <hr className = 'horiz'/>
+                            <br/><br/>
+                            <input onChange = {this.handleNewIDChange} value = {this.state.idNew}></input>
+                            <button onClick = {this.makeNewProduct}>SUBMIT</button>
+                        </div>
                     </div>
-                    <div className = 'vert'>
-                        <hr className = 'vert'/>
-                    </div>
-                    <div className ='container1SC'>
-                        <hr className = 'horiz'/>
-                        <br/><br/>
-                        <p className = 'item' > {this.props.item.name}  </p>   
-                    </div>
-                    <div className = 'vert'>
-                        <hr className = 'vert'/>
-                    </div>
-                    <div className = 'container1SC'>
-                        <hr className = 'horiz'/>
-                        <br/><br/>
-                        <p className = 'item'>{this.props.item.variantid}</p>
-                    </div>
-                    <div className = 'vert'>
-                        <hr className = 'vert'/>
-                    </div>
-                    <div className = 'container1SC'>
-                        <hr className = 'horiz'/>
-                        <br/><br/>
-                        <p className = 'item'>{this.props.item.productid}</p>
-                    </div>
-                    <div className = 'vert'>
-                        <hr className = 'vert'/>
-                    </div>
-                    <div className = 'container1SC'>
-                        <hr className = 'horiz'/>
-                        <br/><br/>
-                        <p className = 'item'> {this.props.item.reason}</p>
-                    </div>
-                    <div className = 'vert'>
-                        <hr className = 'vert'/>
-                    </div>
-                    <div className ='container1SC'>
-                        <hr className = 'horiz'/>
-                        <br/><br/>
+                )
+            }
+            else{
+                return(
+                    <div className = "itemContainerSC">
+                        <div className ='container1SC'style = {this.state.style}>
+                            <hr className = 'horiz'/>
+                            <img className = 'item2' src = {this.state.src}/>
+                        </div>
+                        <div className = 'vert'>
+                            <hr className = 'vert'/>
+                        </div>
+                        <div className ='container1SC' style = {this.state.style}>
+                            <hr className = 'horiz'/>
+                            <br/><br/>
+                            <p className = 'item' > {this.props.item.name} </p>   
+                        </div>
+                        <div className = 'vert'>
+                            <hr className = 'vert'/>
+                        </div>
+                        <div className = 'container1SC' style = {this.state.style}>
+                            <hr className = 'horiz'/>
+                            <br/><br/>
+                            <p className = 'item'>{this.props.item.variantid}</p>
+                        </div>
+                        <div className = 'vert'>
+                            <hr className = 'vert'/>
+                        </div>
+                        <div className = 'container1SC' style = {this.state.style}>
+                            <hr className = 'horiz'/>
+                            <br/><br/>
+                            <p className = 'item'>{this.props.item.productid}</p>
+                        </div>
+                        <div className = 'vert'>
+                            <hr className = 'vert'/>
+                        </div>
+                        <div className = 'container1SC' style = {this.state.style}>
+                            <hr className = 'horiz'/>
+                            <br/><br/>
+                            <p className = 'item'> {this.props.item.reason}</p>
+                        </div>
+                        <div className = 'vert'>
+                            <hr className = 'vert'/>
+                        </div>
+                        <div className ='container1SC' style = {this.state.style} >
+                            <hr className = 'horiz'/>
+                            <br/><br/>
                             <select value={this.state.status} onChange={this.handleStatusChange}>
-                                <option value="submitted">Submitted</option>
-                                <option value="accepted">Accepted - Resell</option>
-                                <option value="returning">Accepted - No Resell</option>
-                                <option value="rejected">Rejected</option>
-                            </select>
+                                    <option value="submitted">Submitted</option>
+                                    <option value="accepted">Accepted - Resell</option>
+                                    <option value="returning">Accepted - No Resell</option>
+                                    <option value="rejected">Rejected</option>
+                                </select>
+                        </div>
+                        <div className = 'vert'>
+                            <hr className = 'vert'/>
+                        </div>
+                        <div className = 'container1SC' style = {this.state.style} >
+                            <hr className = 'horiz'/>
+                            <br/><br/>
+                            <p className = 'item'>N/A</p>
+                        </div>
                     </div>
-                    <div className = 'vert'>
-                        <hr className = 'vert'/>
-                    </div>
-                    <div className = 'container1SC'>
-                        <hr className = 'horiz'/>
-                        <br/><br/>
-                        <input onChange = {this.handleNewIDChange} value = {this.state.idNew}></input>
-                    </div>
-                </div>
-            )
+                )
+            }
         }
         else if (this.props.step == 5){
             return(
                 <div className = "itemContainerSC">
-                    <div className ='container2SC'>
-                        <hr className = 'horiz'/>
-                        <img className = 'item2' src = {this.state.src}/>
+                        <div className ='container2SC'>
+                            <hr className = 'horiz'/>
+                            <img className = 'item2' src = {this.state.src}/>
+                        </div>
+                        <div className = 'vert'>
+                            <hr className = 'vert'/>
+                        </div>
+                        <div className ='container2SC'>
+                            <hr className = 'horiz'/>
+                            <br/><br/>
+                            <p className = 'item' > {this.props.item.store}  </p>   
+                        </div>
+                        <div className = 'vert'>
+                            <hr className = 'vert'/>
+                        </div>
+                        <div className = 'container2SC'>
+                            <hr className = 'horiz'/>
+                            <br/><br/>
+                            <p className = 'item'>{this.props.item.name}</p>
+                        </div>
+                        <div className = 'vert'>
+                            <hr className = 'vert'/>
+                        </div>
+                        <div className = 'container2SC'>
+                            <hr className = 'horiz'/>
+                            <br/><br/>
+                            <p className = 'item'>{this.props.item.variantid}</p>
+                        </div>
+                        <div className = 'vert'>
+                            <hr className = 'vert'/>
+                        </div>
+                        <div className = 'container2SC'>
+                            <hr className = 'horiz'/>
+                            <br/><br/>
+                            <p className = 'item'>{this.props.item.productid}</p>
+                        </div>
+                        <div className = 'vert'>
+                            <hr className = 'vert'/>
+                        </div>
+                        <div className = 'container2SC'>
+                            <hr className = 'horiz'/>
+                            <br/>
+                            <p className = 'item'> Expected: {this.props.item.quantity}</p>
+                            <br/>
+                            <p> Actual: 
+                            <input className = 'numInput' value = {this.props.item.value} onChange = {this.handleQuantityChangeSortingCenter}></input>
+                            </p>
+                        </div>
                     </div>
-                    <div className = 'vert'>
-                        <hr className = 'vert'/>
-                    </div>
-                    <div className ='container2SC'>
-                        <hr className = 'horiz'/>
-                        <br/><br/>
-                        <p className = 'item' > {this.props.item.store}  </p>   
-                    </div>
-                    <div className = 'vert'>
-                        <hr className = 'vert'/>
-                    </div>
-                    <div className = 'container2SC'>
-                        <hr className = 'horiz'/>
-                        <br/><br/>
-                        <p className = 'item'>{this.props.item.name}</p>
-                    </div>
-                    <div className = 'vert'>
-                        <hr className = 'vert'/>
-                    </div>
-                    <div className = 'container2SC'>
-                        <hr className = 'horiz'/>
-                        <br/><br/>
-                        <p className = 'item'>{this.props.item.variantid}</p>
-                    </div>
-                    <div className = 'vert'>
-                        <hr className = 'vert'/>
-                    </div>
-                    <div className = 'container2SC'>
-                        <hr className = 'horiz'/>
-                        <br/><br/>
-                        <p className = 'item'>{this.props.item.productid}</p>
-                    </div>
-                    <div className = 'vert'>
-                        <hr className = 'vert'/>
-                    </div>
-                    <div className = 'container2SC'>
-                        <hr className = 'horiz'/>
-                        <br/>
-                        <p className = 'item'> Expected: {this.props.item.quantity}</p>
-                        <br/>
-                        <p> Actual: 
-                        <input className = 'numInput' value = {this.props.item.value} onChange = {this.handleQuantityChangeSortingCenter}></input>
-                        </p>
-                    </div>
-                </div>
-            )
-        }
+                )
+            }
     }
 }
 
