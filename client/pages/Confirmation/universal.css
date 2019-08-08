@@ -181,13 +181,6 @@ button.Blackout1{
 }
 
 /*input fields(text boxes)*/
-/* input.p1[type=text]{
-  padding: 12px 20px;
-  box-sizing: border-box;
-  margin: auto;
-  display: block;
-  border-radius: 2%
-} */
 div.Search{
   position: fixed;
   width: 100%;
@@ -294,8 +287,11 @@ p.errorMessage{
 Select.qty{
   max-width: 10%
 }
+.Select-menu-outer {
+  z-index: 999 !important;
+}
 div.container1{
-  width:30%;
+  width:26%;
   /* float:left; */
   /* height:150px; */
   text-align:center;
@@ -345,7 +341,8 @@ fieldset.page2{
   max-width:750px;
   min-width:288px;
   overflow-x:auto;
-  border:0
+  padding-bottom:120px;
+  border:0;
 }
 /*fieldset.page2{
   margin-left: 25%;
@@ -354,7 +351,7 @@ fieldset.page2{
 }*/
 .itemContainer{
   display: flex;
-  max-height: 170px;
+  max-height: 150px;
   padding: 15px 0;
   align-items: center;
   border-bottom: 0.5px solid #999;
@@ -394,6 +391,9 @@ p.variantTitle{
   }
   .container3 p {
     font-size: 1.0em;
+  }
+  .reasonSelect{
+    font-size: 0.76em   
   }
 }
 /*End Second Page.........................................................*/
@@ -735,8 +735,10 @@ footer.f1{
   background-color: #fafafa
 }
 /* Hide scrollbar in itemList */
-::-webkit-scrollbar { display: none !important }
-::-webkit-scrollbar { display: none !important }
+::-webkit-scrollbar { display: none }
+select__menu-list::-webkit-scrollbar {
+  display: block !important
+}
 div.itemList{
   /* max-height:100vh;
   overflow-y:auto; */

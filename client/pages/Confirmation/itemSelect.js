@@ -31,6 +31,11 @@ class ItemList extends Component {
         this.handleSubmit = this.handleSubmit.bind(this)
     }
 
+    //back to page top
+    componentDidMount(){
+        window.scrollTo(0, 0)
+    }
+
     //handle submit of items
     handleSubmit(){//this is a failsafe, shouldn't ever happen because button will be grey
         if (this.returnItems.length == 0){

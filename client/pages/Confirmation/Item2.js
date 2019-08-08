@@ -173,6 +173,9 @@ class Item extends Component {
         this.setState({quantities:quantityArr})
     }
 
+    componentDidMount(){
+        window.scrollTo(0, 0)
+    }
 
     render() {
         //get total quantity from state and pass it to return quantity
@@ -224,7 +227,7 @@ class Item extends Component {
                         </div>
                         <div className = 'container3'>
                         <label >Quantity for Return: </label>
-                            <Select className = 'qty' placeholder = {'0'}value={this.state.activeQuantity} onChange={this.handleQuantityChange} options = {this.state.quantities}>
+                            <Select className = 'qty dropDown' placeholder = {'0'}value={this.state.activeQuantity} onChange={this.handleQuantityChange} options = {this.state.quantities} menuContainerStyle={{'zIndex': 999}}>
                             </Select>
                         </div>
                       
@@ -248,7 +251,7 @@ class Item extends Component {
                     <div className = 'container3'>
                         {/* dropdown menu to choose return reason */}
                         <label>Reason for return:
-                            <Select placeholder = {'Reason'}value={this.state.activeReason} onChange={this.handleReasonChange} options = {this.state.reasons}>
+                            <Select className = "reasonSelect" placeholder = {'Reason'}value={this.state.activeReason} onChange={this.handleReasonChange} options = {this.state.reasons} maxMenuHeight={120}>
                             </Select>
                         </label>
                     </div>
