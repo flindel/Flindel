@@ -18,11 +18,43 @@ p {
 }
 /*Navbar.......................................................*/
 /*Store name order portal*/
+/* placeholder for fixed navbar without progress bar */
+div.top-fixed{
+  margin-top:24vh;
+}
+/* placeholder for fixed navbar with progress bar */
+div.top-fixed-bar{
+  height: calc(24vh + 50px);
+  background-color: #fafafa;
+}
+div.navbar{
+  position:fixed;
+  z-index:100;
+  width:100%;
+  background-color: #fafafa;
+  height:24vh;
+  left: 0;
+  top:0;
+}
+div.navbarPB{
+  position: fixed;
+  z-index: 100;
+  width: 100%;
+  background-color: #fafafa;
+  height: calc(24vh + 50px);
+  left: 0;
+  top: 0;
+}
 h1.top{
   font-size:180%;
   text-align: center;
-  padding-bottom: 10px
+  padding-bottom: 10px;
+  padding-top:20px
 }
+/* .PBbackgound{
+  height:50px;
+  background-color: #fafafa
+} */
 .containerPB {
   margin: auto;
   max-width:600px;
@@ -96,8 +128,8 @@ img.headerLogo{
   background-color:black;
   display:block;
   max-height:13vh;
-  max-width:13vh;
-  margin-left: 5vh;
+  max-width:50vh;
+  padding:3vh;
   width:auto;
   height:auto;
 }
@@ -156,6 +188,10 @@ button.Blackout1{
   display: block;
   border-radius: 2%
 } */
+div.Search{
+  position: fixed;
+  width: 100%;
+}
 .Search-block{
   display: inline-block;
   position: relative;
@@ -307,7 +343,7 @@ img.item2{
 fieldset.page2{
   margin: auto;
   max-width:750px;
-  min-width:360px;
+  min-width:288px;
   overflow-x:auto;
   border:0
 }
@@ -333,7 +369,9 @@ p.item2{
   padding-right:20px;
   padding-left:15px
 }
-
+.container3 p {
+  font-size: 1.35em;
+}
 p.title {
   font-weight: 400;
   font-size:1.5em
@@ -354,29 +392,50 @@ p.variantTitle{
     font-size: 0.8em;
     padding-left: 0px
   }
+  .container3 p {
+    font-size: 1.0em;
+  }
 }
 /*End Second Page.........................................................*/
 /*Third Page (Reason Select)..............................................*/
-
+/*Email form*/
+div.getEmail{
+  position:fixed;
+  left:0;
+  right:0;
+  bottom: calc(46px + 6vh);
+  background-color: #fafafa;
+}
+.getEmail img {
+  width: 19px;
+  margin-bottom: -3px;
+}
 /*Label for email (email indent)*/
+span.emailLabel{
+  width: 130px;
+  text-align: left;
+  display: inline-block;
+}
 label.l3On{
   margin:auto;
   text-align:center;
+  font-size:100%
 }
 label.l3Off{
   color: grey;
   text-align:center;
-  font-size: 80%;
+  font-size: 100%;
   margin:auto;
 }
 label.l3Hidden{
   text-align:center;
-  visibility: hidden;
+  display:none;
   margin:auto;
 }
 input.l3On{
   color: black;
   width:auto;
+  font-size:100%;
   max-width: 600px;
   text-align:center;
   margin:auto;
@@ -385,7 +444,7 @@ input.l3Off{
   color:grey;
   font-size: 100%;
   width:auto;
-  max-width: 500px;
+  max-width: 600px;
   text-align:center;
   margin:auto;
   padding:none;
@@ -394,6 +453,8 @@ input.l3Off{
 h3.emailHead{
   text-align:center;
   font-size: 150%;
+  padding-bottom:9px;
+  padding-top: 9px;
 }
 p.emailText{
   margin:auto;
@@ -409,35 +470,35 @@ h3.pageTitle4{
 div.centre{
   text-align: center;
   width: 80%;
-  max-width: 570px;
-  margin: 0 auto;
+  max-width: 1000px;
+  margin: 20px auto;
 }
-.confirmTitle {
-  font-size: 180%;
-  padding-bottom: 30px;
+.explanation {
+  text-align: left;
+  padding-bottom:20px;
 }
 .confirmCode {
-  padding-bottom:10px
+  font-size: 180%;
+  padding-bottom: 30px;
+  padding-top: 20px;
 }
-.centre p{
-  margin-bottom:20px;
+.confirmTitle {
+  padding-bottom:10px
 }
 div.confirmation1{
   width:80%;
-  max-width: 570px;
+  max-width: 1000px;
   margin:0 auto;
   text-align:center;
   padding-top: 20px;
 }
-
-
 .instructions p {
   text-align: left;
   padding-bottom: 10px
 }
 div.confirmation2{
   width: 80%;
-  max-width:570px;
+  max-width:1000px;
   margin: 0 auto;
   text-align:center;
   padding-top: 20px;
@@ -457,13 +518,16 @@ div.instructions{
   margin-left: 10px
 }
 .dropLocations{
-  display:flex
+  display:flex;
+  position:relative;
+  overflow: hidden;
+  min-height: 300px
 }
 .confirmation2 h2{
   padding-bottom:25px
 }
 .dropAdd{
-  margin-left:300px
+  margin-left:500px
 }
 .dropAddress{
   text-align:left;
@@ -471,28 +535,40 @@ div.instructions{
 }
 .mapContainer{
   position: absolute;
-  width: 800px;
-  height: 100%;
+  width: 1300px;
+  height: 600px;
+}
+.customerService{
+  color: #555555;
+  margin-top: 30px;
+  margin-bottom:30px;
 }
 @media only screen and (max-width: 700px){
   .dropLocations{
     display: flex;
     flex-wrap: wrap;
+    position: relative;
+    overflow: hidden;
   }
   .mapContainer {
     position: absolute;
-    width: 220%;
-    height: 100%;
+    width: 260%;
+    height: 600px;
   }
   .dropAdd{
     width:100%;
     margin-top:338px;
     margin-left:0px
   }
+  .customerService{
+    color: #555555;
+    margin-top: 30px;
+    margin-bottom:30px;
+  }
 }
 @media only screen and (max-width: 640px){
   div.centre{
-    max-width: 95%;
+    max-width: 99%;
   }
 }
 
@@ -518,6 +594,7 @@ body{
   right: 0;
   bottom: 0;
   margin: auto;
+  z-index: 200;
   background-color: rgba(0,0,0, 0.5);
 }
 .popup_inner {
@@ -639,21 +716,38 @@ button.r2delete:active {
 }
 
 /*End Restart Popup........................................................*/
-
+div.fixed-footer{
+  width: 100%;
+  height: calc(46px + 5vh);
+}
+div.fixed-footer-email{
+  height:calc(150px + 5vh);
+  width:100%;
+}
 footer.f1{
   position: fixed;
+  z-index:100;
   left:0;
   right:0;
-  bottom: 3vh;
+  bottom: 0;
+  padding-bottom:3vh;
+  padding-top:3vh;
+  background-color: #fafafa
 }
-
+/* Hide scrollbar in itemList */
+::-webkit-scrollbar { display: none !important }
+::-webkit-scrollbar { display: none !important }
 div.itemList{
-  max-height:45vh;
-  overflow-y:auto;
+  /* max-height:100vh;
+  overflow-y:auto; */
+  -ms-overflow-style: none;
+  overflow: -moz-scrollbars-none;
 }
 div.itemListSmall{
-  max-height:45vh;
-  overflow-y:auto;
+  /* max-height:100vh;
+  overflow-y:auto; */
+  -ms-overflow-style: none;
+  overflow: -moz-scrollbars-none;
 }
 
 div.loading{

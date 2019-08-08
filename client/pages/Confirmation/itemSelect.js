@@ -93,7 +93,7 @@ class ItemList extends Component {
                         })}
                     </fieldset>  
                 </div>
-                <br/>
+                <div className = 'fixed-footer'></div>
                 <footer className = 'f1'>
                     <button className = {this.state.style} onClick={this.handleSubmit}>CONTINUE</button> 
                 </footer>                 

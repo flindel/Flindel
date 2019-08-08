@@ -20,11 +20,11 @@ class finalPage extends React.Component{
                 </fieldset>
             </div>
             <br/>
-            {/* if review == true, do not show submit button */}
+            {/* if on review and restart button, do not show submit button */}
             {
-                this.props.review? null:(<footer className = 'f1'>
+                this.props.review? null:(<div><div className = 'fixed-footer'></div><footer className = 'f1'>
                 <button className = 'Submit2' onClick = {this.props.finishOrder}>SUBMIT</button>
-            </footer>)
+            </footer></div>)
             }
             
         </div>
