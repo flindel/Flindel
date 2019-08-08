@@ -178,6 +178,9 @@ class Item extends Component {
         this.setState({quantities:quantityArr})
     }
 
+    componentDidMount(){
+        window.scrollTo(0, 0)
+    }
 
     render() {
         //get total quantity from state and pass it to return quantity
@@ -229,7 +232,7 @@ class Item extends Component {
                         </div>
                         <div className = 'container3'>
                         <label >Quantity for Return: </label>
-                            <Select className = 'qty' placeholder = {'0'}value={this.state.activeQuantity} onChange={this.handleQuantityChange} options = {this.state.quantities}>
+                            <Select className = 'qty dropDown' placeholder = {'0'}value={this.state.activeQuantity} onChange={this.handleQuantityChange} options = {this.state.quantities} menuContainerStyle={{'zIndex': 999}}>
                             </Select>
                         </div>
                       
@@ -253,7 +256,7 @@ class Item extends Component {
                     <div className = 'container3'>
                         {/* dropdown menu to choose return reason */}
                         <label>Reason for return:
-                            <Select placeholder = {'Reason'}value={this.state.activeReason} onChange={this.handleReasonChange} options = {this.state.reasons}>
+                            <Select className = "reasonSelect" placeholder = {'Reason'}value={this.state.activeReason} onChange={this.handleReasonChange} options = {this.state.reasons} maxMenuHeight={120}>
                             </Select>
                         </label>
                     </div>
@@ -270,15 +273,16 @@ class Item extends Component {
                     <div className ='container2'>
                         <p className = 'item2 title'>{this.props.item.title}</p>
                         <p className = 'item2 variantTitle'>{this.props.item.variantTitle}</p>
-                    {
+                        <p className = 'item2'>QTY: {this.props.item.value}</p>
+                    {/* {
                         //show item.quantity as QTY in review page, show item.value as QTY in confirmation page
-                        this.props.review?(<p className = 'item2'>QTY: {this.props.item.quantity}</p>):(<p className = 'item2'>QTY: {this.props.item.value}</p>)
-                    }
+                        this.props.review?(<p className = 'item2'>QTY: {this.props.item.value}</p>):(<p className = 'item2'>QTY: {this.props.item.value}</p>)
+                    } */}
                         
                     </div>
-                    <div className ='container3'>
+                    <div className ='container3 confirmList'>
                         
-                        <p className = 'item2 '>Reason:{this.props.item.reason}</p>
+                        <p className = 'item2 '>Reason: {this.props.item.reason}</p>
                     </div>
                    
                 </div>

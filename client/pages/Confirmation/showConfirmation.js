@@ -28,11 +28,11 @@ class finalPage extends React.Component{
         return(
             <div>
                 <div className = 'centre'>
-                    <h2 className = 'confirmTitle'>Thank you for your return request.</h2>
+                    <h2 className = 'confirmCode'>Your confirmation code is: <strong>{this.props.code}</strong></h2>
                     
-                    <h3 className = 'confirmCode'>Your confirmation code is: <strong>{this.props.code}</strong></h3>
+                    <h3 className = 'confirmTitle'>Thank you for your return request.</h3>
                     
-                    <p>A confirmation email has been sent to {this.props.email}. To make sure that we can process your return as quickly as possible, please follow these steps when returning your package.</p>
+                    <p className = 'explanation'>A confirmation email has been sent to {this.props.email}. To make sure that we can process your return as quickly as possible, please follow these steps when returning your package.</p>
                     <button className = 'Submit2' onClick = {this.sendEmail}>Resend email</button>
                 </div>
                 <br></br>
@@ -60,9 +60,11 @@ class finalPage extends React.Component{
                         <p className = 'dropAddress'>4. 159 Wilson Street (Starbucks)</p>
                         <p className = 'dropAddress'>5. 354 Bay Street (Store)</p>
                     </div>
-                    </div>
-                    
-                </div>        
+                    </div>         
+                </div>   
+                <div className = "customerService">
+                    <p>If you have any question, <br />please contact us at <a href="mailto:customerservice@flindel.com">customerservice@flindel.com</a></p>
+                </div>     
             </div>
         )
     }
