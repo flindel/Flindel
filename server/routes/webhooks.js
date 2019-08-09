@@ -32,11 +32,15 @@ router.post("/hookendpoint", webhookFulfillment, ctx => {
     if (hookload.line_items[i].fulfillment_service == "flindel") {
       console.log("found flindel");
       let fJSON = ctx.request.body.line_items;
-      sendEmail(fJSON);
+      ///sendEmail(fJSON);
       fetch(
-        `https://${SERVEO_NAME}.serveo.net/dbcall/update_order_database?items=${fJSON}&id=${encodeURIComponent(
-          JSON.stringify(hookload.order_id)
-        )}`,
+        `https://${SERVEO_NAME}.serveo.net/dbcall/update_order_database?items=${encodeURIComponent(
+          JSON.stringify(hookload.line_items)
+        )}&destination=${encodeURIComponent(
+          JSON.stringify(hookload.destination)
+        )}&fulf_id=${encodeURIComponent(
+          hookload.id
+        )}&order_id=${encodeURIComponent(hookload.order_id)}`,
         {
           method: "post"
         }
@@ -52,31 +56,47 @@ router.post("/hookendpoint", webhookFulfillment, ctx => {
 //listner for order webhook
 router.post("/hookorderendpoint", webhookOrder, async ctx => {
   let hookload = ctx.request.body;
+  let foundFlindel = false;
+  //create list of flindel GIT items
+  let flindelItems = [];
+  for (let i = 0; i < hookload.line_items.length; i++) {
+    if (hookload.line_items[i].fulfillment_service == "flindel") {
+      foundFlindel = true;
+      let orderObject = {
+        title: hookload.line_items[i].title,
+        id: hookload.line_items[i].id,
+        quantity: hookload.line_items[i].quantity
+      };
+      flindelItems.push(orderObject);
+    }
+  }
 
-  let address =
-    hookload.shipping_address.address1 +
-    "," +
-    hookload.shipping_address.city +
-    "," +
-    hookload.shipping_address.province;
+  if (foundFlindel == true) {
+    let address =
+      hookload.shipping_address.address1 +
+      "," +
+      hookload.shipping_address.city +
+      "," +
+      hookload.shipping_address.province;
 
-  let latlng = await getLatLng(address);
-  console.log("WHY ", latlng);
-  latlng = latlng.results[0].geometry.location;
-  let validLocation = calculateDistance(latlng);
-  //console.log(distance);
-  if (validLocation == false) {
-    console.log("TOO FAR");
-    fetch(
-      `https://${SERVEO_NAME}.serveo.net/orders/cancel?id=${encodeURIComponent(
-        JSON.stringify(hookload.id)
-      )}`,
-      {
-        method: "post"
-      }
-    ).then(function(Response) {
-      //console.log(Response);
-    });
+    let latlng = await getLatLng(address);
+    // console.log("WHY ", latlng);
+    latlng = latlng.results[0].geometry.location;
+    let validLocation = calculateDistance(latlng);
+    //console.log(distance);
+    if (validLocation == false) {
+      console.log("TOO FAR");
+      fetch(
+        `https://${SERVEO_NAME}.serveo.net/sendEmail/brand?package=${encodeURIComponent(
+          JSON.stringify(flindelItems)
+        )}`,
+        {
+          method: "post"
+        }
+      ).then(function(Response) {
+        //console.log(Response);
+      });
+    }
   }
   ctx.response.status = 200;
   ctx.body = "OK";

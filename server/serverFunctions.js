@@ -28,7 +28,7 @@ function calculateDistance(p1) {
 
 function sendEmail(json) {
   fetch(
-    `https://${serveo_name}.serveo.net/sendEmail?package=${encodeURIComponent(
+    `https://${serveo_name}.serveo.net/sendEmail/warehouse?package=${encodeURIComponent(
       JSON.stringify(json)
     )}`,
     {

@@ -86,12 +86,6 @@ app.prepare().then(() => {
           accessToken,
           shop
         });
-        // const registration = await registerWebhook({
-        //   address: "https://suus.serveo.net/hookendpoint",
-        //   topic: "PRODUCTS_CREATE",
-        //   accessToken,
-        //   shop
-        // });
         if (registration.success) {
           console.log("webhooks registered");
         } else {
