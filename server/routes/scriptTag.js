@@ -9,7 +9,7 @@ const router = Router({
 });
 
  //!!!!!!!!import should change this to '/shopify after finish'
-  router.post('/', async ctx => {
+  router.post('/shopify', async ctx => {
       // post a scripttag to shopify
       const { shop, accessToken } = getShopHeaders(ctx);
       const headers = {};
@@ -42,6 +42,7 @@ const router = Router({
 
   //delete a scriptTag from shopify API
   router.delete('/shopify', async ctx => {
+      console.log('call delete shopify')
     const { shop, accessToken } = getShopHeaders(ctx);
     const headers = {};
     if (process.env.DEBUG) {
@@ -71,9 +72,16 @@ const router = Router({
     }
   })
 
-  //get all scriptTags' url for a shop
+  //get all scriptTags' src for a shop
   router.get('/db/src', async ctx => {
-    let shop = ctx.query.shop;
+    //let shop = ctx.query.shop;
+    const { shop, accessToken } = getShopHeaders(ctx);
+    const headers = {};
+    if (process.env.DEBUG) {
+        headers['Authorization'] = process.env.SHOP_AUTH;
+    } else {
+        headers['X-Shopify-Access-Token'] = accessToken;
+    }
     db = ctx.db
     let myRef = db.collection('scripttag').doc(shop);
     try{
@@ -84,43 +92,31 @@ const router = Router({
         console.log("Err on getting doc in scripttag collection", err)
     }
 
-    //update a single scripttag id in firebase
-    //call this right after finishing posting scriptTag to Shopify API
-    router.push('/db/id', async ctx => {
-        let shop = ctx.query.shop
-        let id = ctx.query.id
-        let url = ctx.query.url
-        //define nestedIdentifier
-        let src = `src.${url}`
+    //update scripttags id and other info after posting to shopify
+    router.put('/db/updateid', async ctx => {
+        const { shop, accessToken } = getShopHeaders(ctx);
+        const headers = {};
+        if (process.env.DEBUG) {
+            headers['Authorization'] = process.env.SHOP_AUTH;
+        } else {
+            headers['X-Shopify-Access-Token'] = accessToken;
+        }
+        let resp = await JSON.parse(ctx.query.resp)
+        console.log("called")
         db = ctx.db
-        let updateIdQuery = db.collection('scripttag').doc(shop).update({
-            src:id
-        })
+        let myRef = db.collection('scripttag').doc(shop)
+        updateFields = myRef.update({scripts:resp})
+        updateStatus = myRef.update({status: "active"})
         ctx.body={'success':true}
     })
 
-    //get all scripttag ids of a single store from firebase
-    router.get('/db/ids', async ctx =>{
-        let ids = []
-        let shop = ctx.query.shop
-        db = ctx.db
-        let myRef = db.collection('scripttag').doc(shop);
-        try{
-            getDoc = await myRef.get()
-            //Array of all scriptTag ids of a single store
-            ids = getDoc.data().src.values()
-            ctx.body = {'ids':ids}
-
-        }catch(err){
-            console.log("Err on getting doc in scripttag collection", err)
-        }
-    })
 
     //delete certain doc in scripttag collection, should be called after deleting scriptTag from Shopify API when uninstall APP
-    router.delete('/db', async ctx =>{
-        let shop = ctx.query.shop
+    router.put('/db/status', async ctx =>{
+        const { shop, accessToken } = getShopHeaders(ctx);
         db = ctx.db
-        let deleteDoc = db.collection('scripttag').doc(shop).delete()
+        let myRef = db.collection('scripttag').doc(shop)
+        let updateFields = myRef.update({status:"revert"})
         ctx.body = {'success':true}
     })
 
@@ -128,34 +124,18 @@ const router = Router({
 
 
   //getting all scriptTag id. !!!!!TESTING function for Aug 1st meeting
-   router.get('/getallids', async ctx =>{
+   router.get('/db/ids', async ctx =>{
            // get all scripTag ids
-           //console.log(“get all scriptags”)
-           const { shop, accessToken } = getShopHeaders(ctx);
-           const headers = {}
-           if (process.env.DEBUG) {
-               headers['Authorization'] = process.env.SHOP_AUTH;
-           } else {
-               headers['X-Shopify-Access-Token'] = accessToken;
-           }
-           const option = {
-               url: `https://${shop}/${api_link}/script_tags.json`,
-               headers: headers,
-               json: true,
-           }
-           try {
-               ctx.body = await rp(option);
-               //console.log(JSON.stringify(ctx.body))
-           } catch (err) {
-               console.log(err.message);
-               if (err instanceof errors.StatusCodeError) {
-                   ctx.status = err.statusCode;
-                   ctx.message = err.message;
-               } else if (err instanceof errors.RequestError) {
-                   ctx.status = 500;
-                   ctx.message = err.message;
-               }
-           }
+           let ids = []
+        const { shop, accessToken } = getShopHeaders(ctx);
+        console.log("call db ids")
+        db = ctx.db
+        let myRef =await db.collection('scripttag').doc(shop).get();
+        let data = myRef.data().scripts
+        data.forEach( script => {
+            ids.push(script.id)
+        });
+        ctx.body = {'ids': ids}
    })
 
 module.exports = router;
