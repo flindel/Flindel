@@ -28,6 +28,7 @@
     "google-maps-react": "^2.0.2",
     "isomorphic-fetch": "^2.2.1",
     "koa": "^2.7.0",
+    "koa-better-http-proxy": "^0.2.4",
     "koa-bodyparser": "^4.2.1",
     "koa-combine-routers": "^4.0.2",
     "koa-router": "^7.4.0",
