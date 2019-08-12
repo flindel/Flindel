@@ -1,6 +1,7 @@
 require("isomorphic-fetch");
 const Koa = require("koa");
 const next = require("next");
+const cors = require('@koa/cors')
 const { default: createShopifyAuth } = require("@shopify/koa-shopify-auth");
 const dotenv = require("dotenv");
 const { verifyRequest } = require("@shopify/koa-shopify-auth");
@@ -14,6 +15,7 @@ const cronUtil = require("./util/cronFunction");
 const whTest = require("./util/webhookHelper"); //////////////////////
 const cron = require("cron");
 const { CronJob } = cron;
+const proxy = require('koa-better-http-proxy');
 /////////////
 const rp = require("request-promise");
 const errors = require("request-promise/errors");
@@ -56,8 +58,23 @@ app.prepare().then(() => {
   const server = new Koa();
   server.use(session(server));
   server.use(bodyParser());
+  server.use(cors());
+  //server.use(proxy('feritas.serveo.net'))
   server.use(async (ctx, next) => {
     if (ctx.db === undefined) ctx.db = db;
+    //console.log(ctx.request.host);
+    //console.log(ctx.request)
+    //----------------------------for app proxy---------------------
+    //if (ctx.request.host === 'feritas.serveo.net') {
+      //app.setAssetPrefix('');
+    //} else {
+      //app.setAssetPrefix('flindel-returns');
+    //}
+    //server.use(proxy('feritas.serveo.net'))
+    
+    app.setAssetPrefix('flindel-returns');
+    console.log(ctx)
+
     await next();
   });
   server.keys = [SHOPIFY_API_SECRET_KEY];
@@ -65,6 +82,7 @@ app.prepare().then(() => {
   server.use(
     createShopifyAuth({
       //THIS KEEPS GETTING DELETED AND I NEED IT
+      prefix:'/app/flindel-returns',
       apiKey: SHOPIFY_API_KEY,
       secret: SHOPIFY_API_SECRET_KEY,
       scopes: [
@@ -141,7 +159,7 @@ app.prepare().then(() => {
     })
   );
 
-  // server.use(verifyRequest());
+ //  server.use(verifyRequest());
   server.use(router());
   server.use(async ctx => {
     await handle(ctx.req, ctx.res);
