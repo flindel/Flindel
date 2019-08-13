@@ -13,6 +13,14 @@ router.get('/id/', async ctx => {
   ctx.body = JSON.stringify({shop_id: shop});
 });
 
+router.get('/initialization', async ctx => {
+    const shop = ctx.query.shop
+    console.log(shop)
+    ctx.cookies.set('shop_id',shop)
+    ctx.redirect(`https://${ctx.headers.host}`)
+    ctx.body = {'initilization': shop}
+})
+
 //get shop domain 
 router.get('/domain', async ctx =>{
   const { cookies } = ctx;
@@ -43,6 +51,7 @@ router.get('/domain', async ctx =>{
 })
 
 router.get('/returnPolicy', async ctx =>{
+    console.log(ctx)
     const { shop, accessToken } = getShopHeaders(ctx);
     db = ctx.db
     myRef = db.collection('store')
