@@ -75,6 +75,7 @@ async function clearPending(dbIn){
 //update inv for reselling items
 async function updateInventory(items, dbIn){
     db = dbIn
+    let blockedList = []
     for (var i = 0;i<items.length;i++){
         //get information for active item
             //let idActive = items[i].variantidGIT CHANGE IT TO THIS ONE WHEN WE ACTUALLY HAVE DUPLICATES
@@ -83,35 +84,10 @@ async function updateInventory(items, dbIn){
         //get access token for specific store
         let {accessToken, torontoLocation} = await inv.getAccessToken(db,storeActive)
         let invId = await inv.getInvID(storeActive, idActive, accessToken)
-        //switch to git somewhere in here
-        let blacklist = await checkBlacklist(items[i].productid, db, storeActive)
-        if (blacklist == true){
-            addItem(items[i], 'returning', db)
+        addItem(items[i], 'reselling', db)
+        inv.increment(items[i].quantity,torontoLocation,invId,storeActive)
         }
-        else{
-            //create item status reselling
-            addItem(items[i], 'reselling', db)
-            //add to shopify inv
-            inv.increment(items[i].quantity,torontoLocation,invId,storeActive)
-        }
-    }
-}
-
-//check to see if item is on blacklist
-async function checkBlacklist(productId, dbIn, store){
-    db = dbIn
-    //productID comes in as integer, database only responds to string
-    const target = productId.toString(10)
-    //let query = await myRef.where('productid','==',target).where('store','==',store).get()
-    myRef = db.collection('store')
-    let query = await myRef.doc(store).get()
-    let found = false
-    for (var i = 0;i<query._fieldsProto.blacklist.arrayValue.values.length;i++){
-        if (target == query._fieldsProto.blacklist.arrayValue.values[i].stringValue){
-            found = true
-        }
-    }
-    return found
+    emailHelper.sendBlockedListEmail(blockedList)
 }
 
 //add item to items database

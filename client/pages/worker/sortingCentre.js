@@ -1,12 +1,10 @@
 import React, {Component} from 'react';
-import Item from '../Confirmation/Item2'
-import Blacklist from './blacklistUniversal'
+import Item from './itemSC'
 import {serveo_name} from '../config'
 import './sorting.css'
 const sname = serveo_name
 const serveoname = sname.substring(8)
 
-/* NAVBAR to flip between map view and return portal view. Imported at the top of most pages */
 class sortingCentre extends Component{
     constructor(props){
         super(props);
@@ -22,10 +20,15 @@ class sortingCentre extends Component{
             fullList: [],
             store:'',
             type: 'All',
+            newStore:'',
+            newStatus:'',
+            newVarID: '',
+            newCode: '',
+            newOrder:''
         }
         this.handleSubmit = this.handleSubmit.bind(this)
         this.handlecCode = this.handlecCode.bind(this)
-        this.handleReasonChange = this.handleReasonChange.bind(this)
+        this.handleStatusChange = this.handleStatusChange.bind(this)
         this.handleSubmit2 = this.handleSubmit2.bind(this)
         this.resetAll = this.resetAll.bind(this)
         this.finalCheck = this.finalCheck.bind(this)
@@ -33,7 +36,8 @@ class sortingCentre extends Component{
         this.sendToDB = this.sendToDB.bind(this)
         this.dailyConfirm = this.dailyConfirm.bind(this)
         this.loadConfirmList = this.loadConfirmList.bind(this)
-        this.addItem = this.addItem.bind(this)
+        this.addItem4 = this.addItem4.bind(this)
+        this.addItem5 = this.addItem5.bind(this)
         this.setOpenTime = this.setOpenTime.bind(this)
         this.setCloseTime = this.setCloseTime.bind(this)
         this.submitConfirmation = this.submitConfirmation.bind(this)
@@ -42,8 +46,17 @@ class sortingCentre extends Component{
         this.viewAccepted = this.viewAccepted.bind(this)
         this.viewRejected = this.viewRejected.bind(this)
         this.viewAll = this.viewAll.bind(this)
+        this.handleNewInput = this.handleNewInput.bind(this)
+        this.sortList = this.sortList.bind(this)
+        this.getItemInformation = this.getItemInformation.bind(this)
     }
 
+    //handle input of new variant id
+    handleNewInput(e){
+        this.setState({[e.target.name]:e.target.value})
+    }
+
+    //view accepted items
     viewAccepted(){
         let tempList = []
         for (var i = 0;i<this.state.fullList.length;i++){
@@ -52,21 +65,10 @@ class sortingCentre extends Component{
             }
             
         }
-        for (var j = 0;j<tempList.length;j++){
-            for (var i = 0;i<tempList.length -1;i++){
-                if (tempList[i].flag == '-1' && tempList[i+1].flag!= '-1'){
-                    let tempItem = tempList[i]
-                    tempList[i] = tempList[i+1]
-                    tempList[i+1] = tempItem
-                }
-            }
-        }
-        for (var i = 0;i<tempList.length;i++){
-            tempList[i].index = i
-        }
+        tempList = this.sortList(tempList)
         this.setState({type: 'Accepted', confirmList: tempList})
     }
-
+    //view returning items
     viewReturning(){
         let tempList = []
         for (var i = 0;i<this.state.fullList.length;i++){
@@ -74,21 +76,10 @@ class sortingCentre extends Component{
                 tempList.push(this.state.fullList[i])
             }
         }
-        for (var j = 0;j<tempList.length;j++){
-            for (var i = 0;i<tempList.length -1;i++){
-                if (tempList[i].flag == '-1' && tempList[i+1].flag!= '-1'){
-                    let tempItem = tempList[i]
-                    tempList[i] = tempList[i+1]
-                    tempList[i+1] = tempItem
-                }
-            }
-        }
-        for (var i = 0;i<tempList.length;i++){
-            tempList[i].index = i
-        }
+        tempList = this.sortList(tempList)
         this.setState({type: 'Returning', confirmList: tempList})
     }
-
+    //view rejected items
     viewRejected(){
         let tempList = []
         for (var i = 0;i<this.state.fullList.length;i++){
@@ -96,6 +87,16 @@ class sortingCentre extends Component{
                 tempList.push(this.state.fullList[i])
             }
         }
+        tempList = this.sortList(tempList)
+        this.setState({type: 'Rejected', confirmList: tempList})
+    }
+    //view all items
+    viewAll(){
+        let itemList = this.sortList(this.state.fullList)
+        this.setState({type: 'All', confirmList:itemList})
+    }
+    //sorts items, used in above functions
+    sortList(tempList){
         for (var j = 0;j<tempList.length;j++){
             for (var i = 0;i<tempList.length -1;i++){
                 if (tempList[i].flag == '-1' && tempList[i+1].flag!= '-1'){
@@ -105,36 +106,20 @@ class sortingCentre extends Component{
                 }
             }
         }
+        //give each item index so it's easy to identify changes
         for (var i = 0;i<tempList.length;i++){
             tempList[i].index = i
         }
-        this.setState({type: 'Rejected', confirmList: tempList})
+        return tempList
     }
-
-    viewAll(){
-        let itemList = this.state.fullList
-        for (var j = 0;j<itemList.length;j++){
-            for (var i = 0;i<itemList.length -1;i++){
-                if (itemList[i].store > itemList[i+1].store ){
-                    let tempItem = itemList[i]
-                    itemList[i] = itemList[i+1]
-                    itemList[i+1] = tempItem
-                }
-            }
-        }
-        for (var i = 0;i<itemList.length;i++){
-            itemList[i].index = i
-        }
-        this.setState({type: 'All', confirmList:itemList})
-    }
-
+    //write time to firebase of when processing began
     setOpenTime(){
         fetch(`https://${serveoname}/return/requested/openTime?code=${encodeURIComponent(this.state.cCode)}`, 
         {
             method: 'PUT',
         })
     }
-
+    //write time to firebase of when processing ended
     setCloseTime(){
         fetch(`https://${serveoname}/return/requested/closeTime?code=${encodeURIComponent(this.state.cCode)}`, 
         {
@@ -142,31 +127,40 @@ class sortingCentre extends Component{
         })
     }
 
+    //handle submit of confirmation page
     submitConfirmation(){
-        let tempList = []
-        for (var i = 0;i<this.state.confirmList.length;i++){
-            if (this.state.confirmList[i].value == 0){
-                let conflict = {
-                    variantid: this.state.confirmList[i].variantid,
-                    status: this.state.confirmList[i].status,
-                    difference: -1
-                }
-                tempList.push(conflict)
+        let toContinue = true
+        //make sure each item was checked
+        for (var i = 0;i<this.state.fullList.length;i++){
+            if (this.state.fullList[i].value == 0){
+                toContinue = false
             }
         }
-        this.handleConflicts(tempList)
-        //this.setState({step:4})
+        if (toContinue){
+            let tempList = []
+            for (var i = 0;i<this.state.fullList.length;i++){
+                if (this.state.fullList[i].value == -1){
+                    tempList.push(this.state.fullList[i])
+                }
+            }
+            //write items or something
+            this.handleConflicts(tempList)
+            //this.setState({step:4})
+        }
+        else{
+            //alert, don't allow proceed
+            alert('You missed an item. Each item must be confirmed.')
+        }
     }
 
     handleConflicts(conflicts){
         for (var i = 0;i<conflicts.length;i++){
-            if (conflicts[i].difference < 0){
-                console.log(conflicts[i].variantid+ ' - '+ conflicts[i].status+' - '+'remove')
-            }
+            console.log(conflicts[i])
         }
     }
 
-    addItem(newItem, oldItem){
+    //add item from first sorting center run, adds and then 'deletes' other
+    addItem4(newItem, oldItem){
         let tempList = this.state.itemList
         for (var i = 0;i<tempList.length;i++){
             if (oldItem == tempList[i]){
@@ -186,11 +180,67 @@ class sortingCentre extends Component{
         this.setState({itemList:tempList})
     }
 
+    //add item in sorting center second, adds pure item
+    async addItem5(){
+        let store = this.state.newStore + '.myshopify.com'
+        let varID = this.state.newVarID
+        let code = this.state.newCode
+        let order = this.state.newOrder
+        //get product information
+        let [productID, name] = await this.getItemInformation(varID, store)
+        let tempItem = {
+            variantid:varID,
+            productid: productID,
+            quantity: 1,
+            status: 'rejected',
+            name: name,
+            store: store,
+            value: 0,
+            valueColor: 'grey',
+            order: order,
+            code: code,
+            index: this.state.fullList.length
+        }
+        //make sure product is real
+        if (productID != 0){
+            let tempList = this.state.fullList
+            tempList.push(tempItem)
+            this.setState({fullList:tempList, newOrder: '', newVarID:'', newCode:'',newStore:''})
+            this.viewAll()
+        }
+        else{
+            alert('That is not a real product')
+        }
+    }
+    //get information about an item
+    async getItemInformation(varID, store){
+        let temp = await fetch(`https://${serveoname}/products/all?store=${encodeURIComponent(store)}`, {
+            method: 'get',
+            })
+        let productID = '0'
+        let name = 'name'
+        let productsJSON = await temp.json()
+        //look for its product id from its variant
+        for (var i = 0;i<productsJSON.products.length;i++){
+            let tempItem = productsJSON.products[i]
+            for (var j=0;j<tempItem.variants.length;j++){
+                let tempVar = tempItem.variants[j]
+                if (tempVar.id == varID){
+                    productID = tempVar.product_id
+                    name = tempItem.title + ' - ' + tempVar.title
+                }
+            }
+        }
+        return [productID, name]
+    }
+
+    //when checkover button is clicked
     async dailyConfirm(){
         this.setState({step:5})
         await this.loadConfirmList()
     }
 
+    //load all items for daily checkover
     async loadConfirmList(){
         let items = await fetch(`https://${serveoname}/return/pending/itemList`, 
         {
@@ -208,7 +258,10 @@ class sortingCentre extends Component{
                 status: itemsJSON[i].status.stringValue,
                 name: itemsJSON[i].name.stringValue,
                 store: itemsJSON[i].store,
-                value: 0
+                value: 0,
+                valueColor: 'grey',
+                order: itemsJSON[i].order,
+                code: itemsJSON[i].code,
             }
             itemList.push(tempItem)
             }
@@ -231,7 +284,8 @@ class sortingCentre extends Component{
 
     //accept initial input
     handlecCode(e){
-        this.setState({cCode:e.target.value})
+        let temp = e.target.value.toUpperCase()
+        this.setState({cCode:temp})
     }
 
     //start from beginning (shows at end so you don't have to refresh)
@@ -284,33 +338,43 @@ class sortingCentre extends Component{
         }
         //make sure all items in order have been dealt with
         if (!found){
-            this.sendEmail()
+            //this.sendEmail()
             this.sendToDB()
         }
     }
 
     //handle changing status
-    handleReasonChange(varID, status, oldstatus){
+    handleStatusChange(index, status, step){
         let count = 0
         let found = false
-        let tempList = this.state.itemList
-        while (count < tempList.length && found == false){
-            let temp = tempList[count]
-            if (varID == temp.variantid && temp.status==oldstatus&&found == false){
-                tempList[count].status = status
-                found = true
-            }
-            else{
-                count+=1
-            }
+        if (step == 4){
+            let tempList = this.state.itemList
+            tempList[index].status = status
+            this.setState({itemList:tempList})
         }
-        this.setState({itemList:tempList})
+        else if (step == 5){
+            let tempList = this.state.confirmList
+            tempList[index].status = status
+            this.setState({confirmList:tempList})
+        }
     }
 
-    handleQuantityChange(index, varID){
-        let tempList = this.state.confirmList
-        tempList[index].value = 1 - tempList[index].value
-        this.setState({confirmList:tempList})
+    //checkover stage, flips green or red
+    handleQuantityChange(index, next){
+        if (next == -1){
+            //don't have item
+            let tempList = this.state.confirmList
+            tempList[index].value = -1
+            tempList[index].valueColor = 'red'
+            this.setState({confirmList:tempList})
+        }
+        else{
+            //have item
+            let tempList = this.state.confirmList
+            tempList[index].value = 1
+            tempList[index].valueColor = 'green'
+            this.setState({confirmList:tempList})
+        }
     }
 
     //submit the changing of reasons, finish process and send to db
@@ -346,9 +410,11 @@ class sortingCentre extends Component{
                 variantidGIT: t2.res.items.arrayValue.values[i].mapValue.fields.variantidGIT.stringValue,
                 productidGIT: t2.res.items.arrayValue.values[i].mapValue.fields.productidGIT.stringValue,
                 flag: t2.res.items.arrayValue.values[i].mapValue.fields.flag.stringValue,
-
             }
             tempList.push(tempItem)
+        }
+        for (var i = 0;i<tempList.length;i++){
+            tempList[i].index = i
         }
         await this.setState({itemList:tempList,step:3})
         }
@@ -359,11 +425,13 @@ class sortingCentre extends Component{
     }
 
     render(){
+        //sorting center home
         if(this.state.step == 1){
             return(
                 <div className = 'sc1'>
                     <h1 className = 'scHeader'>FLINDEL SORTING CENTRE</h1>
-                    <br/><br/><br/>
+                    <br/>
+                    <br/><br/>
                     <p>Enter return code below:</p>
                     <label>     
                     <input type="cCode" value={this.state.cCode} onChange={this.handlecCode} />
@@ -379,6 +447,7 @@ class sortingCentre extends Component{
                 </div>
             )
         }
+        //order doesn't exist error message
         else if (this.state.step == 2){
             return(
                 <div className = 'sc1'>
@@ -401,6 +470,7 @@ class sortingCentre extends Component{
                 </div>
             )
         }
+        //first checkover, single order
         else if (this.state.step == 3){
             return(
                 <div>
@@ -453,17 +523,18 @@ class sortingCentre extends Component{
                             </div>
                         </div>
                         {this.state.itemList.map((item)=>{
-                        return <Item item={item} serveoname = {serveoname} step = {4} key={item.variantid} addItem={this.addItem.bind(this)} handleSelect={this.handleReasonChange.bind(this)}/>
+                        return <Item item={item} serveoname = {serveoname} step = {4} key={item.variantid} addItem={this.addItem4.bind(this)} handleSelect={this.handleStatusChange.bind(this)}/>
                         })}
                     </fieldset>
                     <div className = 'sc1'>
                         <br/>   
-                        <button onClick = {this.handleSubmit2}>SUBMIT</button>
                         <button onClick = {this.resetAll}>BACK</button>
+                        <button onClick = {this.handleSubmit2}>SUBMIT</button>
                     </div>
                 </div>
             )
         }
+        //thank you page after first order
         else if(this.state.step == 4){
             return(
                 <div className = 'sc1'>
@@ -475,7 +546,7 @@ class sortingCentre extends Component{
                 </div>
             )
         }
-        //CHECK OVER
+        //big checkover page
         else if (this.state.step == 5){
             return(
                 <div>
@@ -508,6 +579,12 @@ class sortingCentre extends Component{
                                 <hr className = 'vertHeader'/>
                             </div>
                             <div className ='container2SCHeader'>
+                                <p className = 'itemHeader' > CODE  </p>   
+                            </div>
+                            <div className = 'vert'>
+                                <hr className = 'vertHeader'/>
+                            </div>
+                            <div className ='container2SCHeader'>
                                 <p className = 'itemHeader' > NAME  </p>   
                             </div>
                             <div className = 'vert'>
@@ -525,18 +602,40 @@ class sortingCentre extends Component{
                             <div className = 'vert'>
                                 <hr className = 'vertHeader'/>
                             </div>
+                            <div className = 'container2SCHeader'>
+                                <p className = 'itemHeader'>STATUS</p>
+                            </div>
+                            <div className = 'vert'>
+                                <hr className = 'vertHeader'/>
+                            </div>
                             <div className ='container2SCHeader'>
-                                <p className = 'itemHeader'>QUANTITY</p>
+                                <p className = 'itemHeader'>EXISTS</p>
                             </div>
                         </div>
                         {this.state.confirmList.map((item, index)=>{
-                        return <Item handleQuantityChange = {this.handleQuantityChange.bind(this)} item={item} serveoname = {serveoname} step = {5} key={item.variantid + index} handleSelect={this.handleReasonChange.bind(this)}/>
+                        return <Item handleQuantityChange = {this.handleQuantityChange.bind(this)} item={item} serveoname = {serveoname} step = {5} key={item.variantid + index} handleSelect={this.handleStatusChange.bind(this)}/>
                         })}
                     </fieldset>
+                    <br/>
+                    <p>ADD ITEM:</p>
+                    <br/>
+                        <label> Store:
+                            <input name = 'newStore' value={this.state.newStore} onChange={this.handleNewInput} />
+                        </label>
+                        <label> Variant ID:   
+                            <input name = 'newVarID' value={this.state.newVarID} onChange={this.handleNewInput} />
+                        </label>
+                        <label> Code:  
+                            <input name = 'newCode' value={this.state.newCode} onChange={this.handleNewInput} />
+                        </label>
+                        <label> Order:
+                            <input name = 'newOrder' value = {this.state.newOrder} onChange = {this.handleNewInput}/>
+                        </label>
+                        <button onClick = {this.addItem5}>ADD</button>
                     <div className = 'sc1'>
                         <br/><br/>
-                        <button onClick = {this.submitConfirmation}>CONFIRM</button>
                         <button onClick = {this.resetAll}>BACK</button>
+                        <button onClick = {this.submitConfirmation}>CONFIRM</button>
                         <br/><br/>
                     </div>
                 </div>

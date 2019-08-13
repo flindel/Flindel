@@ -4,14 +4,15 @@ emailHelper = require('./emailHelper')
 async function getItems(dbIn){
     let itemList = []
     db = dbIn
-    myRef = db.collection('pending')
+    let myRef = db.collection('pending')
     let query = await myRef.get()
     await query.forEach(async doc => {
         let items = doc._fieldsProto.items.arrayValue.values
         for (var i = 0;i<items.length;i++){
             let tempItem = items[i].mapValue.fields
             tempItem.order = doc._fieldsProto.order.stringValue
-            tempItem.store = doc._fieldsProto.shop.stringValue           
+            tempItem.store = doc._fieldsProto.shop.stringValue
+            tempItem.code = doc._fieldsProto.code.stringValue          
             itemList.push(tempItem)
         }
     });

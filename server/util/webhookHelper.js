@@ -10,7 +10,6 @@ async function sellReturnItem(db, varId, store, orderNum){
     let tempDate = ('1/1/2100')
     let tempRef = ''
     let query = await myRef.where('status','==','reselling').where('store','==',store).where('variantidGIT','==',varId.toString()).get()
-    //let query = await myRef.where('status','==','reselling').get()
     await query.forEach(async doc=>{
         let itemDate = doc._fieldsProto.dateProcessed.stringValue
         let difference = expired.getDateDifference(tempDate, itemDate)
@@ -65,7 +64,6 @@ async function completeReturnItem(db, orderId, varId, itemId, quantity, store){
         }   
     }
     let temp = await rp(option)
-    console.log('done')
 } 
 
 module.exports = {sellReturnItem, completeReturnItem}

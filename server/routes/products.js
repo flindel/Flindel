@@ -63,7 +63,7 @@ router.get('/GITinformation',async ctx=>{
 
 router.get('/all', async ctx=>{
     const { cookies } = ctx;
-  const shop = cookies.get('shop_id');
+  const shop = ctx.query.store
   const accessToken = cookies.get('accessToken');
   const option = {
       method: 'GET',
