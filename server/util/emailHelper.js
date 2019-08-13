@@ -9,6 +9,51 @@ async function getStoreEmail(dbIn, store){
     return email
 }
 
+async function sendBlockedListEmail(itemList){
+  const headers = {}
+    headers['Accept'] = 'application/json';
+    headers['Content-Type'] = 'application/json';
+    headers['Authorization'] = 'Bearer ' + process.env.SENDGRID;
+    let message = ""
+    if (itemList.length>0){
+        message += 'The following items were blacklisted and should be moved from RESELLING to RETURNING.'
+        message +='\n\n'
+        for (var i = 0;i<itemList.length;i++){
+            message += (i+1) + ': '+ itemList[i].name + ' - ' + itemList[i].variantid
+            message += '\n\n'
+        }
+    }
+    const option = {
+      method: 'POST',
+      url: 'https://api.sendgrid.com/v3/mail/send',
+      headers: headers,
+      json: true,
+      body: {
+        "personalizations": [
+          {
+            "to": [
+              {
+                "email": email //change to FLINDEL once live
+              }
+            ],
+            "subject": "Blacklisted Items"
+          }
+        ],
+        "from": {
+            "name": "Flindel - Internal",
+          "email": "no-reply@flindel.com"
+        },
+        "content": [
+          {
+            "type": "text/plain",
+            "value": message
+          }
+        ]
+      }
+  }
+    await rp(option);  
+}
+
 //send email to store about items that were received that day
 async function sendItemEmail(itemList, email){
     const headers = {}
@@ -107,4 +152,4 @@ async function sendRefundEmail(orderList, email){
     await rp(option);
 }
 
-module.exports = {getStoreEmail, sendItemEmail, sendRefundEmail}
+module.exports = {getStoreEmail, sendItemEmail, sendRefundEmail, sendBlockedListEmail}

@@ -5,6 +5,7 @@ import SortingCentre from './sortingCentre'
 import Blacklist from './blacklistUniversal'
 import ReturnShipment from './returnShipment'
 import DeliverItems from './deliverItems'
+import DropOff from './dropOff'
 import {serveo_name} from '../config'
 const sname = serveo_name
 const serveoname = sname.substring(8)
@@ -20,6 +21,7 @@ class Interface extends Component {
         this.goDelivery=this.goDelivery.bind(this)
         this.goBlacklist = this.goBlacklist.bind(this)
         this.goReturnShipment = this.goReturnShipment.bind(this)
+        this.goDropOff = this.goDropOff.bind(this)
         //this.doesProductExist = this.doesProductExist.bind(this)
     }
 
@@ -42,6 +44,10 @@ class Interface extends Component {
     goBlacklist(){
         this.setState({step:5})
     }
+
+    goDropOff(){
+        this.setState({step:6})
+    }
     
     //conditional render - step1 for enter store, step2 for doing stuff
     render() {
@@ -57,6 +63,7 @@ class Interface extends Component {
                     <button className = 'main' onClick = {this.goReturnShipment}>CREATE RETURN SHIPMENT</button>
                     <button className = 'main' onClick = {this.goDelivery}>DELIVER ITEMS</button>
                     <button className = 'main' onClick = {this.goBlacklist}>VIEW/EDIT BLACKLIST</button>
+                    <button className = 'main' onClick = {this.goDropOff}>DROP OFF</button>
                 </div>
             )
         }
@@ -91,6 +98,15 @@ class Interface extends Component {
             return(
                 <div>
                     <Blacklist
+                    back = {this.goHome.bind(this)}
+                    />
+                </div>
+            )
+        }
+        else if (this.state.step == 6){
+            return(
+                <div>
+                    <DropOff
                     back = {this.goHome.bind(this)}
                     />
                 </div>

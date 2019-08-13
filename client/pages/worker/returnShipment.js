@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import '../Confirmation/universal.css'
 import './flindelInterface.css'
 import {serveo_name} from '../config'
-import Item from '../Confirmation/Item2'
+import Item from './itemSC'
 const sname = serveo_name
 const serveoname = sname.substring(8)
 
@@ -119,8 +119,10 @@ class returnShipment extends Component {
         }
         for (var i =0;i<items.length;i++){
             items[i].index = i
+            items[i].productid = items[i].productID
         }
         this.setState({items:items})
+        console.log(items)
     }
 
     //conditional render - step1 for enter store, step2 for doing stuff
@@ -187,7 +189,7 @@ class returnShipment extends Component {
                     </fieldset>
                     <br/><br/>
                     <button onClick = {this.goBeginning}>BACK</button>
-                    <button onClick = {this.goConfirmation}>CONFIRM</button>
+                    <button onClick = {this.goConfirmation}>CONTINUE</button>
                 </div>
             )
         }

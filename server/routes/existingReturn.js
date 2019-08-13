@@ -63,6 +63,16 @@ router.put('/requested/itemStatus', async ctx=>{
         ctx.body = {"success":true}
 })
 
+router.put('/requested/receive', async ctx=>{
+    db = ctx.db
+    code = ctx.query.code
+    worker = ctx.query.workerID
+    time = await getTime()
+    myRef = db.collection('requestedReturns').doc(code)
+    updateFields = myRef.update({order_status:'received', received_by: worker, itemsDropped: time})
+    ctx.body =  true
+})
+
 router.get('/requested/items', async ctx=>{
         code = ctx.query.code
         db = ctx.db
@@ -86,7 +96,6 @@ router.put('/requested/orderStatus', async ctx=>{
             order_status: 'cancelled'
         })
         let getDoc = await db.collection('requestedReturns').doc(code).get()
-        //console.log(getDoc.data())
         let data = getDoc.data()
         let setDoc = db.collection('history').doc().set(data)
         let deleteDoc = db.collection('requestedReturns').doc(code).delete()
@@ -118,7 +127,11 @@ router.post('/requested/new', async ctx=>{
             order: orderNum,
             order_status: 'submitted',
             items: [],
-            createdDate: date
+            createdDate: date,
+            received_by: '',
+            processEnd:'',
+            processBegin:'',
+            itemsDropped:''
         };
         //all items start submitted
         const myStatus = 'submitted'
@@ -170,18 +183,20 @@ function getTime(){
 router.post('/pending/new', async ctx=>{
     db = ctx.db
     const codeIn = ctx.query.code
-    myRef = db.collection('requestedReturns').doc(codeIn)
+    let myRef = db.collection('requestedReturns').doc(codeIn)
     let oldDoc = await myRef.get()
     let newDate = await expiredHelper.getCurrentDate()
     let data = {
         order_status: oldDoc._fieldsProto.order_status.stringValue,
-        email: oldDoc._fieldsProto.order_status.stringValue,
+        email: oldDoc._fieldsProto.email.stringValue,
         processEnd: oldDoc._fieldsProto.processEnd.stringValue,
         createdDate: oldDoc._fieldsProto.createdDate.stringValue,
         code: oldDoc._fieldsProto.code.stringValue,
-        emailOriginal: oldDoc._fieldsProto.code.stringValue,
-        order :oldDoc._fieldsProto.order.stringValue,
+        emailOriginal: oldDoc._fieldsProto.emailOriginal .stringValue,
+        order : oldDoc._fieldsProto.order.stringValue,
         shop: oldDoc._fieldsProto.shop.stringValue,
+        received_by: oldDoc._fieldsProto.received_by.stringValue,
+        itemsDropped: oldDoc._fieldsProto.itemsDropped.stringValue,
         processBegin: oldDoc._fieldsProto.processBegin.stringValue,
         receivedDate: newDate,
         items:[]
@@ -200,7 +215,7 @@ router.post('/pending/new', async ctx=>{
         }
         data.items.push(tempItem)
     }
-    let set = db.collection('pending').doc().set(data)
+    let writeDoc = db.collection('pending').doc().set(data)
     let deleteDoc = db.collection('requestedReturns').doc(codeIn).delete();   
     ctx.body =  true
 })
