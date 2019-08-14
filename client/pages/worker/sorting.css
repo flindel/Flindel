@@ -113,8 +113,8 @@ div.vert{
   }
 
   fieldset.SC{
-      margin-left:5%;
-      margin-right:5%;
+      margin-left:2%;
+      margin-right:2%;
   }
 
   fieldset.Return{
@@ -142,4 +142,13 @@ div.vert{
       color:black;
       border-color: black;
       border: none;
+  }
+
+  p.itemOld{
+      font-size: 80%;
+  }
+
+  p.itemSC{
+      font-weight: bold;
+      max-width: 100%
   }

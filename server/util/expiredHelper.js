@@ -14,33 +14,46 @@ async function clearExpiredOrders(dbIn){
         //get time elapsed since return was requested
         diffDays = getDateDifference(currentDate, orderDate)
         //if there's a 7 day difference, return is expired
-        if (diffDays >= 7){
+        if (Math.abs(diffDays) >= 7){
             //copy items over
-            data = {
-                code: doc._fieldsProto.code.stringValue,
-                email: doc._fieldsProto.email.stringValue,
-                shop: doc._fieldsProto.shop.stringValue,
-                items: [],
+            let data = {
                 order_status: 'expired',
-                order: doc._fieldsProto.order.stringValue,
-                createdDate:doc._fieldsProto.createdDate.stringValue,
+                email: doc._fieldsProto.email.stringValue,
+                processEnd: doc._fieldsProto.processEnd.stringValue,
+                createdDate: doc._fieldsProto.createdDate.stringValue,
+                code: doc._fieldsProto.code.stringValue,
+                emailOriginal: doc._fieldsProto.emailOriginal.stringValue,
+                order : doc._fieldsProto.order.stringValue,
+                shop: doc._fieldsProto.shop.stringValue,
+                received_by: doc._fieldsProto.received_by.stringValue,
+                itemsDropped: doc._fieldsProto.itemsDropped.stringValue,
+                processBegin: doc._fieldsProto.processBegin.stringValue,
+                receivedDate: 'NONE',
+                items:[]
             }
             for (var i = 0;i<doc._fieldsProto.items.arrayValue.values.length;i++){
-                let temp = doc._fieldsProto.items.arrayValue.values[i]
-                tempItem = {
-                    price: temp.mapValue.fields.price.stringValue,
-                    name: temp.mapValue.fields.name.stringValue,
-                    variantid: temp.mapValue.fields.variantid.stringValue,
-                    reason: temp.mapValue.fields.reason.stringValue,
-                    status: temp.mapValue.fields.status.stringValue,
-                    productid: temp.mapValue.fields.productid.stringValue,
-                    variantidGIT: temp.mapValue.fields.variantidGIT.stringValue,
-                    productidGIT: temp.mapValue.fields.productidGIT.stringValue
+                let tempItem = {
+                    value: -1,
+                    flag: doc._fieldsProto.items.arrayValue.values[i].mapValue.fields.flag.stringValue,
+                    name: doc._fieldsProto.items.arrayValue.values[i].mapValue.fields.name.stringValue,
+                    productid: doc._fieldsProto.items.arrayValue.values[i].mapValue.fields.productid.stringValue,
+                    productidGIT: doc._fieldsProto.items.arrayValue.values[i].mapValue.fields.productidGIT.stringValue,
+                    reason: doc._fieldsProto.items.arrayValue.values[i].mapValue.fields.reason.stringValue,
+                    status: doc._fieldsProto.items.arrayValue.values[i].mapValue.fields.status.stringValue,
+                    store: doc._fieldsProto.shop.stringValue,
+                    variantid: doc._fieldsProto.items.arrayValue.values[i].mapValue.fields.variantid.stringValue,
+                    variantidGIT: doc._fieldsProto.items.arrayValue.values[i].mapValue.fields.variantidGIT.stringValue,
+                    oldItem: {
+                        OLDname: doc._fieldsProto.items.arrayValue.values[i].mapValue.fields.name.stringValue,
+                        OLDvariantid: doc._fieldsProto.items.arrayValue.values[i].mapValue.fields.variantid.stringValue,
+                        OLDproductid: doc._fieldsProto.items.arrayValue.values[i].mapValue.fields.productid.stringValue,
+                        OLDvariantidGIT: doc._fieldsProto.items.arrayValue.values[i].mapValue.fields.variantidGIT.stringValue,
+                        OLDproductidGIT: doc._fieldsProto.items.arrayValue.values[i].mapValue.fields.productidGIT.stringValue,
+                    }
                 }
+                data.items.push(tempItem)
             }
-            //copy to history, mark expired, delete from req return to prevent clogging
-            data.items.push(tempItem)
-            let set = db.collection('history').doc()
+            let set = db.collection('historyReturns').doc()
             batch.set(set,data)
             batch.delete(doc.ref)
         }
@@ -73,6 +86,7 @@ async function clearExpiredItems(dbIn){
     });
     //commit batch
     batch.commit()
+    //SEND EMAIL TO SHOW WHAT STUFF IS GONE?
 }
 
 //returns current date (MM/DD/YYYY)

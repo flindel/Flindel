@@ -108,7 +108,7 @@ class DropOff extends Component {
         else if (this.state.step == 1){
             return(
                 <div>
-                    <h1 className = 'scHeader'>Drop Off Worker</h1>
+                    <h1 className = 'scHeader'>Drop Off Worker (F Shirt)</h1>
                     <br/>
                     <p className = 'workerID'>Logged in as: #{this.state.workerID} <br/>
                     <button onClick = {this.changeID}>LOGOUT</button>

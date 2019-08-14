@@ -9,19 +9,54 @@ class deliverItems extends Component {
     constructor(props){
         super(props);
         this.state = {
+            step: 0,
+            workerID: ''
         }
-        //this.doesProductExist = this.doesProductExist.bind(this)
+        this.handleWorkerID = this.handleWorkerID.bind(this)
+        this.selectFulfillments = this.selectFulfillments.bind(this)
+        this.changeID = this.changeID.bind(this)
+    }
+
+    handleWorkerID(e){
+        this.setState({workerID:e.target.value})
+    }
+
+    selectFulfillments(){
+        this.setState({step:1})
+    }
+
+    changeID(){
+        this.setState({step:0, workerID: ''})
     }
 
     //conditional render - step1 for enter store, step2 for doing stuff
     render() {
-        return(
-            <div>
-                <h1 className = 'scHeader'>Deliver Items</h1>
-                <br/><br/>
-                <button onClick = {this.props.back}>BACK</button>
-            </div>
-        )
+        if (this.state.step == 0){
+            return(
+                <div>
+                    <h1 className = 'scHeader'>Deliver Get It Today Items</h1>
+                    <br/><br/>
+                    <p>Enter your worker ID below</p>
+                    <input type = 'text' value = {this.state.workerID} onChange = {this.handleWorkerID}></input>
+                    <button onClick = {this.selectFulfillments}>SUBMIT</button>
+                    <br/><br/>
+                    <button onClick = {this.props.back}>BACK</button>
+                </div>
+            )
+        }
+        else if (this.state.step == 1){
+            return(
+                <div>
+                    <h1 className = 'scHeader'>Deliver Get It Today Items</h1>
+                    <br/>
+                    <p className = 'workerID'>Logged in as: #{this.state.workerID} <br/>
+                    <button onClick = {this.changeID}>LOGOUT</button>
+                    </p>
+                    <br/>
+                    <button onClick = {this.props.back}>BACK</button>
+                </div>
+            )
+        }
     }
 }
 

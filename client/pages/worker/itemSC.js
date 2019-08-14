@@ -2,9 +2,6 @@ import React, { Component } from 'react';
 import '../Confirmation/universal.css'
 import Select from 'react-select';
 
-const greyStyle={
-    backgroundColor: 'grey'
-}
 
 class Item extends Component {
     //constructor/binding methods
@@ -20,14 +17,15 @@ class Item extends Component {
             src:"",
             blacklist: false,
             blacklistMessage: '',
-            price: this.props.item.price,
             reason: this.props.item.reason,
             quantity: this.props.item.quantity,//the quantity of a item that user total brought
             status: this.props.item.status,
             flag: this.props.item.flag,
-            style: greyStyle,
             idNew:'',
             styleName:'',
+            messageOldName:'',
+            messageOldVID:'',
+            messageOldPID:'',
         };
         this.setState = this.setState.bind(this)
         this.handleStatusChange=this.handleStatusChange.bind(this)
@@ -37,8 +35,12 @@ class Item extends Component {
         this.makeNewProduct = this.makeNewProduct.bind(this)
         this.getItemInformation = this.getItemInformation.bind(this)
         this.handleQuantityChangeReturn = this.handleQuantityChangeReturn.bind(this)
+        this.checkBlacklist = this.checkBlacklist.bind(this)
+        this.loadImage = this.loadImage.bind(this)
+        this.loadMessages = this.loadMessages.bind(this)
     }
 
+    //create new product - first time through, single order
     async makeNewProduct(){
         let [pID, name] = await this.getItemInformation(this.state.idNew)
         if (pID != 0){
@@ -47,33 +49,30 @@ class Item extends Component {
             })
             let tempJSON = await temp.json()
             let newItem = {
-            variantid: this.state.idNew,
-            reason: 'Other',
-            store:this.props.item.store,
-            flag: '1',
-            status: this.state.status,
-            name: name,
-            variantidGIT: tempJSON.variant,
-            productidGIT: tempJSON.product,
-            productid: pID.toString()
-        }
+                variantid: this.state.idNew,
+                name: name,
+                variantidGIT: tempJSON.variant,
+                productidGIT: tempJSON.product,
+                productid: pID.toString()
+            }
         //get GIT information
-        console.log(newItem)
         this.setState({idNew:''})
         //callback to make new product
-        this.props.addItem(newItem, this.props.item)
+        this.props.addItem(newItem, this.props.item.index)
         }
         else{
             alert('THIS IS NOT A VALID VARIANT ID')
         }
     }
 
+    //change input of return for return shipment
     handleQuantityChangeReturn(e){
         this.props.handleQuantityChange(this.props.item.index, e.target.value)
     }
 
+    //get information 
     async getItemInformation(varID){
-        let temp = await fetch(`https://${this.props.serveoname}/products/all&store=${(encodeURIComponent(this.props.item.store))}`, {
+        let temp = await fetch(`https://${this.props.serveoname}/products/all?store=${(encodeURIComponent(this.props.item.store))}`, {
             method: 'get',
             })
         let productID = '0'
@@ -109,24 +108,23 @@ class Item extends Component {
         },()=> this.props.handleSelect(this.props.item.index, newStatus, this.props.step))
      }
 
+     //set to red (checkover)
      quantityDown(){
         this.props.handleQuantityChange(this.props.item.index, -1)
      }
 
+     //set to green (checkover)
      quantityUp(){
         this.props.handleQuantityChange(this.props.item.index, 1) 
      }
 
-     //on mount, get important information including image source to show the display picture
-    async componentWillMount(){
-        let imageID = this.props.item.productid
-        if (this.props.step == 4 || this.props.step == 5){ 
-            //sorting center interface
-            let temp = await fetch(`https://${this.props.serveoname}/products/variant/productID?store=${encodeURIComponent(this.props.item.store)}&id=${encodeURIComponent(this.props.item.variantid)}`, {
+     async checkBlacklist(){
+        //sorting center interface
+        let temp = await fetch(`https://${this.props.serveoname}/products/variant/productID?store=${encodeURIComponent(this.props.item.store)}&id=${encodeURIComponent(this.props.item.variantid)}`, {
             method: 'get',
             })
             let tJSON = await temp.json()
-            imageID = tJSON.variant.product_id
+            let imageID = tJSON.variant.product_id
             //check if on blacklist
             let temp2 = await fetch(`https://${this.props.serveoname}/blacklist/exists?store=${encodeURIComponent(this.props.item.store)}&id=${encodeURIComponent(imageID)}`, {
             method: 'get',
@@ -139,8 +137,11 @@ class Item extends Component {
                 message = ''
             }
             this.setState({blacklist:isOn, blacklistMessage:message})
-        }
+     }
 
+     async loadImage(){
+        //get image
+        let imageID = this.props.item.productid
         fetch(`https://${this.props.serveoname}/products/img?id=${encodeURIComponent(imageID)}`, {
         method: 'GET',})
         .then(response => response.json())
@@ -153,6 +154,24 @@ class Item extends Component {
             }
           }
         });
+     }
+
+     loadMessages(){
+        if (this.props.item.flag == '1'){
+            let name = '(OLD: '+ this.props.item.oldItem.OLDname + ')'
+            let vid = '(OLD: '+ this.props.item.oldItem.OLDvariantid + ')'
+            let pid = '(OLD: '+ this.props.item.oldItem.OLDproductid + ')'
+            this.setState({messageOldName:name, messageOldPID:pid,messageOldVID:vid})
+        }
+     }
+
+     //on mount, get important information including image source to show the display picture
+    componentWillMount(){
+        if (this.props.step == 4 || this.props.step == 5){ 
+            this.checkBlacklist()
+            this.loadMessages()
+        }
+        this.loadImage()
     }
 
     componentDidMount(){
@@ -160,138 +179,75 @@ class Item extends Component {
     }
 
     render() {
+        //first time through sorting center (single order)
         if (this.props.step == 4){
-            if (this.props.item.flag != '-1'){
-                return(
-                    <div className = "itemContainerSC">
-                        <div className ='container1SC'>
-                            <hr className = 'horiz'/>
-                            <img className = 'item2' src = {this.state.src}/>
-                        </div>
-                        <div className = 'vert'>
-                            <hr className = 'vert'/>
-                        </div>
-                        <div className ='container1SC'>
-                            <hr className = 'horiz'/>
-                            <br/><br/>
-                            <p className = 'item' > {this.props.item.name} </p>   
-                        </div>
-                        <div className = 'vert'>
-                            <hr className = 'vert'/>
-                        </div>
-                        <div className = 'container1SC'>
-                            <hr className = 'horiz'/>
-                            <br/><br/>
-                            <p className = 'item'>{this.props.item.variantid}</p>
-                        </div>
-                        <div className = 'vert'>
-                            <hr className = 'vert'/>
-                        </div>
-                        <div className = 'container1SC'>
-                            <hr className = 'horiz'/>
-                            <br/><br/>
-                            <p className = 'item'>{this.props.item.productid}</p>
-                        </div>
-                        <div className = 'vert'>
-                            <hr className = 'vert'/>
-                        </div>
-                        <div className = 'container1SC' >
-                            <hr className = 'horiz'/>
-                            <br/><br/>
-                            <p className = 'item'> {this.props.item.reason}</p>
-                        </div>
-                        <div className = 'vert'>
-                            <hr className = 'vert'/>
-                        </div>
-                        <div className ='container1SC'>
-                            <hr className = 'horiz'/>
-                            <br/><br/>
-                                <select value={this.state.status} onChange={this.handleStatusChange}>
-                                    <option value = "submitted">Submitted</option>
-                                    <option value="accepted">Accepted - Resell</option>
-                                    <option value="returning">Accepted - No Resell</option>
-                                    <option value="rejected">Rejected</option>
-                                    <option value ="special">Special Circumstances</option>
-                                </select>
-                                <p className = 'item errorMessage'>{this.state.blacklistMessage}</p>
-                        </div>
-                        <div className = 'vert'>
-                            <hr className = 'vert'/>
-                        </div>
-                        <div className = 'container1SC'>
-                            <hr className = 'horiz'/>
-                            <br/><br/>
-                            <input onChange = {this.handleNewIDChange} value = {this.state.idNew}></input>
-                            <button onClick = {this.makeNewProduct}>SUBMIT</button>
-                        </div>
+            return(
+                <div className = "itemContainerSC">
+                    <div className ='container1SC'>
+                        <hr className = 'horiz'/>
+                        <img className = 'item2' src = {this.state.src}/>
                     </div>
-                )
-            }
-            else{
-                return(
-                    <div className = "itemContainerSC">
-                        <div className ='container1SC'style = {this.state.style}>
-                            <hr className = 'horiz'/>
-                            <img className = 'item2' src = {this.state.src}/>
-                        </div>
-                        <div className = 'vert'>
-                            <hr className = 'vert'/>
-                        </div>
-                        <div className ='container1SC' style = {this.state.style}>
-                            <hr className = 'horiz'/>
-                            <br/><br/>
-                            <p className = 'item' > {this.props.item.name} </p>   
-                        </div>
-                        <div className = 'vert'>
-                            <hr className = 'vert'/>
-                        </div>
-                        <div className = 'container1SC' style = {this.state.style}>
-                            <hr className = 'horiz'/>
-                            <br/><br/>
-                            <p className = 'item'>{this.props.item.variantid}</p>
-                        </div>
-                        <div className = 'vert'>
-                            <hr className = 'vert'/>
-                        </div>
-                        <div className = 'container1SC' style = {this.state.style}>
-                            <hr className = 'horiz'/>
-                            <br/><br/>
-                            <p className = 'item'>{this.props.item.productid}</p>
-                        </div>
-                        <div className = 'vert'>
-                            <hr className = 'vert'/>
-                        </div>
-                        <div className = 'container1SC' style = {this.state.style}>
-                            <hr className = 'horiz'/>
-                            <br/><br/>
-                            <p className = 'item'> {this.props.item.reason}</p>
-                        </div>
-                        <div className = 'vert'>
-                            <hr className = 'vert'/>
-                        </div>
-                        <div className ='container1SC' style = {this.state.style} >
-                            <hr className = 'horiz'/>
-                            <br/><br/>
-                            <select value={this.state.status} onChange={this.handleStatusChange}>
-                                    <option value = "submitted">Submitted</option>
-                                    <option value="accepted">Accepted - Resell</option>
-                                    <option value="returning">Accepted - No Resell</option>
-                                    <option value="rejected">Rejected</option>
-                                    <option value ="special">Special Circumstances</option>
-                                </select>
-                                <p className = 'item errorMessage'>{this.state.blacklistMessage}</p>
-                        </div>
-                        <div className = 'vert'>
-                            <hr className = 'vert'/>
-                        </div>
-                        <div className = 'container1SC' style = {this.state.style} >
-                            <hr className = 'horiz'/>
-                            <br/><br/>
-                            <p className = 'item'>N/A</p>
-                        </div>
+                    <div className = 'vert'>
+                        <hr className = 'vert'/>
                     </div>
-                )
-            }
+                    <div className ='container1SC'>
+                        <hr className = 'horiz'/>                            
+                        <br/><br/>
+                        <p className = 'itemSC' > {this.props.item.name} </p>  
+                        <p className = 'itemOld' > {this.state.messageOldName}</p>
+                    </div>
+                    <div className = 'vert'>
+                        <hr className = 'vert'/>
+                    </div>
+                        <div className = 'container1SC'>
+                        <hr className = 'horiz'/>
+                        <br/><br/>
+                        <p className = 'itemSC'>{this.props.item.variantid}</p>
+                        <p className = 'itemOld' >{this.state.messageOldVID}</p>
+                    </div>
+                    <div className = 'vert'>
+                        <hr className = 'vert'/>
+                    </div>
+                    <div className = 'container1SC'>
+                        <hr className = 'horiz'/>
+                        <br/><br/>
+                        <p className = 'itemSC'>{this.props.item.productid}</p>
+                        <p className = 'itemOld' >{this.state.messageOldPID}</p>
+                    </div>
+                    <div className = 'vert'>
+                        <hr className = 'vert'/>
+                    </div>
+                    <div className = 'container1SC'>
+                        <hr className = 'horiz'/>
+                        <br/><br/>
+                        <p className = 'itemSC'> {this.props.item.reason}</p>
+                    </div>
+                    <div className = 'vert'>
+                        <hr className = 'vert'/>
+                    </div>
+                    <div className ='container1SC'>
+                        <hr className = 'horiz'/>
+                        <br/><br/>
+                        <select value={this.state.status} onChange={this.handleStatusChange}>
+                            <option value = "submitted">Submitted</option>
+                            <option value="accepted">Accepted - Resell</option>
+                            <option value="returning">Accepted - No Resell</option>
+                            <option value="rejected">Rejected</option>
+                            <option value ="special">Special Circumstances</option>
+                        </select>
+                        <p className = 'item errorMessage'>{this.state.blacklistMessage}</p>
+                    </div>
+                    <div className = 'vert'>
+                        <hr className = 'vert'/>
+                    </div>
+                    <div className = 'container1SC'>
+                        <hr className = 'horiz'/>
+                        <br/><br/>
+                        <input onChange = {this.handleNewIDChange} value = {this.state.idNew}></input>
+                        <button onClick = {this.makeNewProduct}>SUBMIT</button>
+                    </div>
+                </div>
+            )
         }
         //sorting center checkover
         else if (this.props.step == 5){
@@ -307,7 +263,7 @@ class Item extends Component {
                         <div className ='container2SC' className = {this.props.item.valueColor} >
                             <hr className = 'horiz'/>
                             <br/><br/>
-                            <p className = 'item' > {this.props.item.store.substring(0,12)}  </p>   
+                            <p className = 'itemSC' > {this.props.item.store.substring(0,12)}  </p>   
                         </div>
                         <div className = 'vert'>
                             <hr className = 'vert'/>
@@ -315,7 +271,7 @@ class Item extends Component {
                         <div className ='container2SC' className = {this.props.item.valueColor}>
                             <hr className = 'horiz'/>
                             <br/><br/>
-                            <p className = 'item' > {this.props.item.code} - {this.props.item.order} </p>   
+                            <p className = 'itemSC' > {this.props.item.code}</p>   
                         </div>
                         <div className = 'vert'>
                             <hr className = 'vert'/>
@@ -323,7 +279,8 @@ class Item extends Component {
                         <div className = 'container2SC' className = {this.props.item.valueColor}>
                             <hr className = 'horiz'/>
                             <br/><br/>
-                            <p className = 'item'>{this.props.item.name}</p>
+                            <p className = 'itemSC'>{this.props.item.name}</p>
+                            <p className = 'itemOld'>{this.state.messageOldName}</p>
                         </div>
                         <div className = 'vert'>
                             <hr className = 'vert'/>
@@ -331,7 +288,8 @@ class Item extends Component {
                         <div className = 'container2SC' className = {this.props.item.valueColor}>
                             <hr className = 'horiz'/>
                             <br/><br/>
-                            <p className = 'item'>{this.props.item.variantid}</p>
+                            <p className = 'itemSC'>{this.props.item.variantid}</p>
+                            <p className = 'itemOld'>{this.state.messageOldVID}</p>
                         </div>
                         <div className = 'vert'>
                             <hr className = 'vert'/>
@@ -339,7 +297,8 @@ class Item extends Component {
                         <div className = 'container2SC' className = {this.props.item.valueColor}>
                             <hr className = 'horiz'/>
                             <br/><br/>
-                            <p className = 'item'>{this.props.item.productid}</p>
+                            <p className = 'itemSC'>{this.props.item.productid}</p>
+                            <p className = 'itemOld'>{this.state.messageOldPID}</p>
                         </div>
                         <div className = 'vert'>
                             <hr className = 'vert'/>
@@ -462,5 +421,4 @@ class Item extends Component {
             }
     }
 }
-
 export default Item;
