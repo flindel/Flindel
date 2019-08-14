@@ -13,7 +13,7 @@ router.get('/id/', async ctx => {
   ctx.body = JSON.stringify({shop_id: shop});
 });
 
-//get shop domain 
+//get shop domain
 router.get('/domain', async ctx =>{
   const { cookies } = ctx;
   const shop = cookies.get('shop_id');
@@ -50,17 +50,35 @@ router.get('/returnPolicy', async ctx =>{
     ctx.body = {'res': query._fieldsProto.returnPolicy, 'default':query._fieldsProto.defaultReturn}
 })
 
-router.post('/install_time/', async ctx =>{
+router.post("/onboardingStep", async ctx => {
+  ctx.set("Access-Control-Allow-Origin", "*");
+  ctx.set(
+    "Access-Control-Allow-Headers",
+    "Origin, X-Requested-With, Content-Type, Accept"
+  );
+  ctx.set("Access-Control-Allow-Methods", "POST, GET, PUT, DELETE, OPTIONS");
+  const { shop } = getShopHeaders(ctx);
+  let body = JSON.parse(ctx.query.body);
+  db = ctx.db;
+  let docRef = db.collection("store").doc(shop);
+  docRef.set(body, { merge: true });
+  ctx.body = "success";
+});
+
+router.get('/onboardingStep', async ctx => {
   ctx.set('Access-Control-Allow-Origin', '*');
   ctx.set('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept');
   ctx.set('Access-Control-Allow-Methods', 'POST, GET, PUT, DELETE, OPTIONS');
-  let body = JSON.parse(ctx.query.body);
-  let db = ctx.db
-  let setDoc = db.collection('shop_tokens').doc(body.shop_id+"").set(
-    {
-      install_time: body.install_time
-    }, {merge:true});
-  ctx.body = 'success'
+  ctx.set('Access-Control-Allow-Origin', '*');
+  ctx.set('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept');
+  ctx.set('Access-Control-Allow-Methods', 'POST, GET, PUT, DELETE, OPTIONS');
+  db = ctx.db
+  const { shop } = getShopHeaders(ctx);
+  let myRef = db.collection('store').doc(shop);
+  getDoc = await myRef.get()
+  ctx.body = getDoc;
+
 })
+
 
 module.exports = router;
