@@ -31,4 +31,21 @@ router.get("/", async ctx => {
   }
 });
 
+router.post("/fulfill", async ctx => {
+  const { shop, accessToken } = getShopHeaders(ctx);
+  const option = {
+    url: `https://${shop}/${api_link}/orders/${order_id}/fulfillments.json`,
+    headers: {
+      "X-Shopify-Access-Token": accessToken
+    },
+    json: true,
+    body: {
+      fulfillment: {
+        location_id: ctx.query.location_id,
+        tracking_number: null,
+        line_items: [ctx.query.lineitem_id]
+      }
+    }
+  };
+});
 module.exports = router;

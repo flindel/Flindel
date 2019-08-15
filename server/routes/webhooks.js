@@ -50,15 +50,16 @@ router.post("/hookendpoint", webhookFulfillment, ctx => {
     }
   }
   ctx.response.status = 200; //tell shopify we got payload
-  ctx.body = "OK";
+  ctx.response.body = "OK";
 });
 
 //listner for order webhook
 router.post("/hookorderendpoint", webhookOrder, async ctx => {
   let hookload = ctx.request.body;
   let foundFlindel = false;
-  //create list of flindel GIT items
+  //create list of flindel GIT items and list of line item ID
   let flindelItems = [];
+  let lineItemsID = [];
   for (let i = 0; i < hookload.line_items.length; i++) {
     if (hookload.line_items[i].fulfillment_service == "flindel") {
       foundFlindel = true;
@@ -68,6 +69,8 @@ router.post("/hookorderendpoint", webhookOrder, async ctx => {
         quantity: hookload.line_items[i].quantity
       };
       flindelItems.push(orderObject);
+      let lineObject = { id: hookload.line_items[i].id };
+      lineItemsID.push(lineObject);
     }
   }
 
@@ -96,10 +99,17 @@ router.post("/hookorderendpoint", webhookOrder, async ctx => {
       ).then(function(Response) {
         //console.log(Response);
       });
+    } else {
+      //location is valid
+      fetch(
+        `https://${SERVEO_NAME}.serveo.net/orders/fulfill?location_id=${encodeURIComponent(
+          hookload.location_id
+        )}&lineitem_id=${encodeURIComponent(lineItemsID)}`
+      );
     }
   }
   ctx.response.status = 200;
-  ctx.body = "OK";
+  ctx.response.body = "OK";
 });
 //listner for theme webhook
 router.post("/hookthemeendpoint", webhookTheme, ctx => {

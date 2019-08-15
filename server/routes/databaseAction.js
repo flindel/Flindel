@@ -73,20 +73,27 @@ router.post("/update_order_database", async ctx => {
   const fulfId = ctx.query.fulf_id;
   const orderId = ctx.query.order_id;
   let payload = {
-    order_id: orderId,
-    store_name: items[0].vendor,
-    fulfillment_id: fulfId,
-    shipping_address:
+    orderId: orderId,
+    store: items[0].vendor,
+    fulfillmentId: fulfId,
+    shippingAddress:
       destination.address1 + " " + destination.city + " " + destination.zip
   };
-  payload["date_created"] = new Date();
+  payload["dateCreated"] = new Date();
+  payload["workerID"] = "";
+  payload["code"] = "";
+  payload["status"] = "";
+  payload["name"] = destination.name;
+  payload["comment"] = "";
 
   for (let i = 0; i < items.length; i++) {
     itemList[i] = {
       itemId: items[i].id,
-      variant_id: items[i].variant_id,
+      variantId: items[i].variant_id,
       quantity: items[i].quantity,
-      title: items[i].title
+      name: items[i].title,
+      fulfilled: 0,
+      productId: items[i].product_id
     };
   }
   payload["items"] = itemList;
