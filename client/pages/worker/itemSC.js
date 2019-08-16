@@ -38,6 +38,8 @@ class Item extends Component {
         this.checkBlacklist = this.checkBlacklist.bind(this)
         this.loadImage = this.loadImage.bind(this)
         this.loadMessages = this.loadMessages.bind(this)
+        this.packageItem = this.packageItem.bind(this)
+        this.failItem = this.failItem.bind(this)
     }
 
     //create new product - first time through, single order
@@ -154,6 +156,14 @@ class Item extends Component {
             }
           }
         });
+     }
+
+     failItem(){
+        this.props.changeItemStatus(this.props.item.index, -1)
+     }
+
+     packageItem(){
+        this.props.changeItemStatus(this.props.item.index, 1)
      }
 
      loadMessages(){
@@ -415,6 +425,39 @@ class Item extends Component {
                             <br/>
                             <br/>
                             <p className = 'item'>{this.props.item.value}</p>
+                        </div>
+                    </div>
+                )
+            }
+            else if (this.props.step == 8){
+                return(
+                    <div className = 'itemContainerSC'>
+                        <div className ='itemOrder'>
+                            <hr className = 'horiz'/>
+                            <p className = 'item' >{this.props.item.name}</p>   
+                        </div>
+                        <div className = 'vert'>
+                            <hr className = 'vertRI'/>
+                        </div>
+                        <div className ='itemOrder'>
+                            <hr className = 'horiz'/>
+                            <p className = 'item'>{this.props.item.variantid}</p>
+                        </div>
+                        <div className = 'vert'>
+                            <hr className = 'vertRI'/>
+                        </div>
+                        <div className = 'itemOrder'>
+                            <hr className = 'horiz'/>
+                            <p className = 'item'>{this.props.item.productid}</p>
+                        </div>
+                        <div className = 'vert'>
+                            <hr className = 'vertRI'/>
+                        </div>
+                        <div className = 'itemOrder'>
+                            <hr className = 'horiz'/>
+                            <button onClick = {this.failItem}>N</button>
+                            <button onClick = {this.packageItem}>Y</button>
+                            <p className = 'item'>{this.props.item.fulfilled}</p>
                         </div>
                     </div>
                 )
