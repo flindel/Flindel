@@ -32,7 +32,6 @@ class sortingCentre extends Component{
         this.handleSubmit2 = this.handleSubmit2.bind(this)
         this.resetAll = this.resetAll.bind(this)
         this.finalCheck = this.finalCheck.bind(this)
-        this.sendEmail = this.sendEmail.bind(this)
         this.sendToDB = this.sendToDB.bind(this)
         this.dailyConfirm = this.dailyConfirm.bind(this)
         this.loadConfirmList = this.loadConfirmList.bind(this)
@@ -41,7 +40,7 @@ class sortingCentre extends Component{
         this.setOpenTime = this.setOpenTime.bind(this)
         this.setCloseTime = this.setCloseTime.bind(this)
         this.submitConfirmation = this.submitConfirmation.bind(this)
-        this.handleConflicts = this.handleConflicts.bind(this)
+        this.updateItems = this.updateItems.bind(this)
         this.viewReturning = this.viewReturning.bind(this)
         this.viewAccepted = this.viewAccepted.bind(this)
         this.viewRejected = this.viewRejected.bind(this)
@@ -97,15 +96,6 @@ class sortingCentre extends Component{
     }
     //sorts items, used in above functions
     sortList(tempList){
-        for (var j = 0;j<tempList.length;j++){
-            for (var i = 0;i<tempList.length -1;i++){
-                if (tempList[i].flag == '-1' && tempList[i+1].flag!= '-1'){
-                    let tempItem = tempList[i]
-                    tempList[i] = tempList[i+1]
-                    tempList[i+1] = tempItem
-                }
-            }
-        }
         //give each item index so it's easy to identify changes
         for (var i = 0;i<tempList.length;i++){
             tempList[i].index = i
@@ -137,15 +127,8 @@ class sortingCentre extends Component{
             }
         }
         if (toContinue){
-            let tempList = []
-            for (var i = 0;i<this.state.fullList.length;i++){
-                if (this.state.fullList[i].value == -1){
-                    tempList.push(this.state.fullList[i])
-                }
-            }
-            //write items or something
-            this.handleConflicts(tempList)
-            //this.setState({step:4})
+            this.updateItems(this.state.fullList)
+            this.setState({step:4})
         }
         else{
             //alert, don't allow proceed
@@ -153,63 +136,99 @@ class sortingCentre extends Component{
         }
     }
 
-    handleConflicts(conflicts){
-        for (var i = 0;i<conflicts.length;i++){
-            console.log(conflicts[i])
+    async updateItems(items){
+        for (var i = 0;i<items.length;i++){
+            delete items[i]['index']
+            delete items[i]['valueColor']
+            delete items[i]['quantity']
+        }
+        while (items.length>0){
+            let activeList = []
+            let activeCode = items[0].code
+            for (var i = 0;i<items.length;i++){
+                if (items[i].code == activeCode){
+                    activeList.push(items[i])
+                    items.splice(i,1)
+                    i--
+                }
+            }
+            //call to api, activeCode + activeList
+            for (var i = 0;i<activeList.length;i++){
+                delete activeList[i]['code']
+            }
+            let theItems = JSON.stringify(activeList)
+            await fetch(`https://${serveoname}/return/pending/items?code=${encodeURIComponent(activeCode)}&items=${encodeURIComponent(theItems)}`, 
+            {
+            method: 'PUT',
+            })
         }
     }
 
     //add item from first sorting center run, adds and then 'deletes' other
-    addItem4(newItem, oldItem){
+    addItem4(newItem, index){
         let tempList = this.state.itemList
-        for (var i = 0;i<tempList.length;i++){
-            if (oldItem == tempList[i]){
-                tempList[i].flag = '-1'
-            }
-        }
-        tempList.push(newItem)
-        for (var j = 0;j<tempList.length;j++){
-            for (var i = 0;i<tempList.length -1;i++){
-                if (tempList[i].flag == '-1' && tempList[i+1].flag!= '-1'){
-                    let tempItem = tempList[i]
-                    tempList[i] = tempList[i+1]
-                    tempList[i+1] = tempItem
-                }
-            }
-        }
+        tempList[index].name = newItem.name
+        tempList[index].productid = newItem.productid
+        tempList[index].variantid = newItem.variantid
+        tempList[index].variantidGIT = newItem.variantidGIT
+        tempList[index].productidGIT = newItem.productidGIT
+        tempList[index].flag = '1'
         this.setState({itemList:tempList})
+    }
+
+    isItemValid(code, store){
+        let valid = false
+        for (var i =0;i<this.state.fullList.length;i++){
+            if (this.state.fullList[i].store == store && this.state.fullList[i].code == code){
+                valid=true
+            }
+        }
+        return valid
     }
 
     //add item in sorting center second, adds pure item
     async addItem5(){
-        let store = this.state.newStore + '.myshopify.com'
+        let store = this.state.newStore.toLowerCase() + '.myshopify.com'
         let varID = this.state.newVarID
-        let code = this.state.newCode
-        let order = this.state.newOrder
+        let code = this.state.newCode.toUpperCase()
         //get product information
         let [productID, name] = await this.getItemInformation(varID, store)
-        let tempItem = {
-            variantid:varID,
-            productid: productID,
-            quantity: 1,
-            status: 'rejected',
-            name: name,
-            store: store,
-            value: 0,
-            valueColor: 'grey',
-            order: order,
-            code: code,
-            index: this.state.fullList.length
-        }
-        //make sure product is real
-        if (productID != 0){
+        let validInfo = await this.isItemValid(code, store)
+        if (productID != 0 && validInfo){
+            let GITinfo = await fetch(`https://${serveoname}/products/GITinformation?productID=${encodeURIComponent(productID)}&varID=${encodeURIComponent(varID)}`, {
+            method: 'get',
+            })
+            let GITjson = await GITinfo.json()
+            let tempItem = {
+                variantid:varID,
+                productid: productID.toString(),
+                quantity: 1,
+                status: 'rejected',
+                name: name,
+                store: store,
+                value: 0,
+                reason: 'new',
+                flag:'0',
+                valueColor: 'grey',
+                code: code,
+                productidGIT:GITjson.product,
+                variantidGIT:GITjson.variant,
+                index: this.state.fullList.length,
+                oldItem: {
+                    OLDname: name,
+                    OLDvariantid:varID,
+                    OLDproductid:productID.toString(),
+                    OLDproductidGIT: GITjson.product,
+                    OLDvariantidGIT:GITjson.variant
+                }
+            }
             let tempList = this.state.fullList
             tempList.push(tempItem)
-            this.setState({fullList:tempList, newOrder: '', newVarID:'', newCode:'',newStore:''})
+            this.setState({fullList:tempList, newVarID:'', newCode:'',newStore:''})
             this.viewAll()
         }
         else{
-            alert('That is not a real product')
+            alert('That is not a valid entry. Item does not exist or code does not match.')
         }
     }
     //get information about an item
@@ -254,26 +273,26 @@ class sortingCentre extends Component{
                 let tempItem = {
                 variantid:itemsJSON[i].variantid.stringValue,
                 productid: itemsJSON[i].productid.stringValue,
+                variantidGIT: itemsJSON[i].variantidGIT.stringValue,
+                productidGIT: itemsJSON[i].productidGIT.stringValue,
                 quantity: 1,
                 status: itemsJSON[i].status.stringValue,
                 name: itemsJSON[i].name.stringValue,
                 store: itemsJSON[i].store,
+                reason: itemsJSON[i].reason.stringValue,
                 value: 0,
                 valueColor: 'grey',
-                order: itemsJSON[i].order,
                 code: itemsJSON[i].code,
+                flag: itemsJSON[i].flag.stringValue,
+                oldItem: {
+                    OLDvariantid: itemsJSON[i].oldItem.mapValue.fields.OLDvariantid.stringValue,
+                    OLDproductid: itemsJSON[i].oldItem.mapValue.fields.OLDproductid.stringValue,
+                    OLDvariantidGIT: itemsJSON[i].oldItem.mapValue.fields.OLDvariantidGIT.stringValue,
+                    OLDproductidGIT: itemsJSON[i].oldItem.mapValue.fields.OLDproductidGIT.stringValue,
+                    OLDname: itemsJSON[i].oldItem.mapValue.fields.OLDname.stringValue
+                }
             }
             itemList.push(tempItem)
-            }
-        }
-        //sort
-        for (var j = 0;j<itemList.length;j++){
-            for (var i = 0;i<itemList.length -1;i++){
-                if (itemList[i].store > itemList[i+1].store ){
-                    let tempItem = itemList[i]
-                    itemList[i] = itemList[i+1]
-                    itemList[i+1] = tempItem
-                }
             }
         }
         for (var i = 0;i<itemList.length;i++){
@@ -295,7 +314,7 @@ class sortingCentre extends Component{
         itemList: []})
     }
 
-    //send email
+    /*//send email
     async sendEmail(){
         let rejectList = []
         let acceptList = []
@@ -314,13 +333,11 @@ class sortingCentre extends Component{
         {
             method: 'post',
         })
-    }
+    }*/
     
     //write to db
     async sendToDB(){
-        let currentDate = ''
-        let items = JSON.stringify(this.state.itemList)
-        //write to pending + history, delete from reqReturns, all one transaction
+        //write to pending, delete from reqReturns, all one transaction
         await fetch(`https://${serveoname}/return/pending/new?code=${encodeURIComponent(this.state.cCode)}`, {
             method: 'post',
         })
@@ -380,9 +397,13 @@ class sortingCentre extends Component{
     //submit the changing of reasons, finish process and send to db
     async handleSubmit2(){
         this.setCloseTime()
-        let items = await JSON.stringify(this.state.itemList)
+        let tempList = this.state.itemList
+        for (var i = 0;i<tempList.length;i++){
+            delete tempList[i]['index']
+        }
+        let items = await JSON.stringify(tempList)
         //update new reasons
-        fetch(`https://${serveoname}/return/requested/itemStatus?code=${encodeURIComponent(this.state.cCode)}&items=${encodeURIComponent(items)}`, {
+        await fetch(`https://${serveoname}/return/requested/itemStatus?code=${encodeURIComponent(this.state.cCode)}&items=${encodeURIComponent(items)}`, {
             method: 'PUT',
         })
         this.setState({step:4})
@@ -410,6 +431,27 @@ class sortingCentre extends Component{
                 variantidGIT: t2.res.items.arrayValue.values[i].mapValue.fields.variantidGIT.stringValue,
                 productidGIT: t2.res.items.arrayValue.values[i].mapValue.fields.productidGIT.stringValue,
                 flag: t2.res.items.arrayValue.values[i].mapValue.fields.flag.stringValue,
+            }
+            //old item is the original item, to be used for return purposes / notifying the company
+            //if the flag is 0, nothing's been changed. can copy the original over
+            if (t2.res.items.arrayValue.values[i].mapValue.fields.flag.stringValue == '0'){
+                tempItem.oldItem = {
+                    OLDvariantid: t2.res.items.arrayValue.values[i].mapValue.fields.variantid.stringValue,
+                    OLDproductid: t2.res.items.arrayValue.values[i].mapValue.fields.productid.stringValue,
+                    OLDvariantidGIT: t2.res.items.arrayValue.values[i].mapValue.fields.variantidGIT.stringValue,
+                    OLDproductidGIT: t2.res.items.arrayValue.values[i].mapValue.fields.productidGIT.stringValue,
+                    OLDname: t2.res.items.arrayValue.values[i].mapValue.fields.name.stringValue
+                }
+            }
+            //if the flag is 1, something was already changed. have to copy the existing old item over
+            else{
+                tempItem.oldItem = {
+                    OLDvariantid: t2.res.items.arrayValue.values[i].mapValue.fields.oldItem.mapValue.fields.OLDvariantid.stringValue,
+                    OLDproductid: t2.res.items.arrayValue.values[i].mapValue.fields.oldItem.mapValue.fields.OLDproductid.stringValue,
+                    OLDvariantidGIT: t2.res.items.arrayValue.values[i].mapValue.fields.oldItem.mapValue.fields.OLDvariantidGIT.stringValue,
+                    OLDproductidGIT: t2.res.items.arrayValue.values[i].mapValue.fields.oldItem.mapValue.fields.OLDproductidGIT.stringValue,
+                    OLDname: t2.res.items.arrayValue.values[i].mapValue.fields.oldItem.mapValue.fields.OLDname.stringValue
+                }
             }
             tempList.push(tempItem)
         }
@@ -522,8 +564,8 @@ class sortingCentre extends Component{
                                 <p className = 'itemHeader'>NEW ITEM (varID)</p>
                             </div>
                         </div>
-                        {this.state.itemList.map((item)=>{
-                        return <Item item={item} serveoname = {serveoname} step = {4} key={item.variantid} addItem={this.addItem4.bind(this)} handleSelect={this.handleStatusChange.bind(this)}/>
+                        {this.state.itemList.map((item,index)=>{
+                        return <Item item={item} serveoname = {serveoname} step = {4} key={item.variantid+index} addItem={this.addItem4.bind(this)} handleSelect={this.handleStatusChange.bind(this)}/>
                         })}
                     </fieldset>
                     <div className = 'sc1'>
@@ -579,7 +621,7 @@ class sortingCentre extends Component{
                                 <hr className = 'vertHeader'/>
                             </div>
                             <div className ='container2SCHeader'>
-                                <p className = 'itemHeader' > CODE  </p>   
+                                <p className = 'itemHeader' > CODE</p>   
                             </div>
                             <div className = 'vert'>
                                 <hr className = 'vertHeader'/>
@@ -627,9 +669,6 @@ class sortingCentre extends Component{
                         </label>
                         <label> Code:  
                             <input name = 'newCode' value={this.state.newCode} onChange={this.handleNewInput} />
-                        </label>
-                        <label> Order:
-                            <input name = 'newOrder' value = {this.state.newOrder} onChange = {this.handleNewInput}/>
                         </label>
                         <button onClick = {this.addItem5}>ADD</button>
                     <div className = 'sc1'>

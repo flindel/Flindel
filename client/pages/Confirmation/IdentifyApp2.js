@@ -72,7 +72,6 @@ class IdentifyApp extends Component {
             method: 'get',
         })
         let json = await temp.json()
-        //console.log("json----"+JSON.stringify(json))
         this.setState({step:1,returnPolicy: json.res.mapValue.fields, defaultReturn: json.default.stringValue})
         //get shop domain from db
         let domainTemp = await fetch(`https://${serveoname}/shop/domain?shop=${encodeURIComponent(shop)}`, {
@@ -98,10 +97,13 @@ class IdentifyApp extends Component {
             //search here instead of manually setting
           }
           //set state to the new code
-          await this.setState({code:code})
-          let unique =  await this.checkUnique()
+          let unique =  await this.checkUnique(code)
           if(unique == false){
               this.generateID() 
+          }
+          else{
+              await this.setState({step:5, code: code})
+              this.sendToDB()
           }
     }
 
@@ -182,9 +184,6 @@ class IdentifyApp extends Component {
         }
         await this.setState({returnlist:tempList})
         await this.generateID()
-        await this.sendToDB()
-        //this.sendEmail()
-        this.setState({step:5})
     }
 
     //begin return portal from very start
@@ -214,8 +213,8 @@ class IdentifyApp extends Component {
        }
 
     //check if code is unique (call to db)
-    async checkUnique(){
-        let temp = await fetch(`https://${serveoname}/return/requested/uuid?code=${encodeURIComponent(this.state.code)}`, {
+    async checkUnique(code){
+        let temp = await fetch(`https://${serveoname}/return/requested/uuid?code=${encodeURIComponent(code)}`, {
             method: 'get',
         })
         let json = await temp.json()
@@ -270,7 +269,7 @@ class IdentifyApp extends Component {
 
       //check returns database to see if return already exists
     async checkReturnsFromDB(orderNum,emailAdd){
-        //orderNum =1
+        orderNum =1
         let temp = await fetch(`https://${serveoname}/return/requested/exists?orderNum=${encodeURIComponent(orderNum)}&emailAdd=${encodeURIComponent(emailAdd)}`, {
             method: 'get',
         })

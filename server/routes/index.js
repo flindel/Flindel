@@ -16,6 +16,7 @@ const dbRouter = require("./databaseAction");
 const webhookRouter = require("./webhooks");
 const priceRule = require("./priceRule");
 const itemRouter = require('./item')
+const fulfillmentRouter = require('./fulfillment')
 
 router = combineRouters(
   rootRouter,
@@ -35,6 +36,7 @@ router = combineRouters(
   webhookRouter,
   priceRule,
   itemRouter,
+  fulfillmentRouter
 );
 
 module.exports = router;

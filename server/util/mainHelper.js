@@ -4,7 +4,7 @@ emailHelper = require('./emailHelper')
 async function getItems(dbIn){
     let itemList = []
     db = dbIn
-    let myRef = db.collection('pending')
+    let myRef = db.collection('pendingReturns')
     let query = await myRef.get()
     await query.forEach(async doc => {
         let items = doc._fieldsProto.items.arrayValue.values
@@ -22,58 +22,18 @@ async function getItems(dbIn){
 //split items into accepted, return, refund lists
 async function breakdown(db, items){
     let acceptedList = []
-    let refundList = []
     let returningList = []
-    for (var i = 0; i<items.length;i++){
-        let tempItem = {
-            name: items[i].name.stringValue,
-            store: items[i].store,
-            order: items[i].order,
-            status: items[i].status.stringValue,
-            variantid: items[i].variantid.stringValue,
-            variantidGIT: items[i].variantidGIT.stringValue,
-            productid: items[i].productid.stringValue,
-            productidGIT: items[i].productidGIT.stringValue,
-            quantity: 1,
-            flag: items[i].flag.stringValue
-        }
-        //item is created twice as a deep-copy substitute. it doesn't work without this
-        let tempItem2 = {
-            name: items[i].name.stringValue,
-            store: items[i].store,
-            order: items[i].order,
-            status: items[i].status.stringValue,
-            variantid: items[i].variantid.stringValue,
-            variantidGIT: items[i].variantidGIT.stringValue,
-            productid: items[i].productid.stringValue,
-            productidGIT: items[i].productidGIT.stringValue,
-            quantity: 1,
-            flag: items[i].flag.stringValue
-        }
-        //item was swapped out, refund to keep consistent with customer information
-        if(tempItem.flag == '-1' && tempItem.status != 'rejected'){
-            refundList.push(tempItem2)
-        }
-        //item was normal, mark accepted and add to list
-        else if (tempItem.flag == '0' && tempItem.status == 'accepted'){
-            acceptedList.push(tempItem)
-            refundList.push(tempItem2)
-        }
-        //item was normal, mark returning and add to list
-        else if (tempItem.flag == '0' && tempItem.status == 'returning'){
-            refundList.push(tempItem2)
-            returningList.push(tempItem2)
-        }
-        //item was added as substitute, mark accepted, but don't refund (covered in first option)
-        else if (tempItem.flag == '1' && tempItem.status == 'accepted'){
-            acceptedList.push(tempItem)
-        }
-        //item was added as substitute, mark returning, but don't refund (covered in first option)
-        else if (tempItem.flag == '1'&& tempItem.status == 'returning'){
-            returningList.push(tempItem2)
+    for (var i = 0;i<items.length;i++){
+        if (items[i].value.integerValue == 1){
+            if (items[i].status.stringValue == 'accepted'){
+                acceptedList.push(items[i])
+            }
+            else if (items[i].status.stringValue == 'returning'){
+                returningList.push(items[i])
+            }
         }
     }
-    return {acceptedList, refundList, returningList}
+    return [acceptedList, returningList]
 }
 
 async function getGITInformation(db, variantid, productid){
@@ -130,7 +90,7 @@ async function combine(items){
 }
 
 //sort items that need to be refunded by store and order, send email to various stores
-async function sortRefundItems(items){
+async function sortRefundItems(items, db){
     let currList = []
     let storeItems = []
         while (items.length>0){
@@ -176,10 +136,20 @@ async function sortNewItems(items, dbIn){
         let storeItems = []
         let currStore = items[0].store
         for (var i = 0;i<items.length;i++){
+            items[i].quantity = 1
             if(items[i].store == currStore){
                 currList.push(items[i])
                 items.splice(i,1)
                 i--
+            }
+        }
+        for (var i = 0;i<items.length;i++){
+            for (var j = i+1;j<items.length;j++){
+                if (items[i].variantid.stringValue == items[j].variantid.stringValue){
+                    items[i].quantity++
+                    items.splice(j,1)
+                    j--
+                }
             }
         }
     sendItemEmail(currList, currStore, dbIn)

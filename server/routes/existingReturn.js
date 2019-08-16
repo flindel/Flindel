@@ -15,7 +15,14 @@ router.get('/requested/uuid', async ctx => {
         myRef = db.collection('requestedReturns')
         let query = await myRef.where('code','==',code).get()
         if (query.empty){
-            ctx.body = { "unique":true}
+            myRef2 = db.collection('pendingReturns')
+            let query2 = await myRef2.where('code','==',code).get()
+            if (query2.empty){
+                ctx.body = { "unique":true}
+            }
+            else{
+                ctx.body = { "unique":false}
+            }
         }
         else{
             ctx.body = { "unique":false}
@@ -162,6 +169,20 @@ router.put('/requested/closeTime', async ctx=>{
     ctx.body = true
 })
 
+router.put('/pending/items',async ctx=>{
+    code = ctx.query.code
+    items = await JSON.parse(ctx.query.items)
+    db = ctx.db
+    myRef = db.collection('pendingReturns')
+    let query = await myRef.where('code','==',code).get()
+    let dRef = ''
+    await query.forEach(doc=>{
+        dRef = doc.ref
+    })
+    updateItems = dRef.update({items:items})
+    ctx.body = true
+})
+
 function getTime(){
     let now = new Date()
     let month = now.getMonth()+1
@@ -203,6 +224,7 @@ router.post('/pending/new', async ctx=>{
     }
     for (var i = 0;i<oldDoc._fieldsProto.items.arrayValue.values.length;i++){
         let tempItem = {
+            value: 0,
             flag: oldDoc._fieldsProto.items.arrayValue.values[i].mapValue.fields.flag.stringValue,
             name: oldDoc._fieldsProto.items.arrayValue.values[i].mapValue.fields.name.stringValue,
             productid: oldDoc._fieldsProto.items.arrayValue.values[i].mapValue.fields.productid.stringValue,
@@ -211,11 +233,18 @@ router.post('/pending/new', async ctx=>{
             status: oldDoc._fieldsProto.items.arrayValue.values[i].mapValue.fields.status.stringValue,
             store: oldDoc._fieldsProto.items.arrayValue.values[i].mapValue.fields.store.stringValue,
             variantid: oldDoc._fieldsProto.items.arrayValue.values[i].mapValue.fields.variantid.stringValue,
-            variantidGIT: oldDoc._fieldsProto.items.arrayValue.values[i].mapValue.fields.variantidGIT.stringValue
+            variantidGIT: oldDoc._fieldsProto.items.arrayValue.values[i].mapValue.fields.variantidGIT.stringValue,
+            oldItem: {
+                OLDname: oldDoc._fieldsProto.items.arrayValue.values[i].mapValue.fields.oldItem.mapValue.fields.OLDname.stringValue,
+                OLDvariantid: oldDoc._fieldsProto.items.arrayValue.values[i].mapValue.fields.oldItem.mapValue.fields.OLDvariantid.stringValue,
+                OLDproductid: oldDoc._fieldsProto.items.arrayValue.values[i].mapValue.fields.oldItem.mapValue.fields.OLDproductid.stringValue,
+                OLDvariantidGIT: oldDoc._fieldsProto.items.arrayValue.values[i].mapValue.fields.oldItem.mapValue.fields.OLDvariantidGIT.stringValue,
+                OLDproductidGIT: oldDoc._fieldsProto.items.arrayValue.values[i].mapValue.fields.oldItem.mapValue.fields.OLDproductidGIT.stringValue,
+            }
         }
         data.items.push(tempItem)
     }
-    let writeDoc = db.collection('pending').doc().set(data)
+    let writeDoc = await db.collection('pendingReturns').doc(codeIn).set(data)
     let deleteDoc = db.collection('requestedReturns').doc(codeIn).delete();   
     ctx.body =  true
 })

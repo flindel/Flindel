@@ -66,6 +66,16 @@ hr.horiz{
       border-color: black;
       border: none; 
 }
+hr.horizStrong{
+  height: 4px;
+    margin-left: -5%;
+    margin-right: -5%;
+    background-color: black;
+      background-color: black;
+      color:black;
+      border-color: black;
+      border: none; 
+}
 
 div.red{
     background-color: lightpink;
@@ -113,13 +123,37 @@ div.vert{
   }
 
   fieldset.SC{
-      margin-left:5%;
-      margin-right:5%;
+      margin-left:2%;
+      margin-right:2%;
   }
 
   fieldset.Return{
       margin-left:10%;
       margin-right:10%;
+  }
+
+  hr.vertR{
+    margin-left:40%;
+      margin-top:-8px;
+      width:20%;
+      height: 160px;
+      background-color: black;
+      background-color: black;
+      color:black;
+      border-color: black;
+      border: none;   
+  }
+
+  hr.vertRI{
+    margin-left:40%;
+      margin-top:-8px;
+      width:20%;
+      height: 60px;
+      background-color: black;
+      background-color: black;
+      color:black;
+      border-color: black;
+      border: none;
   }
 
   hr.vert{
@@ -137,9 +171,98 @@ div.vert{
     margin-left:40%;
       margin-top:-8px;
       width:20%;
-      height: 30px;
+      height: 50px;
       background-color: black;
       color:black;
       border-color: black;
       border: none;
+  }
+
+  p.itemOld{
+      font-size: 80%;
+  }
+
+  p.itemSC{
+      font-weight: bold;
+      max-width: 100%
+  }
+/* ASSEMBLING ITEMS*/
+  div.deliveryHeaderS{
+    width:10%;
+    text-align:center;
+  }
+  div.deliveryS{
+    width:10%;
+    text-align:center;
+    height: 200px;
+    padding-top: 10px;
+    padding-bottom: 10px;
+  }
+
+  div.deliveryHeaderM{
+    width:20%;
+    text-align:center; 
+  }
+  div.deliveryM{
+    width:20%;
+    text-align:center;
+    height: 200px;
+    padding-top: 10px;
+    padding-bottom: 10px;
+  }
+  div.deliveryHeaderL{
+    width:46%;
+    text-align:center;
+  }
+  div.deliveryL{
+    width:46%;
+    text-align:center;
+    height: 200px;
+    padding-top: 10px;
+    padding-bottom: 10px;
+  }
+
+  textarea{
+      resize: none;
+      height: 95%;
+      width: 95%;
+      text-align: left;
+  }
+
+  div.itemOrderHeader{
+    width:24.25%;
+    text-align:center;
+  }
+
+  div.itemOrder{
+    width:24.25%;
+    text-align:center;
+    height: 60px;
+    padding-top: 10px;
+    padding-bottom: 10px;
+  }
+
+  /*DELIVERING ITEMS*/
+  div.deliveryHeader2S{
+    width:10%;
+    text-align:center;
+  }
+  div.delivery2S{
+    width:10%;
+    text-align:center;
+    height: 120px;
+    padding-top: 10px;
+    padding-bottom: 10px;
+  }
+
+  div.deliveryHeader2L{
+    width:43.5%;
+    text-align:center;
+  }
+  div.delivery2L{
+    width:43.5%;
+    text-align:center;
+    height: 120px;
+    padding-top: 10px;
+    padding-bottom: 10px;
   }

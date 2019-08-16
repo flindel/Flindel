@@ -6,33 +6,58 @@ const expiredHelper = require('./expiredHelper')
 const inv = require ('./editInventory')
 const mainHelper = require('./mainHelper')
 
-//get rid of anything that's been in orders for over 7 days
+//get rid of anything that's been in orders/items for over 7 days
 async function checkExpired(db){
-    //clear items that have been in warehouse for 7+ days, mark returning and pull inventory
     expiredHelper.clearExpiredItems(db)
-    //clear return requests that have been in system for 7+ days
     expiredHelper.clearExpiredOrders(db)
 }
 
-//main function, gets handles the orders that are in pending
-async function mainReport(dbIn){
-    db = dbIn
-        //pull all the items from pending
-    let items = await mainHelper.getItems(dbIn)
-        //break down items into items being resold and items being refunded (not mutually exclusive)
-    let {acceptedList, refundList, returningList} = await mainHelper.breakdown(db, items)
-        //write any items directly to returning
-    for (var i =0;i<returningList.length;i++){
-        addItem(returningList[i],'returning',db)
-    }
-        //cancel duplicates to get accurate quantities
-    acceptedList = await mainHelper.combine(acceptedList)
-        //update inventory for accepted items
-    await updateInventory(acceptedList, dbIn)
-        //sort items, ultimately send email to brand about what new items were received today
-    //mainHelper.sortNewItems(acceptedList, dbIn)
-        //sort items, ultimately send email to brand about who they need to refund
-    //mainHelper.sortRefundItems(refundList, dbIn)   
+//send information about which items need to be refunded
+async function refundInformation(db){
+    let myRef = db.collection('pendingReturns')
+    let query = await myRef.get()
+    let refundItems = []
+    let specialItems = []
+    await query.forEach(async doc=>{
+        let orderRefundItems = []
+        let orderRejectItems = []
+        let allItems = doc._fieldsProto.items.arrayValue.values
+        for (var i = 0;i<allItems.length;i++){
+            let tempItem = allItems[i].mapValue.fields
+            tempItem.store = doc._fieldsProto.shop.stringValue
+            tempItem.order = doc._fieldsProto.order.stringValue
+            if (tempItem.value.integerValue == -1){
+                orderRejectItems.push(tempItem)
+            }
+            else if (tempItem.value.integerValue == 1){
+                if (tempItem.status.stringValue == 'rejected'){
+                    orderRejectItems.push(tempItem)
+                }
+                else if (tempItem.status.stringValue == 'special'){
+                    orderRejectItems.push(tempItem)
+                    specialItems.push(tempItem)
+                }
+                else if (tempItem.status.stringValue == 'returning' || tempItem.status.stringValue == 'accepted'){
+                    orderRefundItems.push(tempItem)
+                    refundItems.push(tempItem)
+                }
+            }
+        }
+        //send email to customer about what stuff got accepted
+        //emailHelper.sendUpdateEmail(doc._fieldsProto.email.stringValue, orderRefundItems, orderRejectItems)
+    })
+    mainHelper.sortRefundItems(refundItems,db)
+    //SPECIAL ITEMS?
+}
+
+//update flindel inventory on which items have been accepted. update shopify inventory for reselling items
+async function itemUpdate(db){
+    let items = await mainHelper.getItems(db)
+    let [acceptedItems, returningItems] = await mainHelper.breakdown(db, items)
+    addItems(returningItems, 'returning', db)
+    updateInventory(acceptedItems,db)
+    addItems(acceptedItems, 'reselling', db)
+    mainHelper.sortNewItems(acceptedItems,db)
 }
 
 //notify of all items marked returning so we know when to send shipments back
@@ -53,8 +78,6 @@ async function returningReport(dbIn){
         }
     });
     returningList = mainHelper.combine(returningList)
-    //console.log(returningList)
-    console.log('the list is here:')
 }
 
 
@@ -62,57 +85,87 @@ async function returningReport(dbIn){
 async function clearPending(dbIn){
     db = dbIn
     let batch = db.batch()
-    let myRef = db.collection('pending')
+    let myRef = db.collection('pendingReturns') //duplicate to history
     let query = await myRef.get()
     await query.forEach(async doc =>{
+        let data = {
+            order_status: doc._fieldsProto.email.stringValue,
+            email: doc._fieldsProto.email.stringValue,
+            processEnd: doc._fieldsProto.processEnd.stringValue,
+            createdDate: doc._fieldsProto.createdDate.stringValue,
+            code: doc._fieldsProto.code.stringValue,
+            emailOriginal: doc._fieldsProto.emailOriginal.stringValue,
+            order : doc._fieldsProto.order.stringValue,
+            shop: doc._fieldsProto.shop.stringValue,
+            received_by: doc._fieldsProto.received_by.stringValue,
+            itemsDropped: doc._fieldsProto.itemsDropped.stringValue,
+            processBegin: doc._fieldsProto.processBegin.stringValue,
+            receivedDate: doc._fieldsProto.receivedDate.stringValue,
+            items:[]
+        }
+        for (var i = 0;i<doc._fieldsProto.items.arrayValue.values.length;i++){
+            let tempItem = {
+                value:  doc._fieldsProto.items.arrayValue.values[i].mapValue.fields.value.integerValue,
+                flag: doc._fieldsProto.items.arrayValue.values[i].mapValue.fields.flag.stringValue,
+                name: doc._fieldsProto.items.arrayValue.values[i].mapValue.fields.name.stringValue,
+                productid: doc._fieldsProto.items.arrayValue.values[i].mapValue.fields.productid.stringValue,
+                productidGIT: doc._fieldsProto.items.arrayValue.values[i].mapValue.fields.productidGIT.stringValue,
+                reason: doc._fieldsProto.items.arrayValue.values[i].mapValue.fields.reason.stringValue,
+                status: doc._fieldsProto.items.arrayValue.values[i].mapValue.fields.status.stringValue,
+                store: doc._fieldsProto.items.arrayValue.values[i].mapValue.fields.store.stringValue,
+                variantid: doc._fieldsProto.items.arrayValue.values[i].mapValue.fields.variantid.stringValue,
+                variantidGIT: doc._fieldsProto.items.arrayValue.values[i].mapValue.fields.variantidGIT.stringValue,
+                oldItem: {
+                    OLDname: doc._fieldsProto.items.arrayValue.values[i].mapValue.fields.oldItem.mapValue.fields.OLDname.stringValue,
+                    OLDvariantid: doc._fieldsProto.items.arrayValue.values[i].mapValue.fields.oldItem.mapValue.fields.OLDvariantid.stringValue,
+                    OLDproductid: doc._fieldsProto.items.arrayValue.values[i].mapValue.fields.oldItem.mapValue.fields.OLDproductid.stringValue,
+                    OLDvariantidGIT: doc._fieldsProto.items.arrayValue.values[i].mapValue.fields.oldItem.mapValue.fields.OLDvariantidGIT.stringValue,
+                    OLDproductidGIT: doc._fieldsProto.items.arrayValue.values[i].mapValue.fields.oldItem.mapValue.fields.OLDproductidGIT.stringValue,
+                }
+            }
+            data.items.push(tempItem)
+        }
+        let set = db.collection('historyReturns').doc()
+        batch.set(set,data)
         batch.delete(doc.ref)
     })
     batch.commit();
 }
 
-////////////////////////////////////////////////////////////////////
-
 //update inv for reselling items
 async function updateInventory(items, dbIn){
     db = dbIn
-    let blockedList = []
     for (var i = 0;i<items.length;i++){
-        //get information for active item
-            //let idActive = items[i].variantidGIT CHANGE IT TO THIS ONE WHEN WE ACTUALLY HAVE DUPLICATES
-        let idActive = items[i].variantid
+        let idActive = items[i].variantid.stringValue//let idActive = items[i].variantidGIT CHANGE IT TO THIS ONE WHEN WE ACTUALLY HAVE DUPLICATES
         let storeActive = items[i].store
-        //get access token for specific store
         let {accessToken, torontoLocation} = await inv.getAccessToken(db,storeActive)
         let invId = await inv.getInvID(storeActive, idActive, accessToken)
-        addItem(items[i], 'reselling', db)
-        inv.increment(items[i].quantity,torontoLocation,invId,storeActive)
+        inv.increment(1,torontoLocation,invId,storeActive)
         }
-    emailHelper.sendBlockedListEmail(blockedList)
 }
 
 //add item to items database
-async function addItem(item, status, dbIn){
+async function addItems(items, status, dbIn){
     let currentDate = expiredHelper.getCurrentDate()
     db = dbIn
     //efficiency
     let batch = db.batch()
-    let data = {
-        name: item.name,
-        variantid: item.variantid,
-        variantidGIT: item.variantidGIT,
-        productid: item.productid,
-        productidGIT: item.productidGIT,
-        store: item.store,
-        status: status,
-        dateProcessed: currentDate,
-        };
-        //create multiple copies of item based on quantity
-        for (var i = 0;i<item.quantity;i++){
-            setDoc = db.collection('items').doc()
-            batch.set(setDoc,data)
-        }
-        //commit batch
+    for (var i =0;i<items.length;i++){
+        let item = items[i]
+        let data = {
+            name: item.name.stringValue,
+            variantid: item.variantid.stringValue,
+            variantidGIT: item.variantidGIT.stringValue,
+            productid: item.productid.stringValue,
+            productidGIT: item.productidGIT.stringValue,
+            store: item.store,
+            status: status,
+            dateProcessed: currentDate,
+            };
+        setDoc = db.collection('items').doc()
+        batch.set(setDoc,data)
+    }
     batch.commit()
 }
 
-module.exports = {mainReport, clearPending, checkExpired, returningReport}
+module.exports = {refundInformation, itemUpdate, clearPending, checkExpired, returningReport}

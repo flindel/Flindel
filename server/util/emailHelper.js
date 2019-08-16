@@ -9,49 +9,62 @@ async function getStoreEmail(dbIn, store){
     return email
 }
 
-async function sendBlockedListEmail(itemList){
+async function sendUpdateEmail(email, acceptedList, rejectedList){
   const headers = {}
-    headers['Accept'] = 'application/json';
-    headers['Content-Type'] = 'application/json';
-    headers['Authorization'] = 'Bearer ' + process.env.SENDGRID;
-    let message = ""
-    if (itemList.length>0){
-        message += 'The following items were blacklisted and should be moved from RESELLING to RETURNING.'
+  headers['Accept'] = 'application/json';
+  headers['Content-Type'] = 'application/json';
+  headers['Authorization'] = 'Bearer ' + process.env.SENDGRID;
+      let message = ''
+      message += 'Thank you for submitting your return. Your order has been processed. '
+      if (acceptedList.length>0){
+        message += 'The following items have been accepted:'
         message +='\n\n'
-        for (var i = 0;i<itemList.length;i++){
-            message += (i+1) + ': '+ itemList[i].name + ' - ' + itemList[i].variantid
-            message += '\n\n'
+        for (var i = 0;i<acceptedList.length;i++){
+        message += (i+1) + ': '+ acceptedList[i].oldItem.mapValue.fields.OLDname.stringValue + ' - ' + acceptedList[i].oldItem.mapValue.fields.OLDvariantid.stringValue
+        message += '\n\n'
         }
-    }
-    const option = {
-      method: 'POST',
-      url: 'https://api.sendgrid.com/v3/mail/send',
-      headers: headers,
-      json: true,
-      body: {
-        "personalizations": [
-          {
-            "to": [
+      }
+      if (rejectedList.length>0){
+        message += 'The following items have been rejected. You may pick them up from X within the next 7 days. '
+        message += '\n\n'
+        for (var i = 0;i<rejectedList.length;i++){
+        message += (i+1) + ': ' + rejectedList[i].oldItem.mapValue.fields.OLDname.stringValue + ' - ' + rejectedList[i].oldItem.mapValue.fields.OLDvariantid.stringValue
+        message += '\n\n'
+        message += '\n\n'
+        }
+      }
+      message += '\n'
+      message += 'Thank you.'
+      const option = {
+        method: 'POST',
+        url: 'https://api.sendgrid.com/v3/mail/send',
+        headers: headers,
+        json: true,
+        body:{
+            "personalizations": [
               {
-                "email": email //change to FLINDEL once live
+                "to": [
+                  {
+                    "email": 'booleafs17@yahoo.ca' //change to EMAIL once live
+                  }
+                ],
+                "subject": "Status Update"
               }
             ],
-            "subject": "Blacklisted Items"
+            "from": {
+                "name": "Status Update",
+              "email": "no-reply@sender.com"
+            },
+            "content": [
+              {
+                "type": "text/plain",
+                "value": message
+              }
+            ]
           }
-        ],
-        "from": {
-            "name": "Flindel - Internal",
-          "email": "no-reply@flindel.com"
-        },
-        "content": [
-          {
-            "type": "text/plain",
-            "value": message
-          }
-        ]
-      }
-  }
-    await rp(option);  
+    }
+    await rp(option);
+  
 }
 
 //send email to store about items that were received that day
@@ -62,10 +75,10 @@ async function sendItemEmail(itemList, email){
     headers['Authorization'] = 'Bearer ' + process.env.SENDGRID;
     let message = ""
     if (itemList.length>0){
-        message += 'The following return items have been accepted in the last 12 hours, and are eligible for potential resale in the morning.'
+        message += 'The following return items have been accepted in the last X hours, will be added to the store in the morning.'
         message +='\n\n'
         for (var i = 0;i<itemList.length;i++){
-            message += (i+1) + ': '+ itemList[i].name + ' - ' + itemList[i].variantid + ' ... Quantity: ' + itemList[i].quantity
+            message += (i+1) + ': '+ itemList[i].name.stringValue + ' - ' + itemList[i].variantid.stringValue + ' ... Quantity: ' + itemList[i].quantity
             message += '\n\n'
         }
     }
@@ -115,7 +128,7 @@ async function sendRefundEmail(orderList, email){
       for(var j = 0;j<orderList[i].refundItems.length;j++){
           message += '\n'
           message += '\t'
-          message += orderList[i].refundItems[j].variantid + ' ... ' + orderList[i].refundItems[j].name 
+          message += orderList[i].refundItems[j].oldItem.mapValue.fields.OLDname.stringValue + ' ... ' + orderList[i].refundItems[j].oldItem.mapValue.fields.OLDvariantid.stringValue
       }
       message += '\n\n'
     }
@@ -152,4 +165,4 @@ async function sendRefundEmail(orderList, email){
     await rp(option);
 }
 
-module.exports = {getStoreEmail, sendItemEmail, sendRefundEmail, sendBlockedListEmail}
+module.exports = {getStoreEmail, sendItemEmail, sendRefundEmail, sendUpdateEmail}
