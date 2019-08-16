@@ -43,7 +43,8 @@ class ReviewRestart extends Component {
                         serveoname = {this.props.serveoname}
                         items = {this.props.items}
                         orderNum = {this.state.orderNum}
-                        review = {true}/>
+                        review = {true}
+                        shop = {this.props.shop}/>
                     <p className="reviewInfo2">If you would like to delete your current return and create a new return for Order #{this.state.orderNum}, please click the delete button below:</p>
                     <button className = 'Submit2 Small'onClick={this.togglePopup}>DELETE + RESTART</button>
                     <p className="reviewInfo2">Or, to make a return for a different order, please click below to be redirected to the beginning of the return portal.</p>

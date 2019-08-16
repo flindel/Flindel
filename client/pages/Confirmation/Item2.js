@@ -73,10 +73,11 @@ class Item extends Component {
 
 
      //on mount, get important information including image source to show the display picture
-    async componentWillMount(){
+    async componentDidMount(){
+        window.scrollTo(0, 0)
         var imageID = this.props.item.productID
 
-        fetch(`https://${this.props.serveoname}/products/img?id=${encodeURIComponent(imageID)}`, {
+        fetch(`https://${this.props.serveoname}/products/img?id=${encodeURIComponent(imageID)}&shop=${encodeURIComponent(this.props.shop)}`, {
         method: 'GET',})
         .then(response => response.json())
         .then(resData=>{
@@ -97,9 +98,9 @@ class Item extends Component {
         this.setState({quantities:quantityArr})
     }
 
-    componentDidMount(){
-        window.scrollTo(0, 0)
-    }
+    // componentDidMount(){
+    //     window.scrollTo(0, 0)
+    // }
 
     render() {
         //get total quantity from state and pass it to return quantity
@@ -185,6 +186,7 @@ class Item extends Component {
         //third time through item - display confirmation, no dropdown
         else if (this.props.step == 3){
             return(
+                
                 <div className="itemContainer">
                     <div className ='container1'>
                         <img className = 'item2' src={this.state.src} />

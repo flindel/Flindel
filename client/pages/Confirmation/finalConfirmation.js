@@ -6,6 +6,10 @@ Allow customer to look over one more time before submit
 */
 
 class finalPage extends React.Component{
+    constructor(props){
+        super(props)
+    }
+
     //display
     render(){
     return(
@@ -15,7 +19,7 @@ class finalPage extends React.Component{
                     {/* <p className = 'orderHeader'>Order Number: {this.props.orderNum}</p> */}
                     <br/>
                     {this.props.items.map((item,index)=>{
-                        return <Item item={item} serveoname={this.props.serveoname} step = {3} review = {true} key={index}/>    
+                        return <Item shop={this.props.shop} item={item} serveoname={this.props.serveoname} step = {3} review = {true} key={index}/>    
                     })}
                 </fieldset>
             </div>
