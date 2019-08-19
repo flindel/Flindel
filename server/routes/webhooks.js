@@ -104,8 +104,15 @@ router.post("/hookorderendpoint", webhookOrder, async ctx => {
       fetch(
         `https://${SERVEO_NAME}.serveo.net/orders/fulfill?location_id=${encodeURIComponent(
           hookload.location_id
-        )}&lineitem_id=${encodeURIComponent(lineItemsID)}`
-      );
+        )}&lineitem_id=${encodeURIComponent(
+          JSON.stringify(lineItemsID)
+        )}&orderid=${encodeURIComponent(hookload.id)}`,
+        {
+          method: "post"
+        }
+      ).then(function(Response) {
+        console.log(Response);
+      });
     }
   }
   ctx.response.status = 200;
