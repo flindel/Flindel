@@ -11,6 +11,7 @@ import '@shopify/polaris/styles.css';
 import {serveo_name} from '../config'
 const sname = serveo_name
 const serveoname = sname.substring(8)
+let shop = ''
 
 class IdentifyApp extends Component {
     //constructor and binding methods
@@ -64,20 +65,23 @@ class IdentifyApp extends Component {
 
     //load return policy - have to expand this to multiple stores once we load
     async componentDidMount(){
+        shop = window.location.hostname
+        console.log(shop)
         //get return policy from db
-        let temp = await fetch(`https://${serveoname}/shop/returnPolicy`, {
+        let temp = await fetch(`https://${serveoname}/shop/returnPolicy?shop=${encodeURIComponent(shop)}`, {
             method: 'get',
         })
         let json = await temp.json()
         this.setState({step:1,returnPolicy: json.res.mapValue.fields, defaultReturn: json.default.stringValue})
         //get shop domain from db
-        let domainTemp = await fetch(`https://${serveoname}/shop/domain`, {
+        let domainTemp = await fetch(`https://${serveoname}/shop/domain?shop=${encodeURIComponent(shop)}`, {
             method: 'get',
         })
         let domainJson = await domainTemp.json()
         this.setState({
             shopDomain: `https://${domainJson.domain}`
         })
+
     }
 
     //generate usable unique codes
@@ -316,7 +320,7 @@ class IdentifyApp extends Component {
         this.setState({email:emailAdd.toLowerCase(), emailOriginal:emailAdd.toLowerCase()})
         const data = {orderNumber: orderNum, emailAddress:emailAdd};
         //get order fromm shopify db
-        let temp = await fetch(`https://${serveoname}/orders?orderNum=${encodeURIComponent(data.orderNumber)}`, {
+        let temp = await fetch(`https://${serveoname}/orders?orderNum=${encodeURIComponent(data.orderNumber)}&shop=${encodeURIComponent(shop)}`, {
             method: 'GET',
 
         })
@@ -430,7 +434,8 @@ class IdentifyApp extends Component {
                         orderNum = {this.state.orderNum} 
                         items = {this.state.returnList}
                         serveoname = {serveoname}
-                        restartReturn = {this.restartReturn}/>
+                        restartReturn = {this.restartReturn}
+                        shop = {shop}/>
                    </div>
                 )
             }
@@ -465,6 +470,7 @@ class IdentifyApp extends Component {
                 show = {true}
                 shopName = {this.state.shopName}/> 
                <ItemList 
+               shop = {shop}
                serveoname = {serveoname}
                orderNum = {this.state.orderNum}
                handleSubmit = {this.checkOver.bind(this)}
@@ -511,6 +517,7 @@ class IdentifyApp extends Component {
                 viewPage3 = {this.viewPage3.bind(this)}
                 shopName = {this.state.shopName}/> 
                 <PriceDisplay
+                shop = {shop}
                 serveoname={serveoname}
                 items = {this.state.returnlist}
                 orderNum = {this.state.orderNum}

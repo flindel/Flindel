@@ -110,6 +110,7 @@ export function postCollection(body, callback = doNothing){
     .then((data) => {
       console.log('POST Collection: ', data)
       callback(data);
+      return data;
     })
     .catch((error) => console.log(error))
 }

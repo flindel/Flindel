@@ -3,15 +3,17 @@ const rp = require("request-promise");
 const errors = require("request-promise/errors");
 const { api_link } = require("../default-shopify-api.json");
 const { getShopHeaders } = require("../util/shop-headers");
+const {accessTokenDB} = require('../util/acessTokenDB');
 const router = Router({
   prefix: "/orders"
 });
 
+//Only used by return portal
 router.get('/', async ctx => {
-    // Get all orders
-    const { shop, accessToken } = getShopHeaders(ctx);
+    // Get order info with order name (4 digit number like 1001)
+    const shop = ctx.query.shop
+    const accessToken = await accessTokenDB(ctx)
     const name = ctx.query.orderNum;
-    const { cookies } = ctx;
     const option = {
         url: `https://${shop}/${api_link}/orders.json?name=${name}&status=any`,
         headers: {

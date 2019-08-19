@@ -139,7 +139,7 @@ class confirmOrder extends React.Component{
                   <p className = 'orderHeader'>Order Number: {this.props.orderNum}</p>
                   <br/>
                       {this.props.items.map((item,index)=>{ 
-                      return <Item step = {2} item={item} serveoname={this.props.serveoname} key={index}handleSelect={this.handleSelect.bind(this)}/>    
+                      return <Item step = {2} item={item} serveoname={this.props.serveoname} key={index}handleSelect={this.handleSelect.bind(this)} shop = {this.props.shop}/>    
                       })} {/*show all items*/}
                 </fieldset>
               <br/>

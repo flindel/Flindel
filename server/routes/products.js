@@ -5,6 +5,7 @@ const { api_link } = require('../default-shopify-api.json');
 const { getShopHeaders } = require('../util/shop-headers');
 const getAccessToken = require('../util/editInventory')
 const mainHelper = require('../util/mainHelper')
+const {accessTokenDB} = require('../util/acessTokenDB');
 const router = Router({
     prefix: '/products'
 });
@@ -115,12 +116,14 @@ router.get('/ids/', async ctx => {
   }
 });
 
+//Only used by return portal
 router.get('/img', async ctx => {
     // Get product img src
     const productid = ctx.query.id;
     const { cookies } = ctx;
-    const shop = cookies.get('shop_id');
-    const accessToken = cookies.get('accessToken');
+    const shop = ctx.query.shop;
+    db = ctx.db
+    const accessToken = await accessTokenDB(ctx)
     const option = {
         url: `https://${shop}/${api_link}/products/${productid}.json`,
         headers: {
