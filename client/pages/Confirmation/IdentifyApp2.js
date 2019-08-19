@@ -100,6 +100,7 @@ class IdentifyApp extends Component {
           else{
               await this.setState({step:5, code: code})
               this.sendToDB()
+              this.sendEmail()
           }
     }
 

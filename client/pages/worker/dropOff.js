@@ -14,7 +14,8 @@ class DropOff extends Component {
             step: 0,
             workerID: '',
             items: [],
-            errorMessage:''
+            errorMessage:'',
+            history: ''
         }
         this.selectOrder = this.selectOrder.bind(this)
         this.handleWorkerID = this.handleWorkerID.bind(this)
@@ -25,15 +26,41 @@ class DropOff extends Component {
         this.receiveOrder = this.receiveOrder.bind(this)
         this.handleSubmit = this.handleSubmit.bind(this)
         this.updateDB = this.updateDB.bind(this)
+        this.loadHistory = this.loadHistory.bind(this)
     }
 
     handleWorkerID(e){
         this.setState({workerID: e.target.value})
     }
 
-    selectOrder(){
+    async loadHistory(){
+        let temp = await fetch(`https://${serveoname}/return/dropoffSummary?id=${encodeURIComponent(this.state.workerID)}`, {
+            method: 'get',
+            })
+        let res = await temp.json()
+        let allOrders = ''
+        for (var i = 0;i<res.codes.length;i++){
+            allOrders += res.codes[i] + ' , '
+        }
+        this.setState({history: allOrders})  
+    }
+
+    async selectOrder(){
         if (this.state.workerID!=''){
-            this.setState({step:1, errorMessage: '', code: ''})
+            let temp = await fetch(`https://${serveoname}/worker/check?id=${encodeURIComponent(this.state.workerID)}`, {
+            method: 'get',
+            })
+            let isValid = await temp.json()
+            if (isValid){
+                this.loadHistory()
+                this.setState({step:1, errorMessage: '', code: ''})
+            }
+            else{
+                this.setState({errorMessage: 'Invalid worker ID.'})
+            }
+        }
+        else{
+            this.setState({errorMessage:'Invalid worker ID.'})
         }
     }
 
@@ -98,6 +125,7 @@ class DropOff extends Component {
                     <h1 className = 'scHeader'>Drop Off Worker</h1>
                     <br/><br/>
                     <p>Enter your worker ID below</p>
+                    <p className = 'errorMessage'>{this.state.errorMessage}</p>
                     <input type = 'text' value = {this.state.workerID} onChange = {this.handleWorkerID}></input>
                     <button onClick = {this.selectOrder}>SUBMIT</button>
                     <br/><br/>
@@ -118,7 +146,10 @@ class DropOff extends Component {
                     <button onClick = {this.viewReturn}>SUBMIT</button>
                     <br/>
                     <p className = 'errorMessage'>{this.state.errorMessage}</p>
-                    <br/>
+                    <br/> <br/><br/><br/>
+                    <p className = 'itemHeader'>TODAY'S ORDERS</p>
+                    <p>{this.state.history}</p>
+                    <br/><br/><br/><br/>
                     <button onClick = {this.props.back}>BACK</button>
                 </div>
             )

@@ -128,7 +128,7 @@ class Item extends Component {
             let tJSON = await temp.json()
             let imageID = tJSON.variant.product_id
             //check if on blacklist
-            let temp2 = await fetch(`https://${this.props.serveoname}/blacklist/exists?store=${encodeURIComponent(this.props.item.store)}&id=${encodeURIComponent(imageID)}`, {
+            let temp2 = await fetch(`https://${this.props.serveoname}/blacklist/exists?store=${encodeURIComponent(this.props.item.store)}&id=${encodeURIComponent(imageID)}&id2=${encodeURIComponent(this.props.item.variantid)}`, {
             method: 'get',
             })
             let t2JSON = await temp2.json()
@@ -432,32 +432,31 @@ class Item extends Component {
             else if (this.props.step == 8){
                 return(
                     <div className = 'itemContainerSC'>
-                        <div className ='itemOrder'>
+                        <div className ={this.props.item.backgroundColor}>
                             <hr className = 'horiz'/>
                             <p className = 'item' >{this.props.item.name}</p>   
                         </div>
                         <div className = 'vert'>
                             <hr className = 'vertRI'/>
                         </div>
-                        <div className ='itemOrder'>
+                        <div className ={this.props.item.backgroundColor}>
                             <hr className = 'horiz'/>
                             <p className = 'item'>{this.props.item.variantid}</p>
                         </div>
                         <div className = 'vert'>
                             <hr className = 'vertRI'/>
                         </div>
-                        <div className = 'itemOrder'>
+                        <div className = {this.props.item.backgroundColor}>
                             <hr className = 'horiz'/>
                             <p className = 'item'>{this.props.item.productid}</p>
                         </div>
                         <div className = 'vert'>
                             <hr className = 'vertRI'/>
                         </div>
-                        <div className = 'itemOrder'>
+                        <div className = {this.props.item.backgroundColor}>
                             <hr className = 'horiz'/>
                             <button onClick = {this.failItem}>N</button>
                             <button onClick = {this.packageItem}>Y</button>
-                            <p className = 'item'>{this.props.item.fulfilled}</p>
                         </div>
                     </div>
                 )

@@ -66,7 +66,7 @@ class returnShipment extends Component {
     }
     confirmReturn(){
         this.sendEmails()
-        //this.updateDB()
+        this.updateDB()
         this.setState({step:4})
     }
 

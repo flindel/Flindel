@@ -80,6 +80,18 @@ router.put('/requested/receive', async ctx=>{
     ctx.body =  true
 })
 
+router.get('/dropoffSummary',async ctx=>{
+    db = ctx.db
+    id = ctx.query.id
+    myRef = db.collection('pendingReturns')
+    let query = await myRef.where('received_by', '==', id).get()
+    let codes = []
+    await query.forEach(async doc=>{
+        codes.push(doc._fieldsProto.code.stringValue)
+    })
+    ctx.body = {codes: codes}
+})
+
 router.get('/requested/items', async ctx=>{
         code = ctx.query.code
         db = ctx.db
@@ -197,7 +209,7 @@ function getTime(){
     if (second.length !=2){
         second = '0' + second
     }
-    currTime = month + '/' + day + '/' + year + '-' + hour + ':' + minute + ':' + second
+    let currTime = month + '/' + day + '/' + year + '-' + hour + ':' + minute + ':' + second
     return currTime
 }
 

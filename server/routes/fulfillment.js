@@ -3,20 +3,66 @@ const rp = require('request-promise');
 const errors = require('request-promise/errors');
 const { api_link } = require('../default-shopify-api.json');
 const { getShopHeaders } = require('../util/shop-headers');
+const fulfillHelper = require('../util/webhookHelper')
+const expiredHelper = require('../util/expiredHelper')
 
 const router = Router({
     prefix: '/fulfillment'
 });
 
-router.get('/', async ctx => {
+router.get('/assemble', async ctx => {
+    let date = expiredHelper.getCurrentDate()
     db = ctx.db
     code = ctx.query.workerID
     let orders = []
     myRef = db.collection('fulfillments')
-    let query = await myRef.where('workerid','==',code).get()
-    await query.forEach(async doc=>{
+    if (code == '1'){
+        let query = await myRef.get()
+        await query.forEach(async doc=>{
         orders.push(doc._fieldsProto)
-    })
+        })
+    }
+    else{
+        let query = await myRef.where('workerid','==',code).get()
+        await query.forEach(async doc=>{
+        orders.push(doc._fieldsProto)
+        })
+    }
+    for (var i = 0;i<orders.length;i++){
+        if (orders[i].dateCreated.stringValue.substring(0,9) == date){
+            if (parseInt(orders[i].dateCreated.stringValue.substring(10,12))<9){
+                orders.splice(i,1)
+                i--
+            }
+        }
+    }
+    ctx.body = orders
+});
+
+router.get('/deliver', async ctx => {
+    let date = expiredHelper.getCurrentDate()
+    db = ctx.db
+    code = ctx.query.workerID
+    let orders = []
+    myRef = db.collection('fulfillments')
+    if (code == '1'){
+        let query = await myRef.get()
+        await query.forEach(async doc=>{
+        orders.push(doc._fieldsProto)
+        })
+    }
+    else{
+        let query = await myRef.where('workerid','==',code).get()
+        await query.forEach(async doc=>{
+        orders.push(doc._fieldsProto)
+        })
+    }
+    for (var i = 0;i<orders.length;i++){
+        if (orders[i].status.stringValue == 'incomplete' || orders[i].status.stringValue == 'failed'){
+            orders.splice(i,1)
+            i--
+        }
+    }
     ctx.body = orders
 });
 
@@ -28,19 +74,53 @@ router.put('/update',async ctx=>{
     for (var i = 0;i<orders.length;i++){
         let query = await myRef.where('code','==',orders[i].code).get()
         await query.forEach(async doc=>{
-            batch.delete(doc.ref)
+            batch.set(doc.ref,orders[i])
         })
-        let newDoc = myRef.doc()
+    }
+    batch.commit()
+    ctx.body = true
+})
+function getTime(){
+    let now = new Date()
+    let month = now.getMonth()+1
+    let day = now.getDate()
+    let year = now.getFullYear()
+    let hour = now.getHours()
+    let minute = now.getMinutes().toString()
+    if (minute.length != 2){
+        minute = '0' + minute
+    }
+    let second = now.getSeconds().toString()
+    if (second.length !=2){
+        second = '0' + second
+    }
+    currTime = month + '/' + day + '/' + year + '-' + hour + ':' + minute + ':' + second
+    return currTime
+}
+
+router.post('/complete',async ctx=>{
+    //delete from curr + add to fulfillmentHistory in batch
+    //for each item, add to whatever
+    db = ctx.db
+    let batch = db.batch()
+    let myRef = db.collection('fulfillments')
+    let newRef = db.collection('fulfillmentHistory')
+    let currTime = await getTime()
+    orders = await JSON.parse(ctx.query.orders)
+    for (var i = 0;i<orders.length;i++){
+        orders[i].dateCompleted = currTime
+        let query = await myRef.where('code','==',orders[i].code).get()
+        await query.forEach(async doc=>{
+            //batch.delete(doc.ref)
+        })
+        let newDoc = newRef.doc()
         batch.set(newDoc,orders[i])
+        for (var j = 0;j<orders[i].items.length;j++){
+            fulfillHelper.completeReturnItem(ctx.db, orders[i].orderid, orders[i].items[j].variantid, orders[i].items[j].itemid, orders[i].items[j].quantity, orders[i].store, orders[i].code)
+        }
     }
     batch.commit()
     ctx.body = true
 })
 
 module.exports = router;
-
-router.post('/complete',async ctx=>{
-    db = ctx.db
-    let batch = db.batch()
-    ctx.body = true
-})

@@ -10,8 +10,8 @@ class assembleOrders extends Component {
     constructor(props){
         super(props);
         this.state = {
-            step: 0,
-            workerID: '',
+            step: 1,
+            workerID: '1',
             orderList:[],
             loadingMessage:'Loading.................',
         }
@@ -23,6 +23,17 @@ class assembleOrders extends Component {
         this.changeOrderStatus = this.changeOrderStatus.bind(this)
         this.handleSubmit = this.handleSubmit.bind(this)
         this.changeItemStatus = this.changeItemStatus.bind(this)
+        this.changeDriverID = this.changeDriverID.bind(this)
+    }
+
+    componentDidMount(){
+        this.loadFulfillments()
+    }
+
+    changeDriverID(index, newID){
+        let tempList = this.state.orderList
+        tempList[index].workerid = newID
+        this.setState({orderList:tempList})
     }
 
     changeMessage(newMessage, index){
@@ -57,6 +68,12 @@ class assembleOrders extends Component {
     changeItemStatus(itemIndex, orderIndex, value){
         let tempList = this.state.orderList
         tempList[orderIndex].items[itemIndex].fulfilled = value
+        if (value == 1){
+            tempList[orderIndex].items[itemIndex].backgroundColor = 'itemOrderGreen'  
+        }
+        if (value == -1){
+            tempList[orderIndex].items[itemIndex].backgroundColor = 'itemOrderRed'  
+        }
         tempList[orderIndex].status = 'complete'
         let successful = true
         let failed = true
@@ -133,7 +150,7 @@ class assembleOrders extends Component {
 
     async loadFulfillments(){
         //load fulfillments here
-        let temp = await fetch(`https://${serveoname}/fulfillment?workerID=${encodeURIComponent(this.state.workerID)}`, {
+        let temp = await fetch(`https://${serveoname}/fulfillment/assemble?workerID=${encodeURIComponent(this.state.workerID)}`, {
             method: 'get',
             })
         let tJSON= await temp.json()
@@ -163,7 +180,8 @@ class assembleOrders extends Component {
                     productid: spot.mapValue.fields.productid.stringValue,
                     quantity: spot.mapValue.fields.quantity.integerValue,
                     variantid: spot.mapValue.fields.variantid.stringValue,
-                    index: j
+                    index: j,
+                    backgroundColor: 'itemOrder'
                 }
                 tempOrder.items.push(tempItem)
             }
@@ -201,9 +219,6 @@ class assembleOrders extends Component {
                 <div>
                     <h1 className = 'scHeader'>ASSEMBLE ORDERS</h1>
                     <br/>
-                    <p className = 'workerID'>Logged in as: #{this.state.workerID} <br/>
-                    <button onClick = {this.changeID}>LOGOUT</button>
-                    </p>
                     <br/>
                     <h3 className = 'subHeader'>Today's Orders to Assemble:</h3>
                     <br/>
@@ -221,14 +236,14 @@ class assembleOrders extends Component {
                             <div className = 'vert'>
                                 <hr className = 'vertHeader'/>
                             </div>
-                            <div className = 'deliveryHeaderL'>
-                                <p className = 'itemHeader'>ITEMS</p>
+                            <div className = 'deliveryHeaderS'>
+                                <p className = 'itemHeader'>STORE</p>
                             </div>
                             <div className = 'vert'>
                                 <hr className = 'vertHeader'/>
                             </div>
-                            <div className = 'deliveryHeaderS'>
-                                <p className = 'itemHeader'>STATUS</p>
+                            <div className = 'deliveryHeaderL'>
+                                <p className = 'itemHeader'>ITEMS</p>
                             </div>
                             <div className = 'vert'>
                                 <hr className = 'vertHeader'/>
@@ -238,7 +253,7 @@ class assembleOrders extends Component {
                             </div>
                         </div>
                         {this.state.orderList.map((order,index)=>{
-                            return <Order order={order} step = {1} changeItemStatus = {this.changeItemStatus.bind(this)} changeOrderStatus = {this.changeOrderStatus.bind(this)}changeMessage = {this.changeMessage.bind(this)} serveoname = {serveoname} key={order.code +index}/>
+                            return <Order order={order} step = {1} changeDriverID = {this.changeDriverID.bind(this)} changeItemStatus = {this.changeItemStatus.bind(this)} changeOrderStatus = {this.changeOrderStatus.bind(this)}changeMessage = {this.changeMessage.bind(this)} serveoname = {serveoname} key={order.code +index}/>
                         })}
                     <p>{this.state.loadingMessage}</p>
                     </fieldset>

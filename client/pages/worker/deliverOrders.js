@@ -41,20 +41,25 @@ class deliverOrders extends Component {
             if (this.state.orderList[i].delivered == 1){
                 deliveredList.push(this.state.orderList[i])
             }
-            else if (this.state.orderList[i].delivered == 0){
+            else{
                 failedList.push(this.state.orderList[i])
+                failedList[failedList.length-1].deliveredBy = this.state.workerID
             }
         }
         deliveredList = await this.cleanList(deliveredList)
         failedList = await this.cleanList(failedList)
-        let failedString = JSON.stringify(failedList)
-        fetch(`https://${serveoname}/fulfillment/update?orders=${encodeURIComponent(failedString)}`, {
+        let orders = JSON.stringify(failedList)
+        if (failedList.length > 0){
+            await fetch(`https://${serveoname}/fulfillment/update?orders=${encodeURIComponent(orders)}`, {
             method: 'put',
         })
-        //DEAL WITH THIS - updating stuff that's completed etc
-        fetch(`https://${serveoname}/fulfillment/update?orders=${encodeURIComponent(failedString)}`, {
-            method: 'post',
-        })
+        }
+        orders = JSON.stringify(deliveredList)
+        if (deliveredList.length>0){
+            await fetch(`https://${serveoname}/fulfillment/complete?orders=${encodeURIComponent(orders)}`, {
+                method: 'post',
+            })
+        }
         this.setState({step:2})
     }
 
@@ -74,12 +79,20 @@ class deliverOrders extends Component {
     changeOrderStatus(index, val){
         let tempList = this.state.orderList
         tempList[index].delivered = val
+        for (var i = 0;i<tempList[index].items.length;i++){
+            if (val == 1){
+                tempList[index].items[i].fulfilled = 1
+            }
+            else{
+                tempList[index].items[i].fulfilled = 0
+            }
+        }
         this.setState({orderList:tempList})
     }
 
     async loadFulfillments(){
         //load fulfillments here
-        let temp = await fetch(`https://${serveoname}/fulfillment?workerID=${encodeURIComponent(this.state.workerID)}`, {
+        let temp = await fetch(`https://${serveoname}/fulfillment/deliver?workerID=${encodeURIComponent(this.state.workerID)}`, {
             method: 'get',
             })
         let tJSON= await temp.json()
@@ -103,13 +116,13 @@ class deliverOrders extends Component {
             for (var j = 0;j<tJSON[i].items.arrayValue.values.length;j++){
                 let spot = tJSON[i].items.arrayValue.values[j]
                 let tempItem = {
-                    fulfilled: spot.mapValue.fields.fulfilled.integerValue,
+                    fulfilled: 0,
                     itemid: spot.mapValue.fields.itemid.stringValue,
                     name: spot.mapValue.fields.name.stringValue,
                     productid: spot.mapValue.fields.productid.stringValue,
                     quantity: spot.mapValue.fields.quantity.integerValue,
                     variantid: spot.mapValue.fields.variantid.stringValue,
-                    index: j
+                    index: j,
                 }
                 tempOrder.items.push(tempItem)
             }
@@ -145,7 +158,7 @@ class deliverOrders extends Component {
         else if (this.state.step == 1){
             return(
                 <div>
-                    <h1 className = 'scHeader'>ASSEMBLE ORDERS</h1>
+                    <h1 className = 'scHeader'>DELIVER ORDERS</h1>
                     <br/>
                     <p className = 'workerID'>Logged in as: #{this.state.workerID} <br/>
                     <button onClick = {this.changeID}>LOGOUT</button>
@@ -192,7 +205,7 @@ class deliverOrders extends Component {
         else if (this.state.step == 2){
             return(
                 <div>
-                    <h1 className = 'scHeader'>ASSEMBLE ORDERS</h1>
+                    <h1 className = 'scHeader'>DELIVER ORDERS</h1>
                     <br/>
                     <p className = 'workerID'>Logged in as: #{this.state.workerID} <br/>
                         <button onClick = {this.changeID}>LOGOUT</button>
@@ -200,7 +213,7 @@ class deliverOrders extends Component {
                     <br/><br/>
                     <p>The changes have been saved</p>
                     <br/>
-                    <button onClick = {this.go}>CONTINUE ASSEMBLING</button>
+                    <button onClick = {this.go}>CONTINUE UPDATING</button>
                     <br/><br/>
                     <button onClick = {this.props.back}>EXIT</button>
                 </div>
