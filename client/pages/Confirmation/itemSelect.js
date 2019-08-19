@@ -14,6 +14,8 @@ class ItemList extends Component {
             productID:"",
             variantid:"",
             name: "",
+            title: "",
+            variantTitle:"",
             value:"",
             src: "",
             quantity: "",
@@ -29,6 +31,11 @@ class ItemList extends Component {
         this.handleSubmit = this.handleSubmit.bind(this)
     }
 
+    //back to page top
+    componentDidMount(){
+        window.scrollTo(0, 0)
+    }
+
     //handle submit of items
     handleSubmit(){//this is a failsafe, shouldn't ever happen because button will be grey
         if (this.returnItems.length == 0){
@@ -42,12 +49,14 @@ class ItemList extends Component {
     }
 
     //get return items
-    async handleSelect(productidX, variantidX, nameX, valueX, srcX, quantityX, priceX, reasonX){
+    async handleSelect(productidX, variantidX, nameX, titleX, variantTitleX, valueX, srcX, quantityX, priceX, reasonX){
         let findItem=false;
         this.currItem = {
             productID: productidX,
             variantid: variantidX,
             name: nameX,
+            title: titleX,
+            variantTitle: variantTitleX,
             value: valueX,
             src: srcX,
             quantity: quantityX,
@@ -83,13 +92,13 @@ class ItemList extends Component {
                 <p className = 'errorMessage'>{this.state.errorMessage}</p>
                 <div className = 'itemList'>
                     <fieldset className = 'page2'>
-                        <p className = 'orderHeader'>Order Number: {this.props.orderNum}</p>
+                        {/* <p className = 'orderHeader'>Order Number: {this.props.orderNum}</p> */}
                         {this.props.items.map((item)=>{
-                            return <Item item={item} serveoname={this.props.serveoname} step = {1} key={item.variantID} handleSelect={this.handleSelect.bind(this)}/>
+                            return <Item item={item} serveoname={this.props.serveoname} step = {1} key={item.variantID} handleSelect={this.handleSelect.bind(this)} shop = {this.props.shop}/>
                         })}
                     </fieldset>  
                 </div>
-                <br/>
+                <div className = 'fixed-footer'></div>
                 <footer className = 'f1'>
                     <button className = {this.state.style} onClick={this.handleSubmit}>CONTINUE</button> 
                 </footer>                 

@@ -1,28 +1,42 @@
-const combineRouters = require('koa-combine-routers');
-const rootRouter = require('./root');
-const orderRouter = require('./orders');
-const collectionRouter = require('./collections');
-const productRouter = require('./products');
-const dbGitRouter = require('./databaseActionGit');
-const geoCodingRouter = require('./geocoding');
-const shopRouter = require('./shop');
-const scriptTag = require('./scriptTag');
-const sendRouter = require('./sendEmail')
-const dbRouter = require('./databaseAction')
-const shopNameRouter = require('./shopName')
+const combineRouters = require("koa-combine-routers");
+const rootRouter = require("./root");
+const orderRouter = require("./orders");
+const collectionRouter = require("./collections");
+const productRouter = require("./products");
+const geoCodingRouter = require("./geocoding");
+const shopRouter = require("./shop");
+const scriptTag = require("./scriptTag");
+const sendRouter = require("./sendEmail");
+const blacklistRouter = require("./blacklistFunctions");
+const returnRouter = require("./existingReturn");
+const productsFirestoreRouter = require("./productsFirestore");
+const fulfservRouter = require("./fulserv");
+const sendEmailRouter = require("./sendEmail");
+const dbRouter = require("./databaseAction");
+const webhookRouter = require("./webhooks");
+const priceRule = require("./priceRule");
+const itemRouter = require('./item')
+const fulfillmentRouter = require('./fulfillment')
 
 router = combineRouters(
-    rootRouter,
-    orderRouter,
-    collectionRouter,
-    productRouter,
-    dbGitRouter,
-    geoCodingRouter,
-    shopRouter,
-    scriptTag,
-    sendRouter,
-    dbRouter,
-    shopNameRouter,
-)
+  rootRouter,
+  orderRouter,
+  collectionRouter,
+  productRouter,
+  geoCodingRouter,
+  shopRouter,
+  scriptTag,
+  sendRouter,
+  blacklistRouter,
+  returnRouter,
+  productsFirestoreRouter,
+  fulfservRouter,
+  sendEmailRouter,
+  dbRouter,
+  webhookRouter,
+  priceRule,
+  itemRouter,
+  fulfillmentRouter
+);
 
 module.exports = router;

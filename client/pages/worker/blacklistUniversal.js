@@ -1,6 +1,5 @@
 import React, { Component } from 'react';
-import './universal.css'
-import { Key } from '@shopify/polaris';
+import '../Confirmation/universal.css'
 import {serveo_name} from '../config'
 const sname = serveo_name
 const serveoname = sname.substring(8)
@@ -20,7 +19,9 @@ class Blacklist extends Component {
             addItems : [],
             addIn : '',
             deleteIn :'',
-            errorMessage:''
+            errorMessage: '',
+            loginMessage: '',
+            valid: 0
         }
         this.handleSubmit = this.handleSubmit.bind(this)
         this.handleInputChange = this.handleInputChange.bind(this)
@@ -29,6 +30,23 @@ class Blacklist extends Component {
         this.handleChangeDelete = this.handleChangeDelete.bind(this)
         this.addToBlacklist = this.addToBlacklist.bind(this)
         this.deleteFromBlacklist = this.deleteFromBlacklist.bind(this)
+        this.restart = this.restart.bind(this)
+        this.doesProductExist = this.doesProductExist.bind(this)
+    }
+
+    restart(){
+        this.setState({
+            storeName: '',
+            step: 1,
+            items : [],
+            deleteItems : [],
+            addItems : [],
+            addIn : '',
+            deleteIn :'',
+            errorMessage: '',
+            loginMessage: '',
+            valid: 0
+        })
     }
 
     //input field for entering store name at beginning of process
@@ -46,8 +64,20 @@ class Blacklist extends Component {
         this.setState({deleteIn:e.target.value})
     }
 
+    async doesProductExist(ID){
+        let temp = await fetch(`https://${serveoname}/products?id=${encodeURIComponent(ID)}`, {
+            method: 'get',
+        })
+        let response = await temp.json()
+        if (response){
+            response = true
+        }
+        return response
+    }
+
     //add item to blacklist (on submit of add)
-    addToBlacklist(){
+    async addToBlacklist(){
+        if (this.state.valid){
         //make sure previous error message goes away
         this.setState({errorMessage:''})
         let toAdd = this.state.addIn;
@@ -55,23 +85,32 @@ class Blacklist extends Component {
         let tempList = this.state.items
         //make sure item doesn't exist so we're not making a duplicate
         if (tempList.indexOf(toAdd)==-1){
-            tempList.push(toAdd)
-            tempList.sort()
+            let productExists = await this.doesProductExist(toAdd)
+            if (productExists){
+                tempList.push(toAdd)
+                tempList.sort()
+                let itemString = JSON.stringify(tempList)
+                //save to db
+                this.setState({items:tempList})
+                fetch(`https://${serveoname}/blacklist?items=${encodeURIComponent(itemString)}&store=${encodeURIComponent(this.state.storeName)}`, {
+                method: 'put',
+                })
+            }
+            else{
+                this.setState({errorMessage:'This ID does not correspond to an actual product.'})
+            }  
         }
         //show error message if they enter duplicate
         else{
             this.setState({errorMessage:'This item is already on the blacklist.'})
         }
-        //save to db
-        this.setState({items:tempList})
-        fetch(`https://${serveoname}/dbcall/addBlacklist?id=${encodeURIComponent(toAdd)}&store=${encodeURIComponent(this.state.storeName)}`, {
-            method: 'get',
-        })
+        }
     }
 
     //delete an item from blacklist (on submit of delete)
     deleteFromBlacklist(){
-        //make sure previous error message goes away
+        if (this.state.valid){
+            //make sure previous error message goes away
         this.setState({errorMessage:''})
         let toDelete = this.state.deleteIn;
         this.setState({deleteIn:''})
@@ -88,11 +127,13 @@ class Blacklist extends Component {
         if(found == false){
             this.setState({errorMessage:'This item is not currently on the blacklist.'})
         }
+        let itemString = JSON.stringify(tempList)
+        //save to db
         this.setState({items:tempList})
-        //submit to database
-        fetch(`https://${serveoname}/dbcall/deleteBlacklist?id=${encodeURIComponent(toDelete)}&store=${encodeURIComponent(this.state.storeName)}`, {
-            method: 'get',
+        fetch(`https://${serveoname}/blacklist?items=${encodeURIComponent(itemString)}&store=${encodeURIComponent(this.state.storeName)}`, {
+            method: 'put',
         })
+        }
     }
 
     //handle submit of store name - very beginning
@@ -105,11 +146,16 @@ class Blacklist extends Component {
 
     //get items on blacklist of current store
     async getItems(){
-        let temp = await fetch(`https://${serveoname}/dbcall/getBlacklist?store=${encodeURIComponent(this.state.storeName)}`, {
+        let temp = await fetch(`https://${serveoname}/blacklist?store=${encodeURIComponent(this.state.storeName)}`, {
             method: 'get',
         })
         let json = await temp.json()
-        this.setState({items:json.res.sort()})
+        if (json.res.length == 0){
+            this.setState({step: 1, storeName: '' ,loginMessage: 'This store does not exist.'})
+        }
+        else{
+            this.setState({valid: 1, loginMessage: '', items:json.res.sort()})
+        }
     }
 
     //conditional render - step1 for enter store, step2 for doing stuff
@@ -117,27 +163,32 @@ class Blacklist extends Component {
         if (this.state.step == 1){
             return (
                 <div>
-                    <h1>Blacklist</h1> 
+                    <h1 className = 'scHeader'>Blacklist</h1> 
                     <br></br>
                     <label> 
-                        Enter your store name below:
+                        Enter store name below:
                         <br/>
                         <input type = 'text' value = {this.state.storeName} onChange = {this.handleInputChange}></input>
                     </label>
                     <button onClick = {this.handleSubmit}>SUBMIT</button>
+                    <br/>
+                    <br/>
+                    <p style = {myStyle}>{this.state.loginMessage}</p>
+                    <br/><br/><br/><br/>
+                    <button onClick = {this.props.back}>BACK</button>
                 </div>
              ); 
         } 
         if (this.state.step == 2){
             return(
             <div>
-                <p>{this.state.storeName} Blacklist</p>
+                <h1 className = 'scHeader'>Blacklist - {this.state.storeName} </h1>
                 <br/>
-                <label>Add item:
+                <label>Add item (PRODUCT ID):
                     <input value = {this.state.addIn} onChange = {this.handleChangeAdd} type = 'text'></input>
                 </label>
                 <button onClick = {this.addToBlacklist}>ADD</button>
-                <label> Delete item:
+                <label> Delete item (PRODUCT ID):
                     <input onChange = {this.handleChangeDelete} value = {this.state.deleteIn} type = 'text'></input>
                 </label>
                 <button onClick = {this.deleteFromBlacklist}>DELETE</button>
@@ -148,11 +199,14 @@ class Blacklist extends Component {
                 <br/>
                 <p>The following items are currently on the blacklist.</p>
                 <p>If these items are returned, they will not be made available immediately for resale, and will be eventually shipped back to the distributor.</p>
+                <br/>
                 <div>
                     {this.state.items.map((curr, index) => (
                     <p>{index + 1} - {curr}</p>
                     ))}
                 </div>
+                <br/><br/><br/><br/><br/>
+                <button onClick = {this.restart}>BACK</button>
             </div>
             )
         }

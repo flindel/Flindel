@@ -17,7 +17,7 @@ class finalPage extends React.Component{
 
     //resend email if necessary
     sendEmail(){
-        fetch(`https://${this.props.serveoname}/send?method=${encodeURIComponent(1)}&email=${encodeURIComponent(this.state.email)}&code=${encodeURIComponent(this.state.code)}`, 
+        fetch(`https://${this.props.serveoname}/send/confirmation?email=${encodeURIComponent(this.state.email)}&code=${encodeURIComponent(this.state.code)}`, 
         {
             method: 'POST',     
         })
@@ -28,47 +28,43 @@ class finalPage extends React.Component{
         return(
             <div>
                 <div className = 'centre'>
-                    <h2>Thank you!</h2>
-                    <br/>
-                    <h3>Your confirmation code is: {this.props.code}</h3>
-                    <br/>
-                    <p>A confirmation email has been sent to {this.props.email}</p>
-                    <br/>
+                    <h2 className = 'confirmCode'>Your confirmation code is: <strong>{this.props.code}</strong></h2>
+                    
+                    <h3 className = 'confirmTitle'>Thank you for your return request.</h3>
+                    
+                    <p className = 'explanation'>A confirmation email has been sent to {this.props.email}. To make sure that we can process your return as quickly as possible, please follow these steps when returning your package.</p>
                     <button className = 'Submit2' onClick = {this.sendEmail}>Resend email</button>
                 </div>
                 <br></br>
                 <div className = 'confirmation1'>
-                    <h2 className = 'confirmation'>Item Drop-off Instructions:</h2>
+                    <h2 className = 'confirmation'>Item Drop-off Instructions</h2>
                     <div className = 'instructions'>
                         <br/>
-                        <p>1. Request return on Flindel and receive confirmation code (e.g. A1B2C3)</p>
-                        <p> 2. Present your code and give your return item(s) to one of the staff at one of the locations on the map</p>
-                        <h4>Look for someone wearing a red shirt carrying a big bag!</h4>
-                        <p>3. Wait for your refund!</p>
+                        <p>Request return on Flindel and receive confirmation code (e.g. A1B2C3)</p>
+                        <p>Present your code and give your return item(s) to one of the staff at one of the locations on the map. Look for someone wearing a red shirt carrying a big bag!</p>
+                        <p>Wait for your refund!</p>
                     </div>
                 </div>
                 <div className = 'confirmation2'>
-                    <h2 className = 'confirmation'>Drop-Off Locations:</h2>
-                    <br/>
+                    <h2 className = 'confirmation'>Drop-Off Locations</h2>
+                    <div className = 'dropLocations'> 
                     {/* Below is dynamic google maps component*/}
-                    <div style={{ height: '100vh', width: '100%' }}>
+                    <div className = 'mapContainer'>
                         <MapContainer />
                     </div>
+                    <div className = 'dropAdd'>
                     
-                    {/** <img className  = 'confirmationMap' src = {imageAddress}/> */}
-                    
-                </div>
-                <div className = 'confirmation3'>
-                    <h2 className = 'confirmation'>Drop-Off Locations:</h2>
-                    <div className = 'instructions'>
-                        <br/>
-                        <p>1. 123 Dundas Street (Starbucks)</p>
-                        <p>2. 987 Bathurst Street (Tim Hortons)</p>
-                        <p>3. 456 Front Street (Library) </p>
-                        <p>4. 159 Wilson Street (Starbucks)</p>
-                        <p>5. 354 Bay Street (Store)</p>
+                        <p className = 'dropAddress'>1. 123 Dundas Street (Starbucks)</p>
+                        <p className = 'dropAddress'>2. 987 Bathurst Street (Tim Hortons)</p>
+                        <p className = 'dropAddress'>3. 456 Front Street (Library) </p>
+                        <p className = 'dropAddress'>4. 159 Wilson Street (Starbucks)</p>
+                        <p className = 'dropAddress'>5. 354 Bay Street (Store)</p>
                     </div>
-                </div>          
+                    </div>         
+                </div>   
+                <div className = "customerService">
+                    <p>If you have any question, <br />please contact us at <a href="mailto:customerservice@flindel.com">customerservice@flindel.com</a></p>
+                </div>     
             </div>
         )
     }

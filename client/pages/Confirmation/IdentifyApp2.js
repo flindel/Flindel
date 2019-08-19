@@ -11,6 +11,7 @@ import '@shopify/polaris/styles.css';
 import {serveo_name} from '../config'
 const sname = serveo_name
 const serveoname = sname.substring(8)
+let shop = ''
 
 class IdentifyApp extends Component {
     //constructor and binding methods
@@ -28,6 +29,8 @@ class IdentifyApp extends Component {
             errorMessage:'',
             returnPolicy: [],
             defaultReturn: '',
+            shopDomain: '',
+            emailOriginal:''
         };
         this.returnItemList= []
         this.identifyItems=this.identifyItems.bind(this) 
@@ -62,11 +65,23 @@ class IdentifyApp extends Component {
 
     //load return policy - have to expand this to multiple stores once we load
     async componentDidMount(){
-        let temp = await fetch(`https://${serveoname}/dbcall/returnPolicy`, {
+        shop = window.location.hostname
+        console.log(shop)
+        //get return policy from db
+        let temp = await fetch(`https://${serveoname}/shop/returnPolicy?shop=${encodeURIComponent(shop)}`, {
             method: 'get',
         })
         let json = await temp.json()
         this.setState({step:1,returnPolicy: json.res.mapValue.fields, defaultReturn: json.default.stringValue})
+        //get shop domain from db
+        let domainTemp = await fetch(`https://${serveoname}/shop/domain?shop=${encodeURIComponent(shop)}`, {
+            method: 'get',
+        })
+        let domainJson = await domainTemp.json()
+        this.setState({
+            shopDomain: `https://${domainJson.domain}`
+        })
+
     }
 
     //generate usable unique codes
@@ -82,10 +97,13 @@ class IdentifyApp extends Component {
             //search here instead of manually setting
           }
           //set state to the new code
-          await this.setState({code:code})
-          let unique =  await this.checkUnique()
+          let unique =  await this.checkUnique(code)
           if(unique == false){
               this.generateID() 
+          }
+          else{
+              await this.setState({step:5, code: code})
+              this.sendToDB()
           }
     }
 
@@ -166,9 +184,6 @@ class IdentifyApp extends Component {
         }
         await this.setState({returnlist:tempList})
         await this.generateID()
-        await this.sendToDB()
-        this.sendEmail()
-        this.setState({step:5})
     }
 
     //begin return portal from very start
@@ -182,21 +197,24 @@ class IdentifyApp extends Component {
             returnlist: [],
             shopName:'',
             orderNum:'',
-            errorMessage:'',})
+            existReturn: false,
+            errorMessage:'',
+            shopDomain: ''
+        })
             this.returnItemList = [];
     }
 
     //send email to customer to confirm their return, calls backend function
     sendEmail(){
-        fetch(`https://${serveoname}/send?method=${encodeURIComponent(1)}&email=${encodeURIComponent(this.state.email)}&code=${encodeURIComponent(this.state.code)}`, 
+        fetch(`https://${serveoname}/send/confirmation?email=${encodeURIComponent(this.state.email)}&code=${encodeURIComponent(this.state.code)}`, 
         {
             method: 'post',
         })
        }
 
     //check if code is unique (call to db)
-    async checkUnique(){
-        let temp = await fetch(`https://${serveoname}/dbcall?method=${encodeURIComponent(3)}&code=${encodeURIComponent(this.state.code)}`, {
+    async checkUnique(code){
+        let temp = await fetch(`https://${serveoname}/return/requested/uuid?code=${encodeURIComponent(code)}`, {
             method: 'get',
         })
         let json = await temp.json()
@@ -208,9 +226,8 @@ class IdentifyApp extends Component {
         let currentDate = ''
         currentDate += (new Date().getMonth()+1)+'/'+ new Date().getDate() + '/'+  new Date().getFullYear()
         let items = JSON.stringify(this.state.returnlist)
-        //1 for write, 2 for read
-        fetch(`https://${serveoname}/dbcall?location=${encodeURIComponent('requestedReturns')}&method=${encodeURIComponent(1)}&date=${encodeURIComponent(currentDate)}&code=${encodeURIComponent(this.state.code)}&orderNum=${encodeURIComponent(this.state.orderNum)}&email=${encodeURIComponent(this.state.email)}&items=${encodeURIComponent(items)}`, {
-            method: 'get',
+        fetch(`https://${serveoname}/return/requested/new?date=${encodeURIComponent(currentDate)}&code=${encodeURIComponent(this.state.code)}&orderNum=${encodeURIComponent(this.state.orderNum)}&emailOriginal=${encodeURIComponent(this.state.emailOriginal)}&email=${encodeURIComponent(this.state.email)}&items=${encodeURIComponent(items)}`, {
+            method: 'POST',
         })
     }
 
@@ -238,6 +255,8 @@ class IdentifyApp extends Component {
                 productID: listIn[i].productID,
                 variantid:listIn[i].variantid,
                 name:listIn[i].name,
+                title:listIn[i].title,
+                variantTitle:listIn[i].variantTitle,
                 value:listIn[i].value,
                 quantity:listIn[i].quantity,
                 reason:listIn[i].reason,
@@ -251,7 +270,7 @@ class IdentifyApp extends Component {
       //check returns database to see if return already exists
     async checkReturnsFromDB(orderNum,emailAdd){
         orderNum =1
-        let temp = await fetch(`https://${serveoname}/dbcall?method=${encodeURIComponent(4)}&orderNum=${encodeURIComponent(orderNum)}&emailAdd=${encodeURIComponent(emailAdd)}`, {
+        let temp = await fetch(`https://${serveoname}/return/requested/exists?orderNum=${encodeURIComponent(orderNum)}&emailAdd=${encodeURIComponent(emailAdd)}`, {
             method: 'get',
         })
         let json = await temp.json()
@@ -259,18 +278,20 @@ class IdentifyApp extends Component {
             //set information if it already does
             const returnInfo = {'code':json.code,
                                 'email': emailAdd,
-                                'orderNum': orderNum,}
+                                'orderNum': orderNum,
+                                'items': json.items,
+                            }
             return returnInfo
          }
          else{ return false }
     }
 
-    //if they do restart, flip statu to replaced and move to history
+    //if they do restart, flip status to replaced and move to history
     async restartReturn(orderNum, emailAdd, code){
         
         // call database change order_status
-        let temp = await fetch(`https://${serveoname}/dbcall?method=${encodeURIComponent(8)}&code=${encodeURIComponent(this.state.code)}`, {
-            method: 'get',
+        let temp = await fetch(`https://${serveoname}/return/requested/orderStatus?code=${encodeURIComponent(this.state.code)}`, {
+            method: 'PUT',
         })
         let json = await temp.json()
         if(json.success){
@@ -295,10 +316,10 @@ class IdentifyApp extends Component {
                 phoneNum = phoneNum.substring(0,i)+phoneNum.substring(i+1)
             }
         }
-        this.setState({email:emailAdd.toLowerCase()})
+        this.setState({email:emailAdd.toLowerCase(), emailOriginal:emailAdd.toLowerCase()})
         const data = {orderNumber: orderNum, emailAddress:emailAdd};
         //get order fromm shopify db
-        let temp = await fetch(`https://${serveoname}/orders?orderNum=${encodeURIComponent(data.orderNumber)}`, {
+        let temp = await fetch(`https://${serveoname}/orders?orderNum=${encodeURIComponent(data.orderNumber)}&shop=${encodeURIComponent(shop)}`, {
             method: 'GET',
 
         })
@@ -328,7 +349,8 @@ class IdentifyApp extends Component {
                                 'code':returnInfo.code,
                                 'email': returnInfo.email,
                                 'orderNum': returnInfo.orderNum,
-                                'existReturn': true
+                                'existReturn': true,
+                                'returnList': returnInfo.items
                             })
                         }else{
                         this.setState({
@@ -342,8 +364,9 @@ class IdentifyApp extends Component {
                                         variantID:item.variant_id,
                                         productID: item.product_id,
                                         name: item.name,
+                                        title: item.title,
+                                        variantTitle: item.variant_title,
                                         quantity: item.quantity,
-                                        price: item.price,
                                     }
                                 }
                                 else{
@@ -351,8 +374,9 @@ class IdentifyApp extends Component {
                                         variantID:item.variant_id,
                                         productID: item.product_id,
                                         name: item.name,
+                                        title: item.title,
+                                        variantTitle: item.variant_title,
                                         quantity: 0,
-                                        price: item.price,
                                     }
                                 }
                             }),
@@ -369,6 +393,12 @@ class IdentifyApp extends Component {
                         })      
                 }
             }
+            else {
+                    //show they made an incorrect attempt  
+                        this.setState({
+                            errorMessage:"The order number, email, or phone number you entered didn't match our records."
+                        })      
+                }
 }
     
     /*
@@ -379,11 +409,11 @@ class IdentifyApp extends Component {
         if (this.state.step == 0){
             return(
                 <div>
-                    <NB
-                    shopName = {this.state.shopName}/>
+                    {/* {<NB
+                    shopName = {this.state.shopName}/>} */}
                     <br/><br/><br/>
                     <div className = 'loading'>
-                        <p>Loading.......</p>
+                        <p><img src = 'https://drive.google.com/uc?id=1sdUC8q-XdCViXV-xKYC-XakSsqFDFEEd' /></p>
                     </div>
                 </div>
             )
@@ -394,13 +424,17 @@ class IdentifyApp extends Component {
                 return (
                     <div>
                        <NB
-                       shopName = {this.state.shopName}/>
+                       shopName = {this.state.shopName}
+                       shopDomain = {this.state.shopDomain}/>
                        <Review 
                         restart = {this.restart.bind(this)} 
                         code={this.state.code}
                         email = {this.state.email} 
                         orderNum = {this.state.orderNum} 
-                        restartReturn = {this.restartReturn}/>
+                        items = {this.state.returnList}
+                        serveoname = {serveoname}
+                        restartReturn = {this.restartReturn}
+                        shop = {shop}/>
                    </div>
                 )
             }
@@ -413,7 +447,9 @@ class IdentifyApp extends Component {
                     step2={''}
                     step3={''}
                     show = {false}
-                    shopName = {this.state.shopName}/>
+                    findOrderPage = {true}
+                    shopName = {this.state.shopName}
+                    shopDomain = {this.state.shopDomain}/>
                     <p className = 'errorMessage'>{this.state.errorMessage}</p>
                       <Search 
                       identifyCustomerID={this.identifyCustomerID} 
@@ -433,6 +469,7 @@ class IdentifyApp extends Component {
                 show = {true}
                 shopName = {this.state.shopName}/> 
                <ItemList 
+               shop = {shop}
                serveoname = {serveoname}
                orderNum = {this.state.orderNum}
                handleSubmit = {this.checkOver.bind(this)}
@@ -479,6 +516,7 @@ class IdentifyApp extends Component {
                 viewPage3 = {this.viewPage3.bind(this)}
                 shopName = {this.state.shopName}/> 
                 <PriceDisplay
+                shop = {shop}
                 serveoname={serveoname}
                 items = {this.state.returnlist}
                 orderNum = {this.state.orderNum}
@@ -495,7 +533,8 @@ class IdentifyApp extends Component {
                 step2={''}
                 step3={''}
                 show = {false}
-                shopName = {this.state.shopName}/> 
+                shopName = {this.state.shopName}
+                shopDomain = {this.state.shopDomain}/> 
                 <ConfirmationPage
                 serveoname = {serveoname}
                 code = {this.state.code} 

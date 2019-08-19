@@ -2,12 +2,9 @@ import React, {Component} from 'react';
 import { BrowserRouter, Route } from 'react-router-dom';
 import DuplicateApp from "./DuplicateItems/DuplicateApp";
 import IdentifyApp from "./Confirmation/IdentifyApp2";
-import SC from "./Confirmation/sortingCentre"
-import Blacklist from './Confirmation/blacklist'
-const ui = 2;
-//0: ADMIN APP
-//1: SORTING CENTER INTERFACE
-//2: RETURN PORTAL
+import FlindelWorker from "./worker/flindelWorker"
+
+import {ui} from './config'
 class Index extends React.Component{
  render(){
    if(ui == 0){
@@ -17,20 +14,24 @@ class Index extends React.Component{
        </div>
      )
    }
-   if (ui == 1){
+   else if (ui == 1){
      return (
        <div>
-         <SC />
+         <IdentifyApp/>
        </div>
      )
    }
-   if (ui == 2){
+   else if (ui == 2){
      return (
        <div>
-         <IdentifyApp />
+         <FlindelWorker/>
        </div>
      )
    }
  }
 }
+
+
+
+
 export default Index;

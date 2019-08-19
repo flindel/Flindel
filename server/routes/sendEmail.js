@@ -3,66 +3,22 @@ const rp = require('request-promise');
 const errors = require('request-promise/errors');
 const { api_link } = require('../default-shopify-api.json');
 const { getShopHeaders } = require('../util/shop-headers');
+const emailHelper = require('../util/emailHelper')
+const expiredHelper = require('../util/expiredHelper')
 const router = Router({
     prefix: '/send'
 });
+//these are universal
+const headers = {}
+headers['Accept'] = 'application/json';
+headers['Content-Type'] = 'application/json';
+headers['Authorization'] = 'Bearer ' + process.env.SENDGRID;
 
-//all the different emails sent from return portal come from here
-router.post('/', async ctx=>{
-    const headers = {}
-    headers['Accept'] = 'application/json';
-    headers['Content-Type'] = 'application/json';
-    headers['Authorization'] = 'Bearer ' + process.env.SENDGRID;
+//update from service center
+router.post('/update', async ctx=>{
     const email = ctx.query.email
-    const code = ctx.query.code
-    const method = ctx.query.method
-    //email to be sent confirming return request was submitted (end of return portal)
-    if(method == 3){ //CHANGE THIS TO ==1 to make it actually send
-      const option = {
-        method: 'POST',
-        url: 'https://api.sendgrid.com/v3/mail/send',
-        headers: headers,
-        json: true,
-        body:{
-            "personalizations": [
-              {
-                "to": [
-                  {
-                    "email": 'booleafs17@yahoo.ca' //change to EMAIL once live
-                  }
-                ],
-                "subject": "Return Confirmation"
-              }
-            ],
-            "from": {
-                "name": "Auto-Confirmation",
-              "email": "no-reply@sender.com" //retailer@flindel.com
-            },
-            "content": [
-              {
-                "type": "text/plain",
-                "value": 'Thank you for submitting your return. Your confirmation code is: ' + code + ' . Further instructions here...'
-              }
-            ]
-          }
-    }
-    try {
-        ctx.body = await rp(option);
-    } catch (err) {
-        console.log(err.message);
-        if (err instanceof errors.StatusCodeError) {
-            ctx.status = err.statusCode;
-            ctx.message = err.message;
-        } else if (err instanceof errors.RequestError) {
-            ctx.status = 500;
-            ctx.message = err.message;
-        }
-    }
-    }
-    //this email updates customer on which of their items were accepted/rejected + what to do. Triggered by sorting center
-    else if (method == 2){
-      let acceptedList = await JSON.parse(ctx.query.acceptList)
-      let rejectedList = await JSON.parse(ctx.query.rejectList)
+    let acceptedList = await JSON.parse(ctx.query.acceptList)
+    let rejectedList = await JSON.parse(ctx.query.rejectList)
       let message = ''
       message += 'Thank you for submitting your return. Your order has been processed. '
       if (acceptedList.length>0){
@@ -111,146 +67,91 @@ router.post('/', async ctx=>{
             ]
           }
     }
-    try {
         ctx.body = await rp(option);
-    } catch (err) {
-        console.log(err.message);
-        if (err instanceof errors.StatusCodeError) {
-            ctx.status = err.statusCode;
-            ctx.message = err.message;
-        } else if (err instanceof errors.RequestError) {
-            ctx.status = 500;
-            ctx.message = err.message;
-        }
-    }
-    }
-     
-});
-
-//this is the report sent to the brand about which items have been accepted and could be going out on the store
-router.post('/itemReport', async ctx=>{
-  let itemList = await JSON.parse(ctx.query.list)
-  console.log(itemList)
-  const headers = {}
-  headers['Accept'] = 'application/json';
-  headers['Content-Type'] = 'application/json';
-  headers['Authorization'] = 'Bearer ' + process.env.SENDGRID;
-  message = ""
-  if (itemList.length>0){
-    message += 'The following return items have been accepted in the last 12 hours, and are eligible for potential resale in the morning.'
-    message +='\n\n'
-    for (var i = 0;i<itemList.length;i++){
-    message += (i+1) + ': '+ itemList[i].name + ' - ' + itemList[i].variantid + ' ... Quantity: ' + itemList[i].quantity
-    message += '\n\n'
-    }
-  }
-    const option = {
-      method: 'POST',
-      url: 'https://api.sendgrid.com/v3/mail/send',
-      headers: headers,
-      json: true,
-      body: {
-        "personalizations": [
-          {
-            "to": [
+  
+})
+router.post('/confirmation', async ctx=>{
+  const email = ctx.query.email
+  const code = ctx.query.code
+  const option = {
+        method: 'POST',
+        url: 'https://api.sendgrid.com/v3/mail/send',
+        headers: headers,
+        json: true,
+        body:{
+            "personalizations": [
               {
-                "email": 'booleafs17@yahoo.ca' //change to EMAIL once live
+                "to": [
+                  {
+                    "email": 'booleafs17@yahoo.ca' //change to EMAIL once live
+                  }
+                ],
+                "subject": "Return Confirmation"
               }
             ],
-            "subject": "Daily Report - Items Received"
+            "from": {
+                "name": "Auto-Confirmation",
+              "email": "no-reply@sender.com" //retailer@flindel.com
+            },
+            "content": [
+              {
+                "type": "text/plain",
+                "value": 'Thank you for submitting your return. Your confirmation code is: ' + code + ' . Further instructions here...'
+              }
+            ]
           }
-        ],
-        "from": {
-            "name": "Daily Report",
-          "email": "no-reply@sender.com"
-        },
-        "content": [
-          {
-            "type": "text/plain",
-            "value": message
-          }
-        ]
-      }
-  }
-  try {
-      ctx.body = await rp(option);
-  } catch (err) {
-      console.log(err.message);
-      if (err instanceof errors.StatusCodeError) {
-          ctx.status = err.statusCode;
-          ctx.message = err.message;
-      } else if (err instanceof errors.RequestError) {
-          ctx.status = 500;
-          ctx.message = err.message;
-      }
-  }
-   
+    }
+    ctx.body = await rp(option);    
 });
 
-//this email goes to the brand to let them know which orders need to be removed
-router.post('/refundReport', async ctx=>{
-  let emailAdd = ctx.query.email
-  let orderList = await JSON.parse(ctx.query.list)
+router.post('/returnShipment', async ctx=>{
+  const store = ctx.query.store
+  const itemString = ctx.query.items
+  const items = await JSON.parse(itemString)
+  const db = ctx.db
+  const date = await expiredHelper.getCurrentDate()
+  const email = await emailHelper.getStoreEmail(db,store)
   let message = ''
-  console.log(orderList)
-  if (orderList.length>0){
-    message += 'The following orders have items that should be refunded.'
-    message +='\n\n'
-    for (var i = 0;i<orderList.length;i++){
-    message += 'Order Number ' + orderList[i].orderNum + ': '
-      for(var j = 0;j<orderList[i].refundItems.length;j++){
-          message += '\n'
-          message += '\t'
-          message += orderList[i].refundItems[j].variantid + ' ... ' + orderList[i].refundItems[j].name 
-      }
-      message += '\n\n'
-    }
+  message += 'A return shipment has been filed on ' + date + ', and will be delivered shortly.' + '\n\n'
+  message += 'This shipment includes items from ' + store + '\n\n'
+  message += 'This shipment includes the following items: \n\n'
+  for (var i = 0;i<items.length;i++){
+    message+= items[i].name + ' ... ' + items[i].variantid + '... Quantity: ' + items[i].value + '\n\n'
   }
-  const headers = {}
-  headers['Accept'] = 'application/json';
-  headers['Content-Type'] = 'application/json';
-  headers['Authorization'] = 'Bearer ' + process.env.SENDGRID;
-    const option = {
-      method: 'POST',
-      url: 'https://api.sendgrid.com/v3/mail/send',
-      headers: headers,
-      json: true,
-      body: {
-        "personalizations": [
-          {
-            "to": [
+  const option = {
+        method: 'POST',
+        url: 'https://api.sendgrid.com/v3/mail/send',
+        headers: headers,
+        json: true,
+        body:{
+            "personalizations": [
               {
-                "email": emailAdd //change to EMAIL once live
+                "to": [
+                  {
+                    "email": email,
+                  }
+                ],
+                "bcc":[
+                  {
+                    "email":'mike.mccolm28@gmail.com'
+                  }
+                ],
+                "subject": "Incoming Return Shipment"
               }
             ],
-            "subject": "Daily Report - Refunds Necessary"
+            "from": {
+                "name": "Flindel Warehouse",
+              "email": "flindel@flindel.com" //retailer@flindel.com
+            },
+            "content": [
+              {
+                "type": "text/plain",
+                "value": message
+              }
+            ]
           }
-        ],
-        "from": {
-            "name": "Daily Report",
-          "email": "no-reply@sender.com"
-        },
-        "content": [
-          {
-            "type": "text/plain",
-            "value": message
-          }
-        ]
-      }
-  }
-  try {
-      ctx.body = await rp(option);
-  } catch (err) {
-      console.log(err.message);
-      if (err instanceof errors.StatusCodeError) {
-          ctx.status = err.statusCode;
-          ctx.message = err.message;
-      } else if (err instanceof errors.RequestError) {
-          ctx.status = 500;
-          ctx.message = err.message;
-      }
-  }
-   
+    }
+    ctx.body = await rp(option);    
 });
 
 module.exports = router;

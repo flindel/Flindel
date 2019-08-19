@@ -12,12 +12,15 @@ class restartPop extends Component {
         return (
         <div className = 'popup'>
             <div className = 'popup_inner'>
-                <div className = 'centre'>
-                    <h2 className = 'r2'>Confirmation</h2>
+                <div className = 'popup_content'>
+
+                    <h2 className = 'r2 popup_title'>Confirmation</h2>
                     <br/>
                     <p>If you proceed, your current return form will be deleted, and you will be able to submit a new return form. Are you sure you wish to proceed?</p>
-                    <button className='r2cancel' onClick={this.props.closePopup}>No, keep my old return.</button>
-                    <button className='r2delete' onClick={this.props.handleDelete}> Yes, begin my new return.</button>
+                    <br/>
+                    <button className='Submit2 Small' onClick={this.props.closePopup}>No, keep my old return.</button>
+                    <br/>
+                    <button className='Submit2 Small' onClick={this.props.handleDelete}> Yes, begin my new return.</button>
                 </div>
             </div>
         </div>

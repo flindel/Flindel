@@ -3,11 +3,15 @@ const rp = require('request-promise');
 const errors = require('request-promise/errors');
 const { api_link } = require('../default-shopify-api.json');
 const { getShopHeaders } = require('../util/shop-headers');
+const getAccessToken = require('../util/editInventory')
+const mainHelper = require('../util/mainHelper')
+const {accessTokenDB} = require('../util/acessTokenDB');
 const router = Router({
     prefix: '/products'
 });
 
 router.get('/', async ctx => {
+    ctx.body = false;
   const productid = ctx.query.id;
   const { cookies } = ctx;
   const shop = cookies.get('shop_id');
@@ -34,6 +38,56 @@ router.get('/', async ctx => {
       }
   }
 });
+
+router.get('/variant/productID', async ctx=>{
+const { cookies } = ctx;
+const varID = ctx.query.id
+  const shop = ctx.query.store
+  const {accessToken, torontoLocation} = await getAccessToken.getAccessToken(ctx.db,shop)
+  const option = {
+      method: 'GET',
+      url: `https://${shop}/${api_link}/variants/${varID}.json`,
+      headers: {
+        'X-Shopify-Access-Token': accessToken
+      },
+      json: true,
+    }
+      ctx.body = await rp(option);
+})
+
+router.get('/GITinformation',async ctx=>{
+    varID = ctx.query.varID
+    productID = ctx.query.productID
+    let [pOriginal, pGit, vOriginal, vGit] = await mainHelper.getGITInformation(ctx.db, varID, productID)
+    ctx.body = {'variant': vGit, 'product':pGit}
+})
+
+router.get('/all', async ctx=>{
+    const { cookies } = ctx;
+  const shop = ctx.query.store
+  const accessToken = cookies.get('accessToken');
+  const option = {
+      method: 'GET',
+      url: `https://${shop}/${api_link}/products.json`,
+      headers: {
+        'X-Shopify-Access-Token': accessToken
+      },
+      json: true,
+  }
+  try {
+      ctx.body = await rp(option);
+      //console.log("body..."+JSON.stringify(ctx.body));
+  } catch (err) {
+      console.log(err.message);
+      if (err instanceof errors.StatusCodeError) {
+          ctx.status = err.statusCode;
+          ctx.message = err.message;
+      } else if (err instanceof errors.RequestError) {
+          ctx.status = 500;
+          ctx.message = err.message;
+      }
+  }
+})
 
 router.get('/ids/', async ctx => {
   const { cookies } = ctx;
@@ -62,13 +116,14 @@ router.get('/ids/', async ctx => {
   }
 });
 
+//Only used by return portal
 router.get('/img', async ctx => {
-
     // Get product img src
     const productid = ctx.query.id;
     const { cookies } = ctx;
-    const shop = cookies.get('shop_id');
-    const accessToken = cookies.get('accessToken');
+    const shop = ctx.query.shop;
+    db = ctx.db
+    const accessToken = await accessTokenDB(ctx)
     const option = {
         url: `https://${shop}/${api_link}/products/${productid}.json`,
         headers: {
@@ -155,8 +210,7 @@ router.post('/variant/', async ctx => {
 
 router.delete('/variant/', async ctx => {
   const product_id = ctx.query.id;
-  const variant_id = ctx.quert.variant_id
-  console.log("productID:---------"+product_id)
+  const variant_id = ctx.query.variant_id
   const { cookies } = ctx;
   const shop = cookies.get('shop_id');
   const accessToken = cookies.get('accessToken');
