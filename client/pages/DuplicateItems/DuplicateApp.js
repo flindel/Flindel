@@ -1,13 +1,11 @@
 import React, { Component } from 'react';
 import FindIssues from './FindIssues'
-import TestStore from './TestStore'
+//import TestStore from './TestStore'
 import SetupGit from './SetupGit'
 import Blacklist from './Blacklist'
 import OnboardProcess from './OnboardProcess'
-import {serveo_name} from '../config'
 import { post, put, postCollection, getSmartCollections} from './Shopify'
 
-unpublished = 0;
 class DuplicateApp extends Component {
   constructor(props){
     super(props);
@@ -16,16 +14,14 @@ class DuplicateApp extends Component {
       origCollectionId: 0,
       isGitSetup: false,
       isLoading: true,
-      ui: 0,
+      ui: 2,
       //0: Update Products app
       //1: BlackList
       //2: Onboarding
-      //3: Settings
     }
     this.setIsGitSetup = this.setIsGitSetup.bind(this);
     this.extSetState = this.extSetState.bind(this);
     this.handleClick = this.handleClick.bind(this);
-    this.finishUnpublish = this.finishUnpublish.bind(this);
     getSmartCollections(this.setIsGitSetup);
   }
 
@@ -60,53 +56,21 @@ class DuplicateApp extends Component {
     this.setState({isBlackList: bool});
   }
 
-  unpublishAllGit(){
-    confirm("This will stop all customers from viewing and purchasing Get it Today Products.\nAre you sure you want to proceed?")
-    fetch(`${serveo_name}/collections?id=${encodeURIComponent(this.state.gitCollectionId)}`, {
-      method: 'GET',
-      })
-      .then((response) => {
-        if(response.ok){return response.json()}
-        else{throw Error(response.statusText)}
-      })
-      .then(resData=> {
-        let gitProductIds = resData.products.map((product) => {
-          return product.id;
-        })
-        this.setState({gitProductIds: gitProductIds});
-        console.log("UNPUBLISHING GET IT TODAY: ", gitProductIds);
-        gitProductIds.map(id => {
-          put(id,
-            {"product":{
-              "id": id,
-              "published_at": null,
-            }
-          })
-        }, this.finishUnpublish)
-      })
-  }
 
-  finishUnpublish(){
-    unpublish += 1;
-    if (unpublish == this.state.gitProductIds.length){
-
-    }
-  }
 
   render(){
     if (this.state.ui == 0){//Update Products App
       return (
         <div>
-
+        /*
           {(!this.state.isLoading) &&
             <TestStore
               gitCollectionId = {this.state.gitCollectionId}
             />
           }
-
+        */
           {this.state.isLoading && <h1>Loading Store Setup</h1>}
-          <button onClick={() => this.setState({ui:1})}>Blacklist</button>
-          <button onClick={() => this.setState({ui:3})}>Settings</button>
+          <button onClick={()=> this.handleClick(true)}>Blacklist</button>
           {(!this.state.isGitSetup && !this.state.isLoading) &&
             <SetupGit
               gitCollectionId = {this.state.gitCollectionId}
@@ -126,7 +90,7 @@ class DuplicateApp extends Component {
     if(this.state.ui == 1) {//Blacklist App
       return(
         <div>
-          <button onClick={() => this.setState({ui:0})}>Product Updates</button>
+          <button onClick={()=> this.handleClick(false)}>Product Updates</button>
           <Blacklist />
         </div>
       )
@@ -141,14 +105,7 @@ class DuplicateApp extends Component {
              />
           }
         </div>
-      )
-    }
-    if (this.state.ui == 3){
-      return(
-        <div>
-          <button onClick={() => this.setState({ui:0})}>Product Updates</button>
-          <button onClick={() => this.unpublishAllGit()}>UNPUBLISH GET IT TODAY PRODUCTS</button>
-        </div>
+
       )
     }
   }
