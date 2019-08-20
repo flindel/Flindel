@@ -5,7 +5,6 @@ const GOOGLE_GEO_API_KEY = process.env.GOOGLE_GEO_API_KEY;
 const serveo_name = "suus";
 
 async function getLatLng(address) {
-  console.log(GOOGLE_GEO_API_KEY);
   const response = await fetch(
     `https://maps.googleapis.com/maps/api/geocode/json?address=${address}&key=${GOOGLE_GEO_API_KEY}`
   );
@@ -14,14 +13,14 @@ async function getLatLng(address) {
 }
 
 function calculateDistance(p1) {
-  let pt = turf.point([p1.lat, p1.lng]);
+  let pt = turf.point([p1.lng, p1.lat]);
   let poly = turf.polygon([
     [
-      [44.0502601, -79.5312458],
-      [43.6535273, -79.9723667],
-      [43.38117, -79.9800032],
-      [43.9482713, -79.0184346],
-      [44.0502601, -79.5312458]
+      [-79.4147, 43.6742],
+      [-79.375357964, 43.672409816],
+      [-79.36897, 43.64391],
+      [-79.385437012, 43.64868927],
+      [-79.4147, 43.6742]
     ]
   ]);
   return turf.booleanPointInPolygon(pt, poly);
@@ -29,7 +28,7 @@ function calculateDistance(p1) {
 
 function sendEmail(json) {
   fetch(
-    `https://${serveo_name}.serveo.net/sendEmail?package=${encodeURIComponent(
+    `https://${serveo_name}.serveo.net/sendEmail/warehouse?package=${encodeURIComponent(
       JSON.stringify(json)
     )}`,
     {

@@ -36,28 +36,40 @@ router.get('/', async ctx => {
   }
 );
 
-//cancel order
-router.post("/cancel", async ctx => {
+router.post("/fulfill", async ctx => {
   const { shop, accessToken } = getShopHeaders(ctx);
   const headers = {};
-  const order_id = ctx.query.id;
+  headers["Accept"] = "application/json";
+  headers["Content-Type"] = "application/json";
   if (process.env.DEBUG) {
     headers["Authorization"] = process.env.SHOP_AUTH;
   } else {
-    headers["X-Shopify-Access-Token"] = accessToken;
+    headers["X-Shopify-Access-Token"] = "8ed9510afbb7250e2ecdbfe9317fe983";
   }
-
+  let location_id = ctx.query.location_id;
+  if (ctx.query.location_id == "null") {
+    location_id = null;
+  }
   const option = {
     method: "POST",
-    url: `https://databasecommunicationtest.myshopify.com/${api_link}/orders/${order_id}/cancel.json`,
+    url: `https://databasecommunicationtest.myshopify.com/${api_link}/orders/${
+      ctx.query.orderid
+    }/fulfillments.json`,
     headers: headers,
-    json: true
+    json: true,
+    body: {
+      fulfillment: {
+        location_id: location_id,
+        tracking_number: null,
+        line_items: await JSON.parse(ctx.query.lineitem_id)
+      }
+    }
   };
+  console.log(option.body);
   try {
-    //console.log("what DDDDDDDDDDD: ", option.url);
     ctx.body = await rp(option);
-    console.log("CANCEL " + JSON.stringify(ctx.body));
   } catch (err) {
+    console.log(err.message);
     if (err instanceof errors.StatusCodeError) {
       ctx.status = err.statusCode;
       ctx.message = err.message;

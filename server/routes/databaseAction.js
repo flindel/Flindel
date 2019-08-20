@@ -60,7 +60,7 @@ router.get("/fetch_stock", async ctx => {
   }
 });
 
-router.get("/update_order_database", async ctx => {
+router.post("/update_order_database", async ctx => {
   ctx.set("Access-Control-Allow-Origin", "*");
   ctx.set(
     "Access-Control-Allow-Headers",
@@ -68,14 +68,42 @@ router.get("/update_order_database", async ctx => {
   );
   ctx.set("Access-Control-Allow-Methods", "POST, GET, PUT, DELETE, OPTIONS");
   let items = await JSON.parse(ctx.query.items);
-  let orderId = ctx.query.id;
-  let itemPayload = { id: orderId };
-  itemPayload["date_created"] = new Date();
+  let itemList = [];
+  const destination = await JSON.parse(ctx.query.destination);
+  const fulfId = ctx.query.fulf_id;
+  const orderId = ctx.query.order_id;
+  let payload = {
+    orderId: orderId,
+    store: items[0].vendor,
+    fulfillmentId: fulfId,
+    shippingAddress:
+      destination.address1 + " " + destination.city + " " + destination.zip
+  };
+  payload["dateCreated"] = new Date();
+  payload["workerID"] = "";
+  payload["code"] = "";
+  payload["status"] = "";
+  payload["name"] = destination.name;
+  payload["comment"] = "";
+
   for (let i = 0; i < items.length; i++) {
-    itemPayload[items[i].title] = items[i].quantity;
+    itemList[i] = {
+      itemId: items[i].id,
+      variantId: items[i].variant_id,
+      quantity: items[i].quantity,
+      name: items[i].title,
+      fulfilled: 0,
+      productId: items[i].product_id
+    };
   }
+  payload["items"] = itemList;
   db = ctx.db;
-  db.child("orders").set({ orderId: { itemPayload } });
+  let myRef = db
+    .collection("fulfillments")
+    .doc()
+    .set(payload);
+  ctx.body = "success";
+  console.log("GOOOOOOOOD");
 });
 
 router.post("/warehouse_order", async ctx => {
