@@ -143,7 +143,8 @@ class Item extends Component {
 
      async loadImage(){
         //get image
-        let imageID = this.props.item.productid
+        if (this.props.step != 8){
+            let imageID = this.props.item.productid
         fetch(`https://${this.props.serveoname}/products/img?id=${encodeURIComponent(imageID)}`, {
         method: 'GET',})
         .then(response => response.json())
@@ -156,6 +157,7 @@ class Item extends Component {
             }
           }
         });
+        }
      }
 
      failItem(){
