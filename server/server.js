@@ -51,6 +51,19 @@ app.prepare().then(() => {
   server.use(bodyParser());
   server.use(async (ctx, next) => {
     if (ctx.db === undefined) ctx.db = db;
+    //console.log(ctx.request.host);
+    //console.log(ctx.request)
+    //----------------------------for app proxy---------------------
+    //if (ctx.request.host === 'feritas.serveo.net') {
+      //app.setAssetPrefix('');
+    //} else {
+      //app.setAssetPrefix('flindel-returns');
+    //}
+    //server.use(proxy('feritas.serveo.net'))
+    
+    //app.setAssetPrefix('flindel-returns');
+    console.log(ctx)
+
     await next();
   });
   server.keys = [SHOPIFY_API_SECRET_KEY];
