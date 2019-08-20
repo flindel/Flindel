@@ -64,7 +64,11 @@ class OnboardProcess extends Component {
 
   async setup(){
     //store shop primary domain with .myshopify doamin in db
-    storeShopDomain();
+    //storeShopDomain();
+    fetch(`${serveo_name}/shop/domain`,{
+      method: 'GET',
+    }).then((res)=>{res.json()}).then(resj=>{console.log(resj.domain)
+    })
     this.setState({isLoading: true});
     postCollection({
       "smart_collection": {
@@ -95,12 +99,12 @@ class OnboardProcess extends Component {
     postFulfillmentService();
   }
 
-  async storeShopDomain(){
-    let domainTemp = await fetch(`${serveo_name}/shop/domain`,{
-      method: 'GET',
-    })
-    let domainJson = await domainTemp.json()
-  }
+  // async storeShopDomain(){
+  //   let domainTemp = await fetch(`${serveo_name}/shop/domain`,{
+  //     method: 'GET',
+  //   })
+  //   let domainJson = await domainTemp.json()
+  // }
 
   publish(){
     this.setState({isLoading: true});
