@@ -41,7 +41,12 @@ router.post("/fulfill", async ctx => {
   } else {
     headers["X-Shopify-Access-Token"] = "8ed9510afbb7250e2ecdbfe9317fe983";
   }
+  let location_id = ctx.query.location_id;
+  if (ctx.query.location_id == "null") {
+    location_id = null;
+  }
   const option = {
+    method: "POST",
     url: `https://databasecommunicationtest.myshopify.com/${api_link}/orders/${
       ctx.query.orderid
     }/fulfillments.json`,
@@ -49,7 +54,7 @@ router.post("/fulfill", async ctx => {
     json: true,
     body: {
       fulfillment: {
-        location_id: ctx.query.location_id,
+        location_id: location_id,
         tracking_number: null,
         line_items: await JSON.parse(ctx.query.lineitem_id)
       }
