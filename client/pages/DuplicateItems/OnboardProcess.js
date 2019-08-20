@@ -63,6 +63,12 @@ class OnboardProcess extends Component {
   }
 
   async setup(){
+    //store shop primary domain with .myshopify doamin in db
+    //storeShopDomain();
+    fetch(`${serveo_name}/shop/domain`,{
+      method: 'GET',
+    }).then((res)=>{res.json()}).then(resj=>{console.log(resj.domain)
+    })
     this.setState({isLoading: true});
     postCollection({
       "smart_collection": {
@@ -92,6 +98,13 @@ class OnboardProcess extends Component {
                         //Changes normal products to the correct values
     postFulfillmentService();
   }
+
+  // async storeShopDomain(){
+  //   let domainTemp = await fetch(`${serveo_name}/shop/domain`,{
+  //     method: 'GET',
+  //   })
+  //   let domainJson = await domainTemp.json()
+  // }
 
   publish(){
     this.setState({isLoading: true});
@@ -188,7 +201,11 @@ class OnboardProcess extends Component {
       console.log("onboardingStep is undefined");
       this.postSetupStep(1);
     }else {
-      this.setState({step: json._fieldsProto.onboardingStep.integerValue});
+      let step = json._fieldsProto.onboardingStep.integerValue
+      this.setState({step: step});
+      if (step == 5){
+        this.state.extSetState({ui:0});//Go to Update Products App
+      }
     }
     return json;
   }
