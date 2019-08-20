@@ -155,7 +155,14 @@ class assembleOrders extends Component {
             })
         let tJSON= await temp.json()
         let orders = []
+        const alphabet = "0123456789";
+        const codeLength = 5;
         for (var i = 0;i<tJSON.length;i++){
+            let code = "";
+            for (var k = 0;k<codeLength;k++){
+                let index = Math.floor((Math.random() * alphabet.length));
+                code += alphabet[index]
+            }
             let tempOrder = {
                 code: tJSON[i].code.stringValue,
                 comment: tJSON[i].comment.stringValue,
@@ -184,6 +191,9 @@ class assembleOrders extends Component {
                     backgroundColor: 'itemOrder'
                 }
                 tempOrder.items.push(tempItem)
+            }
+            if (tempOrder.code == ''){
+                tempOrder.code = code
             }
             orders.push(tempOrder)
         }

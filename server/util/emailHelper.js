@@ -9,6 +9,53 @@ async function getStoreEmail(dbIn, store){
     return email
 }
 
+async function sendSpecialEmail(items){
+  const headers = {}
+  headers['Accept'] = 'application/json';
+  headers['Content-Type'] = 'application/json';
+  headers['Authorization'] = 'Bearer ' + process.env.SENDGRID;
+      let message = ''
+      message += 'Today, the following items were marked as special circumstances.'
+      if (items.length>0){
+        for (var i = 0;i<items.length;i++){
+        message += 'Order:' + items[i].order + ' - '+ items[i].oldItem.mapValue.fields.OLDname.stringValue + ' - ' + items[i].oldItem.mapValue.fields.OLDvariantid.stringValue
+        message += '\n\n'
+        }
+      }
+      message += '\n'
+      message += 'Thank you.'
+      const option = {
+        method: 'POST',
+        url: 'https://api.sendgrid.com/v3/mail/send',
+        headers: headers,
+        json: true,
+        body:{
+            "personalizations": [
+              {
+                "to": [
+                  {
+                    "email": 'booleafs17@yahoo.ca' //whatever FLINDEL's in house email is
+                  }
+                ],
+                "subject": "Status Update"
+              }
+            ],
+            "from": {
+                "name": "Status Update",
+              "email": "no-reply@sender.com"
+            },
+            "content": [
+              {
+                "type": "text/plain",
+                "value": message
+              }
+            ]
+          }
+    }
+    await rp(option);
+  
+}
+
 async function sendUpdateEmail(email, acceptedList, rejectedList){
   const headers = {}
   headers['Accept'] = 'application/json';
@@ -165,4 +212,4 @@ async function sendRefundEmail(orderList, email){
     await rp(option);
 }
 
-module.exports = {getStoreEmail, sendItemEmail, sendRefundEmail, sendUpdateEmail}
+module.exports = {getStoreEmail, sendItemEmail, sendRefundEmail, sendUpdateEmail, sendSpecialEmail}
