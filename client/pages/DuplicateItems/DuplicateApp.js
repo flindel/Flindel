@@ -19,7 +19,7 @@ class DuplicateApp extends Component {
       isUnpublishing: false,
       unpublished: 0,
       gitProductIds: [],
-      ui: 3,
+      ui: 2,
       //0: Update Products app
       //1: BlackList
       //2: Onboarding
