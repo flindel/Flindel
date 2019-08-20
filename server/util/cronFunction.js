@@ -44,10 +44,10 @@ async function refundInformation(db){
             }
         }
         //send email to customer about what stuff got accepted
-        emailHelper.sendUpdateEmail(doc._fieldsProto.email.stringValue, orderRefundItems, orderRejectItems)
+        //emailHelper.sendUpdateEmail(doc._fieldsProto.email.stringValue, orderRefundItems, orderRejectItems)
     })
     mainHelper.sortRefundItems(refundItems,db)
-    emailHelper.sendSpecialEmail(specialItems)
+    //SPECIAL ITEMS?
 }
 
 //update flindel inventory on which items have been accepted. update shopify inventory for reselling items

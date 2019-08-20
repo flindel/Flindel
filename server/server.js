@@ -22,18 +22,13 @@ const errors = require("request-promise/errors");
 /////////////
 
 //second (0-59) - minute (0-59) - hour(0-23) - day of month (1-31) - Month (1-12) - Day of Week (0-6, Sun-Sat)
-new CronJob(
-  "*/10 * * * * *",
-  async function() {
-    //KEEP THIS ORDER OF STUFF. unblock all when we go live, set time '0 0 0 * * *'
-    //await cronUtil.checkExpired(db);
-    //await cronUtil.mainReport(db);
-    //await cronUtil.returningReport(db);
-    //await cronUtil.clearPending(db);
-  },
-  null,
-  true
-);
+new CronJob('*/10 * * * * *', async function() {
+  //KEEP THIS ORDER OF STUFF. unblock all when we go live, set time '0 0 0 * * *'
+  //await cronUtil.checkExpired(db);
+  //await cronUtil.mainReport(db);
+  //await cronUtil.returningReport(db);
+  //await cronUtil.clearPending(db);
+}, null, true)
 
 const port = parseInt(process.env.PORT, 10) || 3000;
 const dev = process.env.NODE_ENV !== "production";
@@ -62,19 +57,6 @@ app.prepare().then(() => {
   //server.use(proxy('feritas.serveo.net'))
   server.use(async (ctx, next) => {
     if (ctx.db === undefined) ctx.db = db;
-    //console.log(ctx.request.host);
-    //console.log(ctx.request)
-    //----------------------------for app proxy---------------------
-    //if (ctx.request.host === 'feritas.serveo.net') {
-      //app.setAssetPrefix('');
-    //} else {
-      //app.setAssetPrefix('flindel-returns');
-    //}
-    //server.use(proxy('feritas.serveo.net'))
-    
-    //app.setAssetPrefix('flindel-returns');
-    console.log(ctx)
-
     await next();
   });
   server.keys = [SHOPIFY_API_SECRET_KEY];

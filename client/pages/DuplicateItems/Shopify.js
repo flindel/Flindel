@@ -51,7 +51,7 @@ export function del(product_id, callback = doNothing){
     .catch((error) => console.log(error));
 }
 
-export function put(product_id, body, callback = doNothing){
+export function put(product_id, body, callback = doNothing, args = []){
   const options = {
     method: 'put',
     headers: {
@@ -67,7 +67,11 @@ export function put(product_id, body, callback = doNothing){
     })
     .then((data) => {
       console.log('PUT: ', data)
-      callback(data);
+      if (args == []){
+        callback(data)
+      }else{
+        callback(data, args);
+      }
     })
     .catch((error) => console.log(error))
 }
