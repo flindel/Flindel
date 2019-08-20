@@ -188,7 +188,11 @@ class OnboardProcess extends Component {
       console.log("onboardingStep is undefined");
       this.postSetupStep(1);
     }else {
-      this.setState({step: json._fieldsProto.onboardingStep.integerValue});
+      let step = json._fieldsProto.onboardingStep.integerValue
+      this.setState({step: step});
+      if (step == 5){
+        this.state.extSetState({ui:0});//Go to Update Products App
+      }
     }
     return json;
   }
