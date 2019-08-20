@@ -145,9 +145,7 @@ class Order extends Component {
                     <hr className = 'horizStrong'/>
                         <textarea value = {this.props.order.comment} onChange = {this.handleMessage}/>
                         <br/>
-                        <p> Driver ID:
-                        <input type = 'text' value = {this.props.order.workerid} onChange = {this.changeDriverID}/>    
-                        </p>                
+                        <input type = 'text' value = {this.props.order.workerid} onChange = {this.changeDriverID}/>                    
                     </div>
                 </div>
             )

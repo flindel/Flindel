@@ -63,8 +63,6 @@ class OnboardProcess extends Component {
   }
 
   async setup(){
-    //store shop primary domain with .myshopify doamin in db
-    storeShopDomain();
     this.setState({isLoading: true});
     postCollection({
       "smart_collection": {
@@ -93,13 +91,6 @@ class OnboardProcess extends Component {
     }, this.callbackOrig)//stores id of collection and posts GIT products
                         //Changes normal products to the correct values
     postFulfillmentService();
-  }
-
-  async storeShopDomain(){
-    let domainTemp = await fetch(`${serveo_name}/shop/domain`,{
-      method: 'GET',
-    })
-    let domainJson = await domainTemp.json()
   }
 
   publish(){
