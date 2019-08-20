@@ -10,6 +10,7 @@ const router = Router({
     prefix: '/fulfillment'
 });
 
+//get all orders for assembly step
 router.get('/assemble', async ctx => {
     let date = expiredHelper.getCurrentDate()
     db = ctx.db
@@ -39,6 +40,7 @@ router.get('/assemble', async ctx => {
     ctx.body = orders
 });
 
+//get all orders matching id for delivery step
 router.get('/deliver', async ctx => {
     let date = expiredHelper.getCurrentDate()
     db = ctx.db
@@ -66,6 +68,7 @@ router.get('/deliver', async ctx => {
     ctx.body = orders
 });
 
+//update fulfillments table
 router.put('/update',async ctx=>{
     db = ctx.db
     let batch = db.batch()
@@ -80,6 +83,7 @@ router.put('/update',async ctx=>{
     batch.commit()
     ctx.body = true
 })
+//get time helper function
 function getTime(){
     let now = new Date()
     let month = now.getMonth()+1
@@ -98,6 +102,7 @@ function getTime(){
     return currTime
 }
 
+//complete items
 router.post('/complete',async ctx=>{
     //delete from curr + add to fulfillmentHistory in batch
     //for each item, add to whatever
@@ -108,17 +113,24 @@ router.post('/complete',async ctx=>{
     let currTime = await getTime()
     orders = await JSON.parse(ctx.query.orders)
     for (var i = 0;i<orders.length;i++){
+        //set time
         orders[i].dateCompleted = currTime
         let query = await myRef.where('code','==',orders[i].code).get()
         await query.forEach(async doc=>{
-            //batch.delete(doc.ref)
+            //delete old
+            batch.delete(doc.ref)
         })
         let newDoc = newRef.doc()
+        //write new
         batch.set(newDoc,orders[i])
         for (var j = 0;j<orders[i].items.length;j++){
-            fulfillHelper.completeReturnItem(ctx.db, orders[i].orderid, orders[i].items[j].variantid, orders[i].items[j].itemid, orders[i].items[j].quantity, orders[i].store, orders[i].code)
+            if (orders[i].returnItems[j].fulfilled == 1){
+                //update items
+                fulfillHelper.completeReturnItem(ctx.db, orders[i].orderid, orders[i].items[j].variantid, orders[i].items[j].itemid, orders[i].items[j].quantity, orders[i].store, orders[i].code)
+            }
         }
     }
+    //commit all
     batch.commit()
     ctx.body = true
 })

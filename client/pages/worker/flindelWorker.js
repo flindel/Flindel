@@ -11,6 +11,8 @@ import {serveo_name} from '../config'
 const sname = serveo_name
 const serveoname = sname.substring(8)
 
+//MAIN DASHBOARD FOR FLINDEL WORKER AP
+
 class Interface extends Component {
     constructor(props){
         super(props);
@@ -27,6 +29,7 @@ class Interface extends Component {
         //this.doesProductExist = this.doesProductExist.bind(this)
     }
 
+    //buttons to go to each method
     goHome(){
         this.setState({step:1})
     }

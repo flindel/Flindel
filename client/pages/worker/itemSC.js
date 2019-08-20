@@ -141,6 +141,7 @@ class Item extends Component {
             this.setState({blacklist:isOn, blacklistMessage:message})
      }
 
+     //get product image
      async loadImage(){
         //get image
         let imageID = this.props.item.productid
@@ -157,15 +158,18 @@ class Item extends Component {
           }
         });
      }
-
+     
+     //item is not succesfully assembled, set to red in props
      failItem(){
         this.props.changeItemStatus(this.props.item.index, -1)
      }
 
+     //item is succesfully assembled, set to green in props
      packageItem(){
         this.props.changeItemStatus(this.props.item.index, 1)
      }
 
+     //get messages to go underneath when an item is replaced
      loadMessages(){
         if (this.props.item.flag == '1'){
             let name = '(OLD: '+ this.props.item.oldItem.OLDname + ')'

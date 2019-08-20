@@ -7,6 +7,7 @@ const router = Router({
     prefix: '/worker'
 });
 
+//check to see if worker id exists ... expand on this router later to add employees etc
 router.get('/check', async ctx => {
     let db = ctx.db
     let id = ctx.query.id

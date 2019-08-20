@@ -70,6 +70,7 @@ router.post('/update', async ctx=>{
         ctx.body = await rp(option);
   
 })
+//confirmation order after they complete return form
 router.post('/confirmation', async ctx=>{
   const email = ctx.query.email
   const code = ctx.query.code
@@ -104,6 +105,7 @@ router.post('/confirmation', async ctx=>{
     ctx.body = await rp(option);    
 });
 
+//send emails to brand and flindel after a shipment gets processed
 router.post('/returnShipment', async ctx=>{
   const store = ctx.query.store
   const itemString = ctx.query.items

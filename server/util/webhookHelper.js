@@ -38,7 +38,7 @@ async function completeReturnItem(db, orderId, varId, itemId, quantity, store, c
             count ++
         }
     })
-    //actually update the shopify fulfillment
+    //actually update the shopify fulfillment ///////////////////////////////////////////////////////////////////////
     //updateFulfillment(db, store, orderId, itemId, quantity)
 } 
 

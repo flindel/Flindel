@@ -36,6 +36,7 @@ async function breakdown(db, items){
     return [acceptedList, returningList]
 }
 
+//get get it today information for items
 async function getGITInformation(db, variantid, productid){
     let productid_original ='1'
     let productid_git ='2'

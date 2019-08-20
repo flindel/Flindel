@@ -24,37 +24,44 @@ class deliverOrders extends Component {
         this.handleSubmit = this.handleSubmit.bind(this)
     }
 
+    //edit message
     changeMessage(newMessage, index){
         let tempList = this.state.orderList
         tempList[index].comment = newMessage
         this.setState({orderList:tempList})
     }
 
+    //change login screen
     handleWorkerID(e){
         this.setState({workerID:e.target.value})
     }
 
+    //submit changes
     async handleSubmit(){
         let deliveredList = []
         let failedList = []
         for (var i = 0;i<this.state.orderList.length;i++){
             if (this.state.orderList[i].delivered == 1){
+                //anything that was green
                 deliveredList.push(this.state.orderList[i])
+                deliveredList[deliveredList.length-1].deliveredBy = this.state.workerID
             }
             else{
+                //anything that was red
                 failedList.push(this.state.orderList[i])
-                failedList[failedList.length-1].deliveredBy = this.state.workerID
             }
         }
         deliveredList = await this.cleanList(deliveredList)
         failedList = await this.cleanList(failedList)
         let orders = JSON.stringify(failedList)
+        //send failed deliveries to update
         if (failedList.length > 0){
             await fetch(`https://${serveoname}/fulfillment/update?orders=${encodeURIComponent(orders)}`, {
             method: 'put',
         })
         }
         orders = JSON.stringify(deliveredList)
+        //send successful deliveries to update
         if (deliveredList.length>0){
             await fetch(`https://${serveoname}/fulfillment/complete?orders=${encodeURIComponent(orders)}`, {
                 method: 'post',
@@ -62,9 +69,10 @@ class deliverOrders extends Component {
         }
         this.setState({step:2})
     }
-
+    //clean up list
     cleanList(tempList){
         for (var i = 0;i<tempList.length;i++){
+            //get rid of unnecessary information
             delete tempList[i]['index']
             delete tempList[i]['delivered']
             for (var j = 0;j<tempList[i].items.length;j++){
@@ -76,6 +84,7 @@ class deliverOrders extends Component {
         return tempList
     }
 
+    //change order status to delivered or not
     changeOrderStatus(index, val){
         let tempList = this.state.orderList
         tempList[index].delivered = val
@@ -89,7 +98,6 @@ class deliverOrders extends Component {
         }
         this.setState({orderList:tempList})
     }
-
     async loadFulfillments(){
         //load fulfillments here
         let temp = await fetch(`https://${serveoname}/fulfillment/deliver?workerID=${encodeURIComponent(this.state.workerID)}`, {
@@ -97,6 +105,7 @@ class deliverOrders extends Component {
             })
         let tJSON= await temp.json()
         let orders = []
+        //load all orders
         for (var i = 0;i<tJSON.length;i++){
             let tempOrder = {
                 code: tJSON[i].code.stringValue,
@@ -131,11 +140,13 @@ class deliverOrders extends Component {
         this.setState({loadingMessage:'', orderList:orders})
     }
 
+    //begin delivering
     go(){
         this.setState({step:1})
         this.loadFulfillments()
     }
 
+    //logout button
     changeID(){
         this.setState({step:0, workerID: ''})
     }

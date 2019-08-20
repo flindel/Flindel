@@ -29,72 +29,87 @@ class DropOff extends Component {
         this.loadHistory = this.loadHistory.bind(this)
     }
 
+    //input worker id on login screen
     handleWorkerID(e){
         this.setState({workerID: e.target.value})
     }
 
+    //get history of orders
     async loadHistory(){
         let temp = await fetch(`https://${serveoname}/return/dropoffSummary?id=${encodeURIComponent(this.state.workerID)}`, {
             method: 'get',
             })
         let res = await temp.json()
         let allOrders = ''
+        //add all codes to list to display
         for (var i = 0;i<res.codes.length;i++){
             allOrders += res.codes[i] + ' , '
         }
         this.setState({history: allOrders})  
     }
 
+    //log in
     async selectOrder(){
         if (this.state.workerID!=''){
+            //check to make sure id is valid
             let temp = await fetch(`https://${serveoname}/worker/check?id=${encodeURIComponent(this.state.workerID)}`, {
             method: 'get',
             })
             let isValid = await temp.json()
             if (isValid){
+                //id is valid, load history and let select items
                 this.loadHistory()
                 this.setState({step:1, errorMessage: '', code: ''})
             }
             else{
+                //error message
                 this.setState({errorMessage: 'Invalid worker ID.'})
             }
         }
         else{
+            //error message
             this.setState({errorMessage:'Invalid worker ID.'})
         }
     }
 
+    //show order had been received
     receiveOrder(){
         this.updateDB()
         this.setState({step:4})
     }
 
+    //log out
     changeID(){
         this.setState({step:0, workerID: ''})
     }
 
+    //handle input of return code
     handleCode(e){
         let temp = e.target.value.toUpperCase()
         this.setState({code:temp})
     }
 
     updateDB(){
+        //update database when order is received
         fetch(`https://${serveoname}/return/requested/receive?code=${encodeURIComponent(this.state.code)}&workerID=${encodeURIComponent(this.state.workerID)}`, 
         {
             method: 'put',
         })
     }
 
+    //when button is pressed to receive orders
     handleSubmit(){
         this.selectOrder()
     }
 
     async getItems(){
+        //fetch items when code is inputted
         let temp = await fetch(`https://${serveoname}/return/requested/items?code=${encodeURIComponent(this.state.code)}`, {
             method: 'get',
         })
         let t2 = await temp.json()
         if(t2.valid == true){
+            //if code is valid
             let tempList = []
             for (var i = 0;i<t2.res.items.arrayValue.values.length;i++){
             let tempItem = {
@@ -109,6 +124,7 @@ class DropOff extends Component {
             this.setState({items:tempList, step: 2})
             }
         else{
+            //if code isn't valid
             this.setState({errorMessage: 'No return exists under this code', code: ''})
         }
     }

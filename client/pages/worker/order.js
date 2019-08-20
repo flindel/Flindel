@@ -30,6 +30,7 @@ class Order extends Component {
     }
 
     componentWillMount(){
+        //change sizing for orders, as it's affected by number of items
         if (this.props.step == 1){
             let size = 80 + 60*this.props.order.items.length
             let tempSize = size.toString() + 'px'
@@ -44,35 +45,43 @@ class Order extends Component {
         }
     }
 
+    //change driver id through props
     changeDriverID(e){
         this.props.changeDriverID(this.props.order.index, e.target.value)
     }
 
+    //change item status, this is intermediate function, has identical child and parent
     changeItemStatus(itemIndex, value){
         this.props.changeItemStatus(itemIndex, this.props.order.index, value)
     }
 
+    //incomplete entire order
     incompleteOrder(){
         this.props.changeOrderStatus(this.props.order.index, 0)
     }
 
+    //change message in props (assemble)
     handleMessage(e){
         this.props.changeMessage(e.target.value, this.props.order.index)
     }
 
+    //complete entire order (assemble)
     completeOrder(){
         this.props.changeOrderStatus(this.props.order.index, 1)
     }
 
+    //fail entire order (assemble)
     failOrder(){
         this.props.changeOrderStatus(this.props.order.index, -1)
     }
 
+    //fail to deliver order
     deliveryFail(){
         this.setState({color:'redBackground'})
         this.props.changeOrderStatus(this.props.order.index,-1)
     }
 
+    //succesfully deliver order
     deliverySuccess(){
         this.setState({color:'greenBackground'})
         this.props.changeOrderStatus(this.props.order.index, 1)

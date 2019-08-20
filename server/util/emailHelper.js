@@ -9,6 +9,7 @@ async function getStoreEmail(dbIn, store){
     return email
 }
 
+//send email about the status of their items to customer of each processed order
 async function sendUpdateEmail(email, acceptedList, rejectedList){
   const headers = {}
   headers['Accept'] = 'application/json';

@@ -26,39 +26,48 @@ class assembleOrders extends Component {
         this.changeDriverID = this.changeDriverID.bind(this)
     }
 
+    //automatically load all orders when page loads
     componentDidMount(){
         this.loadFulfillments()
     }
 
+    //edit the driver ID field
     changeDriverID(index, newID){
         let tempList = this.state.orderList
         tempList[index].workerid = newID
         this.setState({orderList:tempList})
     }
 
+    //change the message in the textbox
     changeMessage(newMessage, index){
         let tempList = this.state.orderList
         tempList[index].comment = newMessage
         this.setState({orderList:tempList})
     }
 
+    //not used for now, but handles a login page
     handleWorkerID(e){
         this.setState({workerID:e.target.value})
     }
 
+    //submitting changes made
     async handleSubmit(){
         let tempList = this.state.orderList
         for (var i = 0;i<tempList.length;i++){
+            //these don't need to be written to the db
             delete tempList[i]['index']
             delete tempList[i]['backgroundColor']
             for (var j = 0;j<tempList[i].items.length;j++){
+                //this doesn't need to be written to the db
                 delete tempList[i].items[j]['index']
+                //make sure variable types are consistent
                 tempList[i].items[j].fulfilled = parseInt(tempList[i].items[j].fulfilled)
                 tempList[i].items[j].quantity = parseInt(tempList[i].items[j].quantity)
             }
         }
+        //actually update
         let orderString = JSON.stringify(tempList)
-        fetch(`https://${serveoname}/fulfillment/update?orders=${encodeURIComponent(orderString)}`, {
+        await fetch(`https://${serveoname}/fulfillment/update?orders=${encodeURIComponent(orderString)}`, {
             method: 'put',
         })
         this.setState({step:2})
@@ -68,22 +77,28 @@ class assembleOrders extends Component {
     changeItemStatus(itemIndex, orderIndex, value){
         let tempList = this.state.orderList
         tempList[orderIndex].items[itemIndex].fulfilled = value
+        //set to green if good
         if (value == 1){
             tempList[orderIndex].items[itemIndex].backgroundColor = 'itemOrderGreen'  
         }
+        //set to red if bad
         if (value == -1){
             tempList[orderIndex].items[itemIndex].backgroundColor = 'itemOrderRed'  
         }
+        //autoset to complete
         tempList[orderIndex].status = 'complete'
         let successful = true
         let failed = true
         for (var i = 0;i<tempList[orderIndex].items.length;i++){
             if (tempList[orderIndex].items[i].fulfilled == 0){
+                //if item hasn't been processed, incomplete
                 tempList[orderIndex].status = 'incomplete'
             }
+            //unless all items are 1, it's not fully successful
             if (tempList[orderIndex].items[i].fulfilled != 1){
                 successful = false
             }
+            //unless all items are -1, it's not fully failed
             if (tempList[orderIndex].items[i].fulfilled != -1){
                 failed = false
             }
@@ -96,6 +111,7 @@ class assembleOrders extends Component {
         }
         for (var i = 0;i<tempList.length;i++){
             for (var j = i+1;j<tempList.length;j++){
+                //sort list based on whether orders are completed
                 if ((tempList[i].status == 'successful'|| tempList[i].status == 'complete' || tempList[i].status == 'failed') && tempList[j].status == 'incomplete'){
                     let tempOrder = tempList[i]
                     tempList[i] = tempList[j]
@@ -103,12 +119,14 @@ class assembleOrders extends Component {
                 }
             }
         }
+        //reset indexes
         for (var i = 0;i<tempList.length;i++){
             tempList[i].index = i
         }
         this.setState({orderList:tempList})
     }
 
+    //change order status (+-)
     changeOrderStatus(index, val){
         let tempList = this.state.orderList
         if (val == 1){
@@ -132,7 +150,7 @@ class assembleOrders extends Component {
                 tempList[index].items[i].fulfilled = -1
             }
         }
-        
+        //sort list so unfinished is at top
         for (var i = 0;i<tempList.length;i++){
             for (var j = i+1;j<tempList.length;j++){
                 if ((tempList[i].status == 'successful'|| tempList[i].status == 'complete' || tempList[i].status == 'failed') && tempList[j].status == 'incomplete'){
@@ -142,6 +160,7 @@ class assembleOrders extends Component {
                 }
             }
         }
+        //re-index after sort
         for (var i = 0;i<tempList.length;i++){
             tempList[i].index = i
         }
@@ -155,6 +174,7 @@ class assembleOrders extends Component {
             })
         let tJSON= await temp.json()
         let orders = []
+        //load all orders
         for (var i = 0;i<tJSON.length;i++){
             let tempOrder = {
                 code: tJSON[i].code.stringValue,
@@ -185,16 +205,19 @@ class assembleOrders extends Component {
                 }
                 tempOrder.items.push(tempItem)
             }
+            //push to master list
             orders.push(tempOrder)
         }
         this.setState({loadingMessage:'', orderList:orders})
     }
 
+    //load fulfillments and edit
     go(){
         this.setState({step:1})
         this.loadFulfillments()
     }
 
+    //logout, not used now but for potential login
     changeID(){
         this.setState({step:0, workerID: ''})
     }

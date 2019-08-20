@@ -9,12 +9,15 @@ const router = Router({
     prefix: '/return'
 });
 
+//make sure ID is unique, return yes/no
 router.get('/requested/uuid', async ctx => {
         db = ctx.db
         code = ctx.query.code
+        //check requested returns
         myRef = db.collection('requestedReturns')
         let query = await myRef.where('code','==',code).get()
         if (query.empty){
+            //check pending
             myRef2 = db.collection('pendingReturns')
             let query2 = await myRef2.where('code','==',code).get()
             if (query2.empty){
@@ -29,6 +32,7 @@ router.get('/requested/uuid', async ctx => {
         }
 });
 
+//see if order exists for review/restart
 router.get('/requested/exists', async ctx=>{
     order = ctx.query.orderNum
     customerEmail = ctx.query.emailAdd
@@ -60,6 +64,7 @@ router.get('/requested/exists', async ctx=>{
     }
 })
 
+//change item status
 router.put('/requested/itemStatus', async ctx=>{
         code = ctx.query.code
         rawItems = ctx.query.items
@@ -70,6 +75,7 @@ router.put('/requested/itemStatus', async ctx=>{
         ctx.body = {"success":true}
 })
 
+//write when items are received from DROPOFF
 router.put('/requested/receive', async ctx=>{
     db = ctx.db
     code = ctx.query.code
@@ -80,6 +86,7 @@ router.put('/requested/receive', async ctx=>{
     ctx.body =  true
 })
 
+//get all codes received by drop off worker
 router.get('/dropoffSummary',async ctx=>{
     db = ctx.db
     id = ctx.query.id
@@ -92,6 +99,7 @@ router.get('/dropoffSummary',async ctx=>{
     ctx.body = {codes: codes}
 })
 
+//get items associated with order
 router.get('/requested/items', async ctx=>{
         code = ctx.query.code
         db = ctx.db
@@ -107,6 +115,7 @@ router.get('/requested/items', async ctx=>{
         }
 })
 
+//delete from requested return and write to history when order is cancelled
 router.put('/requested/orderStatus', async ctx=>{
     db = ctx.db
         code = ctx.query.code
@@ -122,11 +131,13 @@ router.put('/requested/orderStatus', async ctx=>{
         ctx.body = {'success':true}
 })
 
+//get item list from pending (helper fn)
 router.get('/pending/itemList', async ctx=>{
     let fullList = await itemList.getItems(ctx.db);
     ctx.body = fullList
 })
 
+//make new entry in requested returns
 router.post('/requested/new', async ctx=>{
         db = ctx.db
         const { shop, accessToken } = getShopHeaders(ctx);
@@ -163,6 +174,7 @@ router.post('/requested/new', async ctx=>{
         ctx.body = 'success'
 })
 
+//set time that processing began in sorting center
 router.put('/requested/openTime', async ctx=>{
     code = ctx.query.code
     db = ctx.db
@@ -172,6 +184,7 @@ router.put('/requested/openTime', async ctx=>{
     ctx.body = true
 })
 
+//set time that processing ended in sorting center
 router.put('/requested/closeTime', async ctx=>{
     code = ctx.query.code
     db = ctx.db
@@ -181,6 +194,7 @@ router.put('/requested/closeTime', async ctx=>{
     ctx.body = true
 })
 
+//update item status in pending
 router.put('/pending/items',async ctx=>{
     code = ctx.query.code
     items = await JSON.parse(ctx.query.items)
@@ -195,6 +209,7 @@ router.put('/pending/items',async ctx=>{
     ctx.body = true
 })
 
+//get current time mm/dd/yyyy-hh/mm/ss
 function getTime(){
     let now = new Date()
     let month = now.getMonth()+1
@@ -213,6 +228,7 @@ function getTime(){
     return currTime
 }
 
+//make new entry in pending, delete from requested
 router.post('/pending/new', async ctx=>{
     db = ctx.db
     const codeIn = ctx.query.code
