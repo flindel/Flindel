@@ -1,6 +1,5 @@
 import React, { Component } from 'react';
 import FindIssues from './FindIssues'
-import TestStore from './TestStore'
 import SetupGit from './SetupGit'
 import Blacklist from './Blacklist'
 import OnboardProcess from './OnboardProcess'
@@ -108,15 +107,6 @@ class DuplicateApp extends Component {
     if (this.state.ui == 0){//Update Products App
       return (
         <div>
-        {/* /*
-
-          {(!this.state.isLoading) &&
-            <TestStore
-              gitCollectionId = {this.state.gitCollectionId}
-            />
-          }
-        */}
-
           {this.state.isLoading && <h1>Loading Store Setup</h1>}
           <button onClick={() => this.setState({ui:1})}>Blacklist</button>
           <button onClick={() => this.setState({ui:3})}>Settings</button>
