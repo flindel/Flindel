@@ -1,6 +1,5 @@
 import React, { Component } from 'react';
 import FindIssues from './FindIssues'
-import TestStore from './TestStore'
 import SetupGit from './SetupGit'
 import Blacklist from './Blacklist'
 import OnboardProcess from './OnboardProcess'
