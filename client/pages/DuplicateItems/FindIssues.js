@@ -50,7 +50,7 @@ class FindIssues extends Component {
       updates: [],
       displayUpdates: [],
     })
-    //Assumption, Brand has less than 50 inventory item/product variations
+    //Assumption, Brand has less than 250 inventory item/product variations
     fetch(`${serveo_name}/collections?id=${encodeURIComponent(collection_all_products_id)}`, {
       method: 'GET',
       })
@@ -148,6 +148,30 @@ class FindIssues extends Component {
       }
       if (product != null && gitProduct == null){
         delProduct(data.git_id+"");
+        if(this.checkRequiresShipping(product)){
+          this.setState({
+            updates: this.state.updates.concat({
+              norm: product,
+              git: null,
+              name: product.title,
+              parameterIssues: [],
+              variantIssues: [],
+              issue: "\"Get it Today\" version of this product does not exist",
+              solution: "A \"Get it Today\" version of the product will be created"
+            })
+          })
+        }
+      }
+      if (product == null && gitProduct == null){
+        delProduct(data.git_id);
+      }
+      if (product != null && gitProduct != null){
+        let comparison = this.compareProducts(this.findOrig(data.orig_id), this.findGit(data.git_id), data);
+        if (comparison){this.setState(this.state.updates.concat(comparison));}
+      }
+    } else {
+      if(this.checkRequiresShipping(product)){
+        //GIT version of product does not exist
         this.setState({
           updates: this.state.updates.concat({
             norm: product,
@@ -158,31 +182,20 @@ class FindIssues extends Component {
             issue: "\"Get it Today\" version of this product does not exist",
             solution: "A \"Get it Today\" version of the product will be created"
           })
-        })
-      }
-      if (product == null && gitProduct == null){
-        delProduct(data.git_id);
-      }
-      if (product != null && gitProduct != null){
-        let comparison = this.compareProducts(this.findOrig(data.orig_id), this.findGit(data.git_id), data);
-        if (comparison){this.setState(this.state.updates.concat(comparison));}
-      }
-    } else {
-      //GIT version of product does not exist
-      this.setState({
-        updates: this.state.updates.concat({
-          norm: product,
-          git: null,
-          name: product.title,
-          parameterIssues: [],
-          variantIssues: [],
-          issue: "\"Get it Today\" version of this product does not exist",
-          solution: "A \"Get it Today\" version of the product will be created"
-        })
-    })
+      })
+    }
   }
 }
-
+  //Returns true if all variants require shipping
+  //Returns false if any variant does not require shipping
+  checkRequiresShipping(product){
+    for(let i = 0; i < product.variants.length; i++){
+      if(!product.variants[i].requires_shipping){
+        return false;
+      }
+    }
+    return true;
+  }
   //name: String, title of original product.
   //return product duplicate Get it Today item
   findGetItTodayDuplicate2(name){

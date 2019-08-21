@@ -30,6 +30,7 @@ router.post("/update", async ctx => {
         i + 1 + ": " + acceptedList[i].name + " - " + acceptedList[i].variantid;
       message += "\n\n";
     }
+<<<<<<< HEAD
   }
   if (rejectedList.length > 0) {
     message +=
@@ -294,6 +295,15 @@ router.post("/update", async ctx => {
 router.post("/confirmation", async ctx => {
   const email = ctx.query.email;
   const code = ctx.query.code;
+=======
+        ctx.body = await rp(option);
+  
+})
+//confirmation order after they complete return form
+router.post('/confirmation', async ctx=>{
+  const email = ctx.query.email
+  const code = ctx.query.code
+>>>>>>> Get-It-Today
   const option = {
     method: "POST",
     url: "https://api.sendgrid.com/v3/mail/send",
@@ -328,6 +338,7 @@ router.post("/confirmation", async ctx => {
   ctx.body = await rp(option);
 });
 
+<<<<<<< HEAD
 router.post("/returnShipment", async ctx => {
   const store = ctx.query.store;
   const itemString = ctx.query.items;
@@ -351,6 +362,22 @@ router.post("/returnShipment", async ctx => {
       "... Quantity: " +
       items[i].value +
       "\n\n";
+=======
+//send emails to brand and flindel after a shipment gets processed
+router.post('/returnShipment', async ctx=>{
+  const store = ctx.query.store
+  const itemString = ctx.query.items
+  const items = await JSON.parse(itemString)
+  const db = ctx.db
+  const date = await expiredHelper.getCurrentDate()
+  const email = await emailHelper.getStoreEmail(db,store)
+  let message = ''
+  message += 'A return shipment has been filed on ' + date + ', and will be delivered shortly.' + '\n\n'
+  message += 'This shipment includes items from ' + store + '\n\n'
+  message += 'This shipment includes the following items: \n\n'
+  for (var i = 0;i<items.length;i++){
+    message+= items[i].name + ' ... ' + items[i].variantid + '... Quantity: ' + items[i].value + '\n\n'
+>>>>>>> Get-It-Today
   }
   const option = {
     method: "POST",

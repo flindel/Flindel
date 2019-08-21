@@ -12,6 +12,7 @@ import DateTimePicker from 'material-ui-datetimepicker';
 import DatePickerDialog from 'material-ui/DatePicker/DatePickerDialog'
 import TimePickerDialog from 'material-ui/TimePicker/TimePickerDialog';
 
+//Dynamic Setup Process, only runs if the brand accidentally deletes GIT and Orig Collection
 class SetupGit extends Component {
   constructor(props){
     super(props);
@@ -96,41 +97,6 @@ class SetupGit extends Component {
       }, this.callbackOrig)
     }
     postFulfillmentService();
-
-    const body = {
-      "price_rule": {
-        "title": "FREESHIPPING",
-        "target_type": "shipping_line",
-        "target_selection": "all",
-        "allocation_method": "each",
-        "value_type": "percentage",
-        "value": "-100.0",
-        "customer_selection": "all",
-        "prerequisite_subtotal_range": {
-          "greater_than_or_equal_to": "50.0"
-        },
-        "starts_at": "2017-01-19T17:59:10Z"
-      }
-    }
-    //Post Price Rule
-    const options = {
-      method: 'post',
-      headers: {
-        'Accept': 'application/json, text/plain, */*',
-        'Content-Type': 'application/json'
-      },
-        body: JSON.stringify(body),
-    }
-    fetch(`${serveo_name}/priceRule`, options)
-      .then((response) => {
-        if(response.ok){return response.json()}
-        else{throw Error(response.statusText)}
-      })
-      .then((data) => {
-        console.log('POST: ', data);
-      })
-      .catch((error) => console.log(error))
-
   }
 
   callbackGit(data){
@@ -142,31 +108,18 @@ class SetupGit extends Component {
   }
 
   render(props){
-    let picker = null;
-    let bottom = null;
-    if (this.state.install_time != null){
-        bottom =
-        <div>
-          <h4>Flindel Setup Scheduled: {this.state.install_time.toString()}</h4>
-          <Button variant="contained" onClick={() => console.log("He")} color="primary">Cancel Setup</Button>
-        </div>;
-
-    } else {
-      bottom =
-        <div>
-          <Button variant="contained" onClick={() => this.setup()} color="primary">Setup Now</Button>
-        </div>;
-    }
     return (
       <div>
-        <h1>Flindel Setup</h1>
-        <h4>Changes to your store:</h4>
+        <h1>Something has went wront</h1>
+        <h4>We will need to make the following changes to your store:</h4>
         <ol style={text}>
           {!this.state.isOrigCollectSetup&&<li>Product collection "Original" will be added to your store</li>}
           {!this.state.isGitCollectSetup&&<li>Product collection "Get it Today" will be added to your store</li>}
           <li>A Flindel fulfillment service for "Get it Today" products will be added to your store.</li>
         </ol>
-        {bottom}
+        <div>
+          <Button variant="contained" onClick={() => this.setup()} color="primary">Setup Now</Button>
+        </div>
       </div>
     )
   }
