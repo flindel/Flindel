@@ -2,6 +2,9 @@ const Router = require("koa-router");
 const router = Router({
   prefix: "/dbcall"
 });
+const rp = require("request-promise");
+const errors = require("request-promise/errors");
+const { getTime } = require("../serverFunctions");
 
 router.get("/fetch_stock", async ctx => {
   ctx.set("Access-Control-Allow-Origin", "*");
@@ -73,14 +76,14 @@ router.post("/update_order_database", async ctx => {
   const fulfId = ctx.query.fulf_id;
   const orderId = ctx.query.order_id;
   let payload = {
-    orderId: orderId,
+    orderid: orderId,
     store: items[0].vendor,
-    fulfillmentId: fulfId,
+    fulfillmentid: fulfId,
     shippingAddress:
       destination.address1 + " " + destination.city + " " + destination.zip
   };
-  payload["dateCreated"] = new Date();
-  payload["workerID"] = "";
+  payload["dateCreated"] = getTime();
+  payload["workerid"] = "";
   payload["code"] = "";
   payload["status"] = "";
   payload["name"] = destination.name;
@@ -88,12 +91,12 @@ router.post("/update_order_database", async ctx => {
 
   for (let i = 0; i < items.length; i++) {
     itemList[i] = {
-      itemId: items[i].id,
-      variantId: items[i].variant_id,
+      itemid: items[i].id,
+      variantid: items[i].variant_id,
       quantity: items[i].quantity,
       name: items[i].title,
       fulfilled: 0,
-      productId: items[i].product_id
+      productid: items[i].product_id
     };
   }
   payload["items"] = itemList;
@@ -113,20 +116,18 @@ router.post("/warehouse_order", async ctx => {
     "Origin, X-Requested-With, Content-Type, Accept"
   );
   ctx.set("Access-Control-Allow-Methods", "POST, GET, PUT, DELETE, OPTIONS");
-  const oneDay = 60 * 60 * 24;
+
   db = ctx.db;
 
-  let jsonData = {};
-  let myRef = db.collection("orders");
+  let jsonData = [];
+  let myRef = db.collection("fulfillments");
   let getProd = await myRef.get().then(snapshot => {
     if (snapshot.empty) {
       console.log("no matching documents.");
       return;
     }
     snapshot.forEach(doc => {
-      if (new date(doc.data().date_created) - new Date() > oneDay) {
-        jsonData.push(doc.data);
-      }
+      jsonData.push(doc.data);
     });
   });
   const headers = {};
@@ -144,7 +145,7 @@ router.post("/warehouse_order", async ctx => {
         {
           to: [
             {
-              email: "someEmail@gmail.com"
+              email: "cengizsirlan.cs@gmail.com"
             }
           ],
           subject: "warehouse"
@@ -157,7 +158,7 @@ router.post("/warehouse_order", async ctx => {
       content: [
         {
           type: "text/plain",
-          value: jsonData
+          value: JSON.stringify(jsonData)
         }
       ]
     }
