@@ -98,7 +98,8 @@ app.prepare().then(() => {
         "read_themes",
         "write_themes",
         "read_script_tags",
-        "write_script_tags"
+        "write_script_tags",
+        "read_price_rules"
       ],
       async afterAuth(ctx) {
         const { shop, accessToken } = ctx.session;
@@ -117,7 +118,7 @@ app.prepare().then(() => {
         ctx.redirect("/");
         //HAS TO BE IN SERVER.js
         const registration = await registerWebhook({
-          address: `https://${SERVEO_NAME}.serveo.net/hookendpoint`,
+          address: `https://${SERVEO_NAME}/hookendpoint`,
           topic: "FULFILLMENTS_CREATE",
           accessToken,
           shop
@@ -128,7 +129,7 @@ app.prepare().then(() => {
           console.log("Failed to webhook ", registration.result);
         }
         const registration1 = await registerWebhook({
-          address: `https://${SERVEO_NAME}.serveo.net/hookorderendpoint`,
+          address: `https://${SERVEO_NAME}/hookorderendpoint`,
           topic: "ORDERS_CREATE",
           accessToken,
           shop
@@ -140,7 +141,7 @@ app.prepare().then(() => {
         }
 
         const registration2 = await registerWebhook({
-          address: `https://${SERVEO_NAME}.serveo.net/hookthemeendpoint`,
+          address: `https://${SERVEO_NAME}/hookthemeendpoint`,
           topic: "THEMES_PUBLISH",
           accessToken,
           shop
