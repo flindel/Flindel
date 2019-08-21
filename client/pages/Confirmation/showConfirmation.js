@@ -27,6 +27,9 @@ class finalPage extends React.Component{
             method: 'POST',     
             })
         }
+        else {
+            alert('An email has already been sent. Please wait and see if it arrives before sending another.')
+        }
     }
 
     //display
