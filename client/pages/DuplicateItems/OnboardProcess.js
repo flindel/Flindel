@@ -67,7 +67,7 @@ class OnboardProcess extends Component {
     //storeShopDomain();
     fetch(`${serveo_name}/shop/domain`,{
       method: 'GET',
-    }).then((res)=>{res.json()}).then(resj=>{console.log(resj.domain)
+    }).then((res)=>{res.json()}).then(resj=>{
     })
     this.setState({isLoading: true});
     postCollection({
@@ -262,7 +262,7 @@ class OnboardProcess extends Component {
   //Creates a dublicate of original product and posts it to shopify and firestore
   fixGitDne(norm){
     if (this.checkRequiresShipping(norm)){
-      let gitBody = norm;
+      let gitBody = JSON.parse(JSON.stringify(norm));
       gitBody.published_at = null;
       gitBody.title = norm.title + " - Get it Today";
       for(let j = 0; j < norm.variants.length; j++){
@@ -281,7 +281,7 @@ class OnboardProcess extends Component {
   /*Sets parameters of an original product to a default value if it conflicts
   get it today, default values are specified in normPara JSON*/
   fixNormDefaultPara(norm){
-    let normBody = norm;
+    let normBody = JSON.parse(JSON.stringify(norm));
     for(let j = 0; j < norm.variants.length; j++){
       if(normBody.variants[j].grams == 0){
         normBody.variants[j].weight_unit = "kg";
