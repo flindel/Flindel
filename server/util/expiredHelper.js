@@ -73,9 +73,9 @@ async function clearExpiredItems(dbIn){
     await query.forEach(async doc => {
         //calculate time difference between current and date of entry
         let processedDate = doc._fieldsProto.dateProcessed.stringValue
-        diffDays = getDateDifference(currentDate, processedDate)
+        diffDays = getDateDifference(processedDate, currentDate)
         //if item has been reselling for 7 days:
-        if (diffDays >= 7){
+        if (diffDays>= 7){
             //mark item with status returning, write to batch
             batch.update(doc.ref, {status:'returning'})
             let store = doc._fieldsProto.store.stringValue
