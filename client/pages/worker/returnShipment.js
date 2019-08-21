@@ -25,15 +25,17 @@ class returnShipment extends Component {
         this.sendEmails = this.sendEmails.bind(this)
         this.updateDB = this.updateDB.bind(this)
     }
-
+    //go back to beinning
     goBeginning(){
         this.setState({step:1, store: ''})
     }
 
+    //go to confirmation page
     goConfirmation(){
         let tempList = this.state.items
         let returnList = []
         let valid = true
+        //make sure all quantities are valid
         for (var i =0;i<tempList.length;i++){
             if (tempList[i].value > tempList[i].quantity){
                 valid = false
@@ -43,18 +45,22 @@ class returnShipment extends Component {
             }
         }
         if (valid){
+            //make sure something was selected
             if (returnList.length!=0){
                 this.setState({step:3, returnList: returnList})
             }
             else{
+                //error message
                 alert('Cannot proceed with an empty list')
             }
         }
         else{
+            //error message
             alert('You cannot return more items than are in the warehouse. Please check again')
         }
     }
 
+    //after store is selected, continue
     selectItems(){
         if (this.state.store != ''){
             if (this.state.start){
@@ -64,13 +70,15 @@ class returnShipment extends Component {
             this.setState({step:2,})
         }
     }
+    //when entire return is confirmed
     confirmReturn(){
         this.sendEmails()
-        //this.updateDB()
+        this.updateDB()
         this.setState({step:4})
     }
 
     sendEmails(){
+        //send email to flindel and brand about items
         let itemString = JSON.stringify(this.state.returnList)
         fetch(`https://${serveoname}/send/returnShipment?store=${encodeURIComponent(this.state.store)}&items=${encodeURIComponent(itemString)}`, {
             method: 'post',
@@ -78,6 +86,7 @@ class returnShipment extends Component {
     }
 
     updateDB(){
+        //update items in db from returning to returned
         for (var i = 0;i<this.state.returnList.length;i++){
             let tempItem = this.state.returnList[i]
             let qty = tempItem.value
@@ -88,21 +97,25 @@ class returnShipment extends Component {
         }
     }
 
+    //change store from dropdown menu
     handleStoreSelect(e){
         this.setState({store:e.target.value})
     }
 
+    //change quantity of returning (parent fn)
     handleQuantityChange(index,numIn){
         let tempList = this.state.items
         if (numIn == ''){
             tempList[index].value = numIn
         }
+        //make sure it is an integer with regex
         else if (numIn.toString()[numIn.toString().length-1].match("-?(0|[1-9]\\d*)")){
             tempList[index].value = numIn
         }
         this.setState({items:tempList})
     }
 
+    //load items when store is selected
     async loadItems(){
         let temp = await fetch(`https://${serveoname}/item/storeList/?store=${encodeURIComponent(this.state.store)}`, {
             method: 'get',
@@ -110,6 +123,7 @@ class returnShipment extends Component {
         let items = await temp.json()
         for (var i = 0;i<items.length;i++){
             for (var j = i+1;j<items.length;j++){
+                //combine quantities so there are no duplicates
                 if (items[i].variantid == items[j].variantid){
                     items[i].quantity++
                     items.splice(j,1)

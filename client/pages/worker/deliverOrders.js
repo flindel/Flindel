@@ -24,42 +24,55 @@ class deliverOrders extends Component {
         this.handleSubmit = this.handleSubmit.bind(this)
     }
 
+    //edit message
     changeMessage(newMessage, index){
         let tempList = this.state.orderList
         tempList[index].comment = newMessage
         this.setState({orderList:tempList})
     }
 
+    //change login screen
     handleWorkerID(e){
         this.setState({workerID:e.target.value})
     }
 
+    //submit changes
     async handleSubmit(){
         let deliveredList = []
         let failedList = []
         for (var i = 0;i<this.state.orderList.length;i++){
             if (this.state.orderList[i].delivered == 1){
+                //anything that was green
                 deliveredList.push(this.state.orderList[i])
+                deliveredList[deliveredList.length-1].deliveredBy = this.state.workerID
             }
-            else if (this.state.orderList[i].delivered == 0){
+            else{
+                //anything that was red
                 failedList.push(this.state.orderList[i])
             }
         }
         deliveredList = await this.cleanList(deliveredList)
         failedList = await this.cleanList(failedList)
-        let failedString = JSON.stringify(failedList)
-        fetch(`https://${serveoname}/fulfillment/update?orders=${encodeURIComponent(failedString)}`, {
+        let orders = JSON.stringify(failedList)
+        //send failed deliveries to update
+        if (failedList.length > 0){
+            await fetch(`https://${serveoname}/fulfillment/update?orders=${encodeURIComponent(orders)}`, {
             method: 'put',
         })
-        //DEAL WITH THIS - updating stuff that's completed etc
-        fetch(`https://${serveoname}/fulfillment/update?orders=${encodeURIComponent(failedString)}`, {
-            method: 'post',
-        })
+        }
+        orders = JSON.stringify(deliveredList)
+        //send successful deliveries to update
+        if (deliveredList.length>0){
+            await fetch(`https://${serveoname}/fulfillment/complete?orders=${encodeURIComponent(orders)}`, {
+                method: 'post',
+            })
+        }
         this.setState({step:2})
     }
-
+    //clean up list
     cleanList(tempList){
         for (var i = 0;i<tempList.length;i++){
+            //get rid of unnecessary information
             delete tempList[i]['index']
             delete tempList[i]['delivered']
             for (var j = 0;j<tempList[i].items.length;j++){
@@ -71,19 +84,28 @@ class deliverOrders extends Component {
         return tempList
     }
 
+    //change order status to delivered or not
     changeOrderStatus(index, val){
         let tempList = this.state.orderList
         tempList[index].delivered = val
+        for (var i = 0;i<tempList[index].items.length;i++){
+            if (val == 1){
+                tempList[index].items[i].fulfilled = 1
+            }
+            else{
+                tempList[index].items[i].fulfilled = 0
+            }
+        }
         this.setState({orderList:tempList})
     }
-
     async loadFulfillments(){
         //load fulfillments here
-        let temp = await fetch(`https://${serveoname}/fulfillment?workerID=${encodeURIComponent(this.state.workerID)}`, {
+        let temp = await fetch(`https://${serveoname}/fulfillment/deliver?workerID=${encodeURIComponent(this.state.workerID)}`, {
             method: 'get',
             })
         let tJSON= await temp.json()
         let orders = []
+        //load all orders
         for (var i = 0;i<tJSON.length;i++){
             let tempOrder = {
                 code: tJSON[i].code.stringValue,
@@ -103,13 +125,13 @@ class deliverOrders extends Component {
             for (var j = 0;j<tJSON[i].items.arrayValue.values.length;j++){
                 let spot = tJSON[i].items.arrayValue.values[j]
                 let tempItem = {
-                    fulfilled: spot.mapValue.fields.fulfilled.integerValue,
+                    fulfilled: 0,
                     itemid: spot.mapValue.fields.itemid.stringValue,
                     name: spot.mapValue.fields.name.stringValue,
                     productid: spot.mapValue.fields.productid.stringValue,
                     quantity: spot.mapValue.fields.quantity.integerValue,
                     variantid: spot.mapValue.fields.variantid.stringValue,
-                    index: j
+                    index: j,
                 }
                 tempOrder.items.push(tempItem)
             }
@@ -118,11 +140,13 @@ class deliverOrders extends Component {
         this.setState({loadingMessage:'', orderList:orders})
     }
 
+    //begin delivering
     go(){
         this.setState({step:1})
         this.loadFulfillments()
     }
 
+    //logout button
     changeID(){
         this.setState({step:0, workerID: ''})
     }
@@ -145,7 +169,7 @@ class deliverOrders extends Component {
         else if (this.state.step == 1){
             return(
                 <div>
-                    <h1 className = 'scHeader'>ASSEMBLE ORDERS</h1>
+                    <h1 className = 'scHeader'>DELIVER ORDERS</h1>
                     <br/>
                     <p className = 'workerID'>Logged in as: #{this.state.workerID} <br/>
                     <button onClick = {this.changeID}>LOGOUT</button>
@@ -192,7 +216,7 @@ class deliverOrders extends Component {
         else if (this.state.step == 2){
             return(
                 <div>
-                    <h1 className = 'scHeader'>ASSEMBLE ORDERS</h1>
+                    <h1 className = 'scHeader'>DELIVER ORDERS</h1>
                     <br/>
                     <p className = 'workerID'>Logged in as: #{this.state.workerID} <br/>
                         <button onClick = {this.changeID}>LOGOUT</button>
@@ -200,7 +224,7 @@ class deliverOrders extends Component {
                     <br/><br/>
                     <p>The changes have been saved</p>
                     <br/>
-                    <button onClick = {this.go}>CONTINUE ASSEMBLING</button>
+                    <button onClick = {this.go}>CONTINUE UPDATING</button>
                     <br/><br/>
                     <button onClick = {this.props.back}>EXIT</button>
                 </div>
