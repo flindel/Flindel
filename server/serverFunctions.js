@@ -45,7 +45,26 @@ function warehouseOrder() {
   });
 }
 
+function getTime() {
+  let now = new Date();
+  let month = now.getMonth() + 1;
+  let day = now.getDate();
+  let year = now.getFullYear();
+  let hour = now.getHours();
+  let minute = now.getMinutes().toString();
+  if (minute.length != 2) {
+    minute = "0" + minute;
+  }
+  let second = now.getSeconds().toString();
+  if (second.length != 2) {
+    second = "0" + second;
+  }
+  let currTime =
+    month + "/" + day + "/" + year + "-" + hour + ":" + minute + ":" + second;
+  return currTime;
+}
 module.exports.warehouseOrder = warehouseOrder;
 module.exports.calculateDistance = calculateDistance;
 module.exports.sendEmail = sendEmail;
 module.exports.getLatLng = getLatLng;
+module.exports.getTime = getTime;

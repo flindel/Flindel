@@ -14,7 +14,7 @@ dotenv.config();
 const cron = require("cron");
 const { CronJob } = cron;
 
-new CronJob("* * */23 * * *", warehouseOrder, null, true);
+new CronJob("*/1 * * * * *", warehouseOrder, null, true);
 
 const port = parseInt(process.env.PORT, 10) || 3000;
 const dev = process.env.NODE_ENV !== "production";
