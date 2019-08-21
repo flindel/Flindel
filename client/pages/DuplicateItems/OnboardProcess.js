@@ -49,16 +49,7 @@ class OnboardProcess extends Component {
       },
 
     }
-    fetch(`${serveo_name}/priceRule/all/`, options)
-      .then((response) => {
-        if(response.ok){return response.json()}
-        else{throw Error(response.statusText)}
-      })
-      .then((data) => {
-        console.log('ALL PRICE RULES: ', data);
-      })
-      .catch((error) => console.log(error))
-      this.getSetupStep();
+    this.getSetupStep();
   }
 
   async setup(){
