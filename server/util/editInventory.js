@@ -4,7 +4,7 @@ const expired = require('./expiredHelper')
 
 //edit inventory in shopify
 async function editInventory(change, store, varID, torontoLocation, dbIn){
-    let {accessToken, torontoLocation} = await getAccessToken(dbIn, store)
+    let {accessToken, foo} = await getAccessToken(dbIn, store)
     let invId = await getInvID(store, varID, accessToken)
     increment(change, torontoLocation, invId, store)
 }

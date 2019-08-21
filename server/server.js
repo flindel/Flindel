@@ -26,8 +26,9 @@ new CronJob(
   "*/10 * * * * *",
   async function() {
     //KEEP THIS ORDER OF STUFF. unblock all when we go live, set time '0 0 0 * * *'
-    await cronUtil.checkExpired(db);
-    //await cronUtil.mainReport(db);
+    //await cronUtil.checkExpired(db);
+    //await cronUtil.itemUpdate(db)
+    //await cronUtil.refundInformation(db)
     //await cronUtil.returningReport(db);
     //await cronUtil.clearPending(db);
   },
