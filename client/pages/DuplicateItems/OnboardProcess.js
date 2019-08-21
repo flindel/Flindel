@@ -1,7 +1,6 @@
 import React, { Component } from 'react';
 import {postCollection, getShopID, postFulfillmentService, postGIT, put} from './Shopify';
 import {serveo_name} from '../config.js';
-import TestStore from './TestStore'
 import SetupNavbar from './SetupNavbar';
 import {getUpdates} from './FindIssues';
 import Button from '@material-ui/core/Button';
@@ -50,16 +49,7 @@ class OnboardProcess extends Component {
       },
 
     }
-    fetch(`${serveo_name}/priceRule/all/`, options)
-      .then((response) => {
-        if(response.ok){return response.json()}
-        else{throw Error(response.statusText)}
-      })
-      .then((data) => {
-        console.log('ALL PRICE RULES: ', data);
-      })
-      .catch((error) => console.log(error))
-      this.getSetupStep();
+    this.getSetupStep();
   }
 
   async setup(){
@@ -455,9 +445,6 @@ class OnboardProcess extends Component {
     }
     return (
       <div>
-        <TestStore
-          gitCollectionId = {this.state.gitCollectionId}
-        />
         <br/>
         <img
           src={'https://img1.wsimg.com/isteam/ip/d1c9d8c1-59ec-45a1-aa09-ca2bc858ce7e/logo/5afca41c-20da-4604-b5a0-7e3d7c35da34.png/:/rs=h:248/qt=q:95'}
