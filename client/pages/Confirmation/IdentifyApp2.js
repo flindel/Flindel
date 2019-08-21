@@ -81,7 +81,6 @@ class IdentifyApp extends Component {
         this.setState({
             shopDomain: `https://${domainJson.domain}`
         })
-
     }
 
     //generate usable unique codes
@@ -104,7 +103,7 @@ class IdentifyApp extends Component {
           else{
               await this.setState({step:5, code: code})
               this.sendToDB()
-              this.sendEmail()
+              //this.sendEmail()
           }
     }
 
@@ -227,7 +226,7 @@ class IdentifyApp extends Component {
         let currentDate = ''
         currentDate += (new Date().getMonth()+1)+'/'+ new Date().getDate() + '/'+  new Date().getFullYear()
         let items = JSON.stringify(this.state.returnlist)
-        fetch(`https://${serveoname}/return/requested/new?date=${encodeURIComponent(currentDate)}&code=${encodeURIComponent(this.state.code)}&orderNum=${encodeURIComponent(this.state.orderNum)}&emailOriginal=${encodeURIComponent(this.state.emailOriginal)}&email=${encodeURIComponent(this.state.email)}&items=${encodeURIComponent(items)}`, {
+        fetch(`https://${serveoname}/return/requested/new?shop=${encodeURIComponent(this.state.shopDomain)}&date=${encodeURIComponent(currentDate)}&code=${encodeURIComponent(this.state.code)}&orderNum=${encodeURIComponent(this.state.orderNum)}&emailOriginal=${encodeURIComponent(this.state.emailOriginal)}&email=${encodeURIComponent(this.state.email)}&items=${encodeURIComponent(items)}`, {
             method: 'POST',
         })
     }
@@ -491,6 +490,8 @@ class IdentifyApp extends Component {
                 viewPage2 = {this.viewPage2.bind(this)}
                 shopName = {this.state.shopName}/> 
                 <CheckPage
+                shop = {shop}
+                shopName = {this.state.shopName}
                 serveoname = {serveoname}
                 setReason = {this.setReason.bind(this)}
                 items={this.returnItemList}
