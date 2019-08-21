@@ -103,7 +103,7 @@ class IdentifyApp extends Component {
           else{
               await this.setState({step:5, code: code})
               this.sendToDB()
-              //this.sendEmail()
+              this.sendEmail()
           }
     }
 
@@ -269,7 +269,6 @@ class IdentifyApp extends Component {
 
       //check returns database to see if return already exists
     async checkReturnsFromDB(orderNum,emailAdd){
-        orderNum =1
         let temp = await fetch(`https://${serveoname}/return/requested/exists?orderNum=${encodeURIComponent(orderNum)}&emailAdd=${encodeURIComponent(emailAdd)}`, {
             method: 'get',
         })

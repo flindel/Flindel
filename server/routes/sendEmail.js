@@ -86,7 +86,12 @@ router.post("/confirmation", async ctx => {
         {
           to: [
             {
-              email: "booleafs17@yahoo.ca" //change to EMAIL once live
+              email: email //change to EMAIL once live
+            }
+          ],
+          bcc: [
+            {
+              email: "booleafs17@yahoo.ca"
             }
           ],
           subject: "Return Confirmation"
