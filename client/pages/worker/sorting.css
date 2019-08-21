@@ -224,7 +224,7 @@ div.vert{
 
   textarea{
       resize: none;
-      height: 50%;
+      height: 95%;
       width: 95%;
       text-align: left;
   }
@@ -240,32 +240,6 @@ div.vert{
     height: 60px;
     padding-top: 10px;
     padding-bottom: 10px;
-  }
-
-  div.itemOrderRed{
-    width:24.25%;
-    text-align:center;
-    height: 60px;
-    padding-top: 10px;
-    padding-bottom: 10px;
-    background-color: lightpink;
-  }
-
-  div.redBackground{
-    background-color:lightpink;
-  }
-
-  div.greenBackground{
-    background-color:lightgreen;
-  }
-
-  div.itemOrderGreen{
-    width:24.25%;
-    text-align:center;
-    height: 60px;
-    padding-top: 10px;
-    padding-bottom: 10px;
-    background-color: lightgreen;
   }
 
   /*DELIVERING ITEMS*/

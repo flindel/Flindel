@@ -88,7 +88,6 @@ async function clearPending(dbIn){
     let myRef = db.collection('pendingReturns') //duplicate to history
     let query = await myRef.get()
     await query.forEach(async doc =>{
-        //copy each entry over
         let data = {
             order_status: doc._fieldsProto.email.stringValue,
             email: doc._fieldsProto.email.stringValue,
@@ -126,7 +125,6 @@ async function clearPending(dbIn){
             }
             data.items.push(tempItem)
         }
-        //write to history, delete from pending
         let set = db.collection('historyReturns').doc()
         batch.set(set,data)
         batch.delete(doc.ref)

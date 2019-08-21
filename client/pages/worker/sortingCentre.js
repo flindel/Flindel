@@ -313,6 +313,27 @@ class sortingCentre extends Component{
         step: 1,
         itemList: []})
     }
+
+    /*//send email
+    async sendEmail(){
+        let rejectList = []
+        let acceptList = []
+        for (var i = 0;i<this.state.itemList.length;i++){
+            let temp = this.state.itemList[i]
+            if((temp.status == 'accepted' || temp.status == 'returning')&& (temp.flag =='-1' || temp.flag == '0')){
+                acceptList.push(temp)
+            }
+            else if (temp.status == 'rejected' && (temp.flag == '-1' || temp.flag == '0')){
+                rejectList.push(temp)
+            }
+        }
+        let RL = await JSON.stringify(rejectList)
+        let AL = await JSON.stringify(acceptList)
+        fetch(`https://${serveoname}/send/update?rejectList=${encodeURIComponent(RL)}&acceptList=${encodeURIComponent(AL)}&email=${encodeURIComponent(this.state.email)}`, 
+        {
+            method: 'post',
+        })
+    }*/
     
     //write to db
     async sendToDB(){

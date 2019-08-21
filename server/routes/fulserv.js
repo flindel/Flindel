@@ -118,7 +118,7 @@ router.post("/firestore/id", async ctx => {
   ctx.set("Access-Control-Allow-Methods", "POST, GET, PUT, DELETE, OPTIONS");
 
   console.log("POST fulserv id to Firestore");
-  const { shop } = await getShopHeaders(ctx);
+  const { shop } = getShopHeaders(ctx);
   let body = JSON.parse(ctx.query.body);
   db = ctx.db;
   let docRef = db.collection("store").doc(shop);
@@ -131,7 +131,7 @@ router.get('/firestore/id', async ctx => {
   ctx.set('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept');
   ctx.set('Access-Control-Allow-Methods', 'POST, GET, PUT, DELETE, OPTIONS');
   db = ctx.db
-  const { shop } = await getShopHeaders(ctx);
+  const { shop } = getShopHeaders(ctx);
   console.log("SHOP:", shop);
   let myRef = db.collection('store').doc(shop);
   getDoc = await myRef.get()

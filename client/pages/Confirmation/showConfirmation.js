@@ -10,23 +10,17 @@ class finalPage extends React.Component{
         super(props) ;
         this.state = {
             email: this.props.email,
-            code:this.props.code,
-            minute: -99      
+            code:this.props.code           
         };
         this.sendEmail = this.sendEmail.bind(this)
     }
 
     //resend email if necessary
     sendEmail(){
-        let now = new Date()
-        let currentMinute = now.getMinutes()
-        if (currentMinute != this.state.minute){
-            this.setState({minute:currentMinute})
-            fetch(`https://${this.props.serveoname}/send/confirmation?email=${encodeURIComponent(this.state.email)}&code=${encodeURIComponent(this.state.code)}`, 
-            {
+        fetch(`https://${this.props.serveoname}/send/confirmation?email=${encodeURIComponent(this.state.email)}&code=${encodeURIComponent(this.state.code)}`, 
+        {
             method: 'POST',     
-            })
-        }
+        })
     }
 
     //display

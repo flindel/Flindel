@@ -34,14 +34,13 @@ router.get('/exists', async ctx => {
     db = ctx.db
     //productID comes in as integer, database only responds to string
     const target = ctx.query.id
-    const target2 = ctx.query.id2
     const store = ctx.query.store
     //let query = await myRef.where('productid','==',target).where('store','==',store).get()
     myRef = db.collection('store')
     let query = await myRef.doc(store).get()
     let found = false
     for (var i = 0;i<query._fieldsProto.blacklist.arrayValue.values.length;i++){
-        if (target == query._fieldsProto.blacklist.arrayValue.values[i].stringValue || target2 == query._fieldsProto.blacklist.arrayValue.values[i].stringValue){
+        if (target == query._fieldsProto.blacklist.arrayValue.values[i].stringValue){
             found = true
         }
     }

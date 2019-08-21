@@ -10,13 +10,7 @@ let fixes = 0;
 const gitPara = {
                   name:["fulfillment_service", "grams", "inventory_management", "weight"],
                   value:["flindel", 0, "shopify", 0],
-                }
-
-
-const normPara = {
-                  name:["fulfillment_service", "grams", "weight"],
-                  value:["flindel", 0, 0],
-                  defaultCorrection:["manual", 100, .1]
+                  defaultCorrection:["manual", 100, "shopify", .1] //REMOVE THIS INCASE COMPANY DOES NOT USE SHOPIFY INVENTORY
                 }
 
 class FixIssues extends Component {
@@ -42,9 +36,9 @@ class FixIssues extends Component {
   }
 
   handleClick(updates1, reloadFunction1){
-    fixes = 0;
     updates = updates1;
     reloadFunction = reloadFunction1;
+    console.log("Updates: ", updates);
     for(let i=0; i < updates.length; i++) {
       switch(updates[i].issue){
         case "Unequal parameters":
@@ -161,12 +155,9 @@ class FixIssues extends Component {
   fixNormDefaultPara(update){
     let normBody = update.norm;
     for(let j = 0; j < update.norm.variants.length; j++){
-      if(normBody.variants[j].grams == 0){
-        normBody.variants[j].weight_unit = "kg";
-      }
-      for(let i = 0; i < normPara.name.length; i++){
-        if(eval("normBody.variants["+j+"]."+normPara.name[i]+" == normPara.value[i]")){
-          eval("normBody.variants["+j+"]."+normPara.name[i]+" = normPara.defaultCorrection[i]");
+      for(let i = 0; i < gitPara.name.length; i++){
+        if(eval("normBody.variants["+j+"]."+gitPara.name[i]+" == gitPara.value[i]")){
+          eval("normBody.variants["+j+"]."+gitPara.name[i]+" = gitPara.defaultCorrection[i]");
         }
       }
     }
@@ -179,6 +170,7 @@ class FixIssues extends Component {
   //DOES NOT ADD SKU NUMBER TO VARIANTS
   fixGitDne(update){
     let gitBody = update.norm;
+    gitBody.published_at = null;
     gitBody.title = update.norm.title + " - Get it Today";
     for(let j = 0; j < update.norm.variants.length; j++){
       gitBody.variants[j].old_inventory_quantity = 0;

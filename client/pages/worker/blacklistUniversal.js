@@ -63,7 +63,7 @@ class Blacklist extends Component {
     handleChangeDelete(e){
         this.setState({deleteIn:e.target.value})
     }
-    //check if product actually exists
+
     async doesProductExist(ID){
         let temp = await fetch(`https://${serveoname}/products?id=${encodeURIComponent(ID)}`, {
             method: 'get',

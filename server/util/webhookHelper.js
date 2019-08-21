@@ -26,23 +26,19 @@ async function sellReturnItem(db, varId, store, orderNum){
 }
 
 //mark item as delivered
-async function completeReturnItem(db, orderId, varId, itemId, quantity, store, code){
+async function completeReturnItem(db, orderId, varId, itemId, quantity, store){
     //UPDATE FLINDEL STATUS
     myRef = db.collection('items')
+    let found = true //SWITCH THIS
     let count = 0
     let query = await myRef.where('status','==','sold').where('store','==',store).where('variantidGIT','==',varId.toString()).get()
     await query.forEach(async doc=>{
         if (count < quantity){
             let docToUpdate = myRef.doc(doc.id)
-            let updateFields = docToUpdate.update({status:'fulfilled', order: code})
+            let updateFields = docToUpdate.update({status:'fulfilled'})
             count ++
         }
     })
-    //actually update the shopify fulfillment ///////////////////////////////////////////////////////////////////////
-    //updateFulfillment(db, store, orderId, itemId, quantity)
-} 
-
-async function updateFulfillment(db, store, orderId, itemId, quantity){
     //get access token to update fulfillment
     let {accessToken, torontoLocation} = await inv.getAccessToken(db, store)
     //console.log(temp.fulfillment.line_items)
@@ -68,6 +64,6 @@ async function updateFulfillment(db, store, orderId, itemId, quantity){
         }   
     }
     let temp = await rp(option)
-}
+} 
 
 module.exports = {sellReturnItem, completeReturnItem}

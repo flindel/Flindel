@@ -17,7 +17,6 @@ const webhookRouter = require("./webhooks");
 const priceRule = require("./priceRule");
 const itemRouter = require('./item')
 const fulfillmentRouter = require('./fulfillment')
-const workerRouter = require('./worker')
 
 router = combineRouters(
   rootRouter,
@@ -37,8 +36,7 @@ router = combineRouters(
   webhookRouter,
   priceRule,
   itemRouter,
-  fulfillmentRouter,
-  workerRouter
+  fulfillmentRouter
 );
 
 module.exports = router;
