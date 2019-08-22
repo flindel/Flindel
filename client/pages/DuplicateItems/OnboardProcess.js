@@ -190,6 +190,7 @@ class OnboardProcess extends Component {
     if(json._fieldsProto.onboardingStep === undefined){
       console.log("onboardingStep is undefined");
       this.postSetupStep(1);
+      this.setState({step: 1})
     }else {
       let step = json._fieldsProto.onboardingStep.integerValue
       this.setState({step: step});

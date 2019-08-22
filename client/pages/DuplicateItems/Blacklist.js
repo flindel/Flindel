@@ -64,13 +64,13 @@ class Blacklist extends Component {
                 let itemString = JSON.stringify(tempList)
                 //save to db
                 this.setState({items:tempList})
-                fetch(`${serveoname}/blacklist?items=${encodeURIComponent(itemString)}&store=${encodeURIComponent(this.state.storeName)}`, {
+                fetch(`${serveo_name}/blacklist?items=${encodeURIComponent(itemString)}&store=${encodeURIComponent(this.state.storeName)}`, {
                 method: 'put',
                 })
             }
             else{
                 this.setState({errorMessage:'This ID does not correspond to an actual product.'})
-            }  
+            }
         }
         //show error message if they enter duplicate
         else{
