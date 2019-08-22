@@ -79,14 +79,14 @@ async function clearExpiredItems(dbIn){
             //mark item with status returning, write to batch
             batch.update(doc.ref, {status:'returning'})
             let store = doc._fieldsProto.store.stringValue
-            let varID = doc._fieldsProto.variantidGIT.stringValue
+            
+            let varID = doc._fieldsProto.variantid.stringValue//FOR LIVE: let varID = doc._fieldsProto.variantidGIT.stringValue
             //decrement inventory
             inv.editInventory(-1, store, varID, '', db)
         }
     });
     //commit batch
     batch.commit()
-    //SEND EMAIL TO SHOW WHAT STUFF IS GONE?
 }
 
 //returns current date (MM/DD/YYYY)

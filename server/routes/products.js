@@ -65,8 +65,9 @@ router.get('/GITinformation',async ctx=>{
 
 router.get('/all', async ctx=>{
     const { cookies } = ctx;
-  const shop = ctx.query.store
-  const accessToken = cookies.get('accessToken');
+  const shop = ctx.query.shop
+  console.log(shop)
+  const accessToken = await accessTokenDB(ctx)
   const option = {
       method: 'GET',
       url: `https://${shop}/${api_link}/products.json`,
@@ -125,6 +126,7 @@ router.get('/img', async ctx => {
     const shop = ctx.query.shop;
     db = ctx.db
     const accessToken = await accessTokenDB(ctx)
+    console.log(accessToken)
     const option = {
         url: `https://${shop}/${api_link}/products/${productid}.json`,
         headers: {

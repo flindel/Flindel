@@ -29,7 +29,6 @@ new CronJob(
     //await cronUtil.checkExpired(db);
     //await cronUtil.itemUpdate(db)
     //await cronUtil.refundInformation(db)
-    //await cronUtil.returningReport(db);
     //await cronUtil.clearPending(db);
   },
   null,
