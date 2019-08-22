@@ -1,7 +1,7 @@
 require("isomorphic-fetch");
 const Koa = require("koa");
 const next = require("next");
-const cors = require('@koa/cors')
+const cors = require("@koa/cors");
 const { default: createShopifyAuth } = require("@shopify/koa-shopify-auth");
 const dotenv = require("dotenv");
 const { verifyRequest } = require("@shopify/koa-shopify-auth");
@@ -15,20 +15,27 @@ const cronUtil = require("./util/cronFunction");
 const whTest = require("./util/webhookHelper"); //////////////////////
 const cron = require("cron");
 const { CronJob } = cron;
-const proxy = require('koa-better-http-proxy');
+const proxy = require("koa-better-http-proxy");
 /////////////
 const rp = require("request-promise");
 const errors = require("request-promise/errors");
 /////////////
 
 //second (0-59) - minute (0-59) - hour(0-23) - day of month (1-31) - Month (1-12) - Day of Week (0-6, Sun-Sat)
-new CronJob('*/10 * * * * *', async function() {
-  //KEEP THIS ORDER OF STUFF. unblock all when we go live, set time '0 0 0 * * *'
-  //await cronUtil.checkExpired(db);
-  //await cronUtil.mainReport(db);
-  //await cronUtil.returningReport(db);
-  //await cronUtil.clearPending(db);
-}, null, true)
+new CronJob(
+  "*/10 * * * * *",
+  async function() {
+    //KEEP THIS ORDER OF STUFF. unblock all when we go live, set time '0 0 0 * * *'
+    //await cronUtil.checkExpired(db);
+    //await cronUtil.mainReport(db);
+    //await cronUtil.returningReport(db);
+    //await cronUtil.clearPending(db);
+  },
+  null,
+  true
+);
+
+//new CronJob("* * */23 * * *", warehouseOrder, null, true);
 
 const port = parseInt(process.env.PORT, 10) || 3000;
 const dev = process.env.NODE_ENV !== "production";
@@ -57,7 +64,7 @@ app.prepare().then(() => {
   //server.use(proxy('feritas.serveo.net'))
   server.use(async (ctx, next) => {
     if (ctx.db === undefined) ctx.db = db;
-    
+
     await next();
   });
   server.keys = [SHOPIFY_API_SECRET_KEY];
@@ -81,7 +88,7 @@ app.prepare().then(() => {
         "write_themes",
         "read_script_tags",
         "write_script_tags",
-        "read_price_rules",
+        "read_price_rules"
       ],
       async afterAuth(ctx) {
         const { shop, accessToken } = ctx.session;
@@ -137,7 +144,7 @@ app.prepare().then(() => {
     })
   );
 
- //  server.use(verifyRequest());
+  //  server.use(verifyRequest());
   server.use(router());
   server.use(async ctx => {
     await handle(ctx.req, ctx.res);

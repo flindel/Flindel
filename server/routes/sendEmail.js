@@ -172,6 +172,9 @@ router.post("/returnShipment", async ctx => {
 
 router.post("/brand", async ctx => {
   const parsedJSON = await JSON.parse(ctx.query.package);
+  const db = ctx.db;
+  const store = ctx.query.store;
+  const email = await emailHelper.getStoreEmail(db, store);
   let emailString =
     parsedJSON[0].title +
     " ID:" +
@@ -200,7 +203,7 @@ router.post("/brand", async ctx => {
         {
           to: [
             {
-              email: "cengizsirlan.cs@gmail.com"
+              email: email
             }
           ],
           subject: "GIT ITEM INCORRECTLY SOLD REFUND REQUIRED"
@@ -221,7 +224,7 @@ router.post("/brand", async ctx => {
   try {
     ctx.body = await rp(option);
   } catch (err) {
-    console.log(err.message);
+    console.log("THIS ", err.message);
     if (err instanceof errors.StatusCodeError) {
       ctx.status = err.statusCode;
       ctx.message = err.message;
