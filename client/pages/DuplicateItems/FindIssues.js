@@ -223,7 +223,7 @@ class FindIssues extends Component {
   gitProductIssuesLoop(data){
     let normProduct = this.findOrig(data.orig_id);
     let gitProduct = this.findGit(data.git_id);
-    if (data.orig_id == "") {
+    if (normProduct === null) {
       this.setState({
         updates: this.state.updates.concat({
           norm: null,
@@ -301,8 +301,10 @@ class FindIssues extends Component {
   //checks if valid flindel
   gitProductParameters(git){
     let productIssues = [];
-    const para = {name:["fulfillment_service", "grams", "inventory_management", "weight"],
-                  value:["flindel", 0, "shopify", 0]}
+    const para = {
+                      name:["fulfillment_service", "grams", "inventory_management", "weight", "inventory_policy"],
+                      value:["flindel", 0, "shopify", 0, "deny"],
+                    }
     for (let j = 0; j < git.variants.length; j++){
       let variant = git.variants[j];
       for (let i = 0; i < para.name.length; i++){
