@@ -1,10 +1,11 @@
 const dotenv = require("dotenv");
 const turf = require("@turf/turf");
 dotenv.config();
-const GOOGLE_GEO_API_KEY = process.env.GOOGLE_GEO_API_KEY;
-const serveo_name = "suus";
+const GOOGLE_GEO_API_KEY = process.env.GOOGLE_GEOCODING_KEY;
+const serveo_name = "https://923e8fe8.ngrok.io";
 
 async function getLatLng(address) {
+  //console.log()
   const response = await fetch(
     `https://maps.googleapis.com/maps/api/geocode/json?address=${address}&key=${GOOGLE_GEO_API_KEY}`
   );
@@ -28,7 +29,7 @@ function calculateDistance(p1) {
 
 function sendEmail(json) {
   fetch(
-    `https://${serveo_name}.serveo.net/sendEmail/warehouse?package=${encodeURIComponent(
+    `https://${serveo_name}/send/warehouse?package=${encodeURIComponent(
       JSON.stringify(json)
     )}`,
     {
@@ -40,7 +41,7 @@ function sendEmail(json) {
 }
 
 function warehouseOrder() {
-  fetch(`https://${serveo_name}.serveo.net/dbcall/warehouse_order`, {
+  fetch(`https://${serveo_name}/dbcall/warehouse_order`, {
     method: "post"
   });
 }
