@@ -29,10 +29,10 @@ class Item extends Component {
             styleName:'',
             //potential reasons for return
             reasons: [
-                { value: "Broken", label: "Item is broken." },
-                { value: "Wrong", label: "Item is wrong." },
-                { value: "Unhappy", label: "Item is unsatisfactory." },
-                { value: "Multiple", label: "Multiple reasons"}
+                { value: "Broken", label: "Broken." },
+                { value: "Wrong", label: "Wrong." },
+                { value: "Unhappy", label: "Unhappy." },
+                { value: "Multiple", label: "Multiple."}
               ],
               //potential quantities - this holds single return value, stored like this because it's a different component
             activeQuantity:[],

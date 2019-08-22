@@ -14,8 +14,9 @@ router.get('/', async ctx => {
     ctx.body = false;
   const productid = ctx.query.id;
   const { cookies } = ctx;
-  const shop = cookies.get('shop_id');
-  const accessToken = cookies.get('accessToken');
+  const shop = ctx.query.shop;
+    db = ctx.db
+    const accessToken = await accessTokenDB(ctx)
   const option = {
       method: 'GET',
       url: `https://${shop}/${api_link}/products/${productid}.json`,

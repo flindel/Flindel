@@ -65,7 +65,7 @@ class Blacklist extends Component {
     }
     //check if product actually exists
     async doesProductExist(ID){
-        let temp = await fetch(`https://${serveoname}/products?id=${encodeURIComponent(ID)}`, {
+        let temp = await fetch(`https://${serveoname}/products?shop=${encodeURIComponent(this.state.storeName)}&id=${encodeURIComponent(ID)}`, {
             method: 'get',
         })
         let response = await temp.json()

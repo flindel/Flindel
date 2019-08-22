@@ -37,12 +37,12 @@ async function sendSpecialEmail(items){
                     "email": 'booleafs17@yahoo.ca' //whatever FLINDEL's in house email is
                   }
                 ],
-                "subject": "Status Update"
+                "subject": "Special Circumstances Items"
               }
             ],
             "from": {
-                "name": "Status Update",
-              "email": "no-reply@sender.com"
+                "name": "Flindel Warehouse",
+              "email": "no-reply@flindel.com.com"
             },
             "content": [
               {
