@@ -38,7 +38,7 @@ class Blacklist extends Component {
         this.setState({deleteIn:e.target.value})
     }
     async doesProductExist(ID){
-        let temp = await fetch(`${serveo_name}/products?id=${encodeURIComponent(ID)}`, {
+        let temp = await fetch(`${serveo_name}/products?shop=${encodeURIComponent(this.state.storeName)}&id=${encodeURIComponent(ID)}`, {
             method: 'get',
         })
         let response = await temp.json()
@@ -64,13 +64,13 @@ class Blacklist extends Component {
                 let itemString = JSON.stringify(tempList)
                 //save to db
                 this.setState({items:tempList})
-                fetch(`${serveoname}/blacklist?items=${encodeURIComponent(itemString)}&store=${encodeURIComponent(this.state.storeName)}`, {
+                fetch(`${serveo_name}/blacklist?items=${encodeURIComponent(itemString)}&store=${encodeURIComponent(this.state.storeName)}`, {
                 method: 'put',
                 })
             }
             else{
                 this.setState({errorMessage:'This ID does not correspond to an actual product.'})
-            }  
+            }
         }
         //show error message if they enter duplicate
         else{

@@ -21,14 +21,15 @@ const rp = require("request-promise");
 const errors = require("request-promise/errors");
 /////////////
 
+//new CronJob("*/30 * * * * *", warehouseOrder, null, true);
 //second (0-59) - minute (0-59) - hour(0-23) - day of month (1-31) - Month (1-12) - Day of Week (0-6, Sun-Sat)
 new CronJob(
   "*/10 * * * * *",
   async function() {
     //KEEP THIS ORDER OF STUFF. unblock all when we go live, set time '0 0 0 * * *'
     //await cronUtil.checkExpired(db);
-    //await cronUtil.mainReport(db);
-    //await cronUtil.returningReport(db);
+    //await cronUtil.itemUpdate(db)
+    //await cronUtil.refundInformation(db)
     //await cronUtil.clearPending(db);
   },
   null,
@@ -64,6 +65,18 @@ app.prepare().then(() => {
   //server.use(proxy('feritas.serveo.net'))
   server.use(async (ctx, next) => {
     if (ctx.db === undefined) ctx.db = db;
+    //console.log(ctx.request.host);
+    //console.log(ctx.request)
+    //----------------------------for app proxy---------------------
+    //if (ctx.request.host === 'feritas.serveo.net') {
+    //app.setAssetPrefix('');
+    //} else {
+    //app.setAssetPrefix('flindel-returns');
+    //}
+    //server.use(proxy('feritas.serveo.net'))
+
+    //app.setAssetPrefix('flindel-returns');
+    //console.log(ctx)
 
     await next();
   });
@@ -112,6 +125,12 @@ app.prepare().then(() => {
           accessToken,
           shop
         });
+        // const registration = await registerWebhook({
+        //   address: "https://suus.serveo.net/hookendpoint",
+        //   topic: "PRODUCTS_CREATE",
+        //   accessToken,
+        //   shop
+        // });
         if (registration.success) {
           console.log("webhooks registered");
         } else {

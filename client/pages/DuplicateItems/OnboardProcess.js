@@ -13,8 +13,8 @@ const text = {
 
 
 const gitPara = {
-                  name:["fulfillment_service", "grams", "inventory_management", "weight"],
-                  value:["flindel", 0, "shopify", 0],
+                  name:["fulfillment_service", "grams", "inventory_management", "weight", "inventory_policy"],
+                  value:["flindel", 0, "shopify", 0, "deny"],
                 }
 
 const normPara = {
@@ -49,16 +49,7 @@ class OnboardProcess extends Component {
       },
 
     }
-    fetch(`${serveo_name}/priceRule/all/`, options)
-      .then((response) => {
-        if(response.ok){return response.json()}
-        else{throw Error(response.statusText)}
-      })
-      .then((data) => {
-        console.log('ALL PRICE RULES: ', data);
-      })
-      .catch((error) => console.log(error))
-      this.getSetupStep();
+    this.getSetupStep();
   }
 
   async setup(){
@@ -199,6 +190,7 @@ class OnboardProcess extends Component {
     if(json._fieldsProto.onboardingStep === undefined){
       console.log("onboardingStep is undefined");
       this.postSetupStep(1);
+      this.setState({step: 1})
     }else {
       let step = json._fieldsProto.onboardingStep.integerValue
       this.setState({step: step});

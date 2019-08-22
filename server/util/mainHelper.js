@@ -38,10 +38,10 @@ async function breakdown(db, items){
 
 //get get it today information for items
 async function getGITInformation(db, variantid, productid){
-    let productid_original ='1'
-    let productid_git ='2'
-    let variantid_original = '3'
-    let variantid_git = '4'
+    let productid_original =productid
+    let productid_git ='1'
+    let variantid_original = variantid
+    let variantid_git = '2'
     myRef = db.collection('products')
     let query = await myRef.where('orig_id','==',productid).get()
     if (query.empty){

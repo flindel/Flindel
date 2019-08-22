@@ -73,20 +73,20 @@ async function clearExpiredItems(dbIn){
     await query.forEach(async doc => {
         //calculate time difference between current and date of entry
         let processedDate = doc._fieldsProto.dateProcessed.stringValue
-        diffDays = getDateDifference(currentDate, processedDate)
+        diffDays = getDateDifference(processedDate, currentDate)
         //if item has been reselling for 7 days:
-        if (diffDays >= 7){
+        if (diffDays>= 7){
             //mark item with status returning, write to batch
             batch.update(doc.ref, {status:'returning'})
             let store = doc._fieldsProto.store.stringValue
-            let varID = doc._fieldsProto.variantidGIT.stringValue
+            
+            let varID = doc._fieldsProto.variantid.stringValue//FOR LIVE: let varID = doc._fieldsProto.variantidGIT.stringValue
             //decrement inventory
             inv.editInventory(-1, store, varID, '', db)
         }
     });
     //commit batch
     batch.commit()
-    //SEND EMAIL TO SHOW WHAT STUFF IS GONE?
 }
 
 //returns current date (MM/DD/YYYY)

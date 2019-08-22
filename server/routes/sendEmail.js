@@ -86,7 +86,12 @@ router.post("/confirmation", async ctx => {
         {
           to: [
             {
-              email: "booleafs17@yahoo.ca" //change to EMAIL once live
+              email: email //change to EMAIL once live
+            }
+          ],
+          bcc: [
+            {
+              email: "booleafs17@yahoo.ca"
             }
           ],
           subject: "Return Confirmation"
@@ -113,6 +118,7 @@ router.post("/confirmation", async ctx => {
 router.post("/returnShipment", async ctx => {
   const store = ctx.query.store;
   const itemString = ctx.query.items;
+  const code = ctx.query.code;
   const items = await JSON.parse(itemString);
   const db = ctx.db;
   const date = await expiredHelper.getCurrentDate();
@@ -123,6 +129,7 @@ router.post("/returnShipment", async ctx => {
     date +
     ", and will be delivered shortly." +
     "\n\n";
+  message += "CODE :" + code + "\n\n";
   message += "This shipment includes items from " + store + "\n\n";
   message += "This shipment includes the following items: \n\n";
   for (var i = 0; i < items.length; i++) {
@@ -192,7 +199,7 @@ router.post("/brand", async ctx => {
       parsedJSON[i].quantity +
       "\n\n";
   }
-
+  console.log(emailString);
   const option = {
     method: "POST",
     url: "https://api.sendgrid.com/v3/mail/send",

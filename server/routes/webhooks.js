@@ -83,7 +83,7 @@ router.post("/hookorderendpoint", webhookOrder, async ctx => {
       hookload.shipping_address.province;
 
     let latlng = await getLatLng(address);
-    // console.log("WHY ", latlng);
+     console.log("WHY ", latlng);
     latlng = latlng.results[0].geometry.location;
     let validLocation = calculateDistance(latlng);
     //console.log("OOOOOOO", ctx.header["x-shopify-shop-domain"]);

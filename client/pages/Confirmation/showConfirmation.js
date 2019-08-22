@@ -72,7 +72,7 @@ class finalPage extends React.Component{
                     </div>         
                 </div>   
                 <div className = "customerService">
-                    <p>If you have any question, <br />please contact us at <a href="mailto:customerservice@flindel.com">customerservice@flindel.com</a></p>
+                    <p>If you have any questions, <br />please contact us at <a href="mailto:customerservice@flindel.com">customerservice@flindel.com</a></p>
                 </div>     
             </div>
         )

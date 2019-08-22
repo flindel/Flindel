@@ -44,10 +44,10 @@ async function refundInformation(db){
             }
         }
         //send email to customer about what stuff got accepted
-        //emailHelper.sendUpdateEmail(doc._fieldsProto.email.stringValue, orderRefundItems, orderRejectItems)
+        emailHelper.sendUpdateEmail(doc._fieldsProto.email.stringValue, orderRefundItems, orderRejectItems)
     })
     mainHelper.sortRefundItems(refundItems,db)
-    //SPECIAL ITEMS?
+    emailHelper.sendSpecialEmail(specialItems)
 }
 
 //update flindel inventory on which items have been accepted. update shopify inventory for reselling items
@@ -140,6 +140,7 @@ async function updateInventory(items, dbIn){
     for (var i = 0;i<items.length;i++){
         let idActive = items[i].variantid.stringValue//let idActive = items[i].variantidGIT CHANGE IT TO THIS ONE WHEN WE ACTUALLY HAVE DUPLICATES
         let storeActive = items[i].store
+        console.log(idActive + ' - '+ storeActive)
         let {accessToken, torontoLocation} = await inv.getAccessToken(db,storeActive)
         let invId = await inv.getInvID(storeActive, idActive, accessToken)
         inv.increment(1,torontoLocation,invId,storeActive)
@@ -163,6 +164,7 @@ async function addItems(items, status, dbIn){
             store: item.store,
             status: status,
             dateProcessed: currentDate,
+            shipmentCode: ''
             };
         setDoc = db.collection('items').doc()
         batch.set(setDoc,data)

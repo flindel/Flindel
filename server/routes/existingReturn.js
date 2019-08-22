@@ -35,17 +35,19 @@ router.get('/requested/uuid', async ctx => {
 //see if order exists for review/restart
 router.get('/requested/exists', async ctx=>{
     order = ctx.query.orderNum
-    customerEmail = ctx.query.emailAdd
+    shopDomain = ctx.query.shopDomain
+    console.log("DB+++"+shopDomain)
     db = ctx.db
     myRef = db.collection('requestedReturns')
     ctx.body = {
             'code':'none',
             'exsit':false
         }
-        let querySnapshot = await myRef.where('order','==',order).where('email','==',customerEmail).get()
+        let querySnapshot = await myRef.where('order','==',order).where('shop','==',shopDomain).get()
         if (!querySnapshot.empty){
             //data.items is the origianl items Array in db, which may contain repeat items
             const data = querySnapshot.docs[0].data()
+            const email = data.email
             //returnItems is the return array without repeated item
             let returnItems = [data.items[0]]
             returnItems[0].quantity = 1
@@ -60,7 +62,7 @@ router.get('/requested/exists', async ctx=>{
             returnItems.forEach(e =>{
                 e.productID = e.productid
             })
-            ctx.body = {"exist":true, 'code':data.code, 'items':returnItems}
+            ctx.body = {"exist":true, 'code':data.code, 'items':returnItems, 'email':email}
     }
 })
 
@@ -125,7 +127,7 @@ router.put('/requested/orderStatus', async ctx=>{
         })
         let getDoc = await db.collection('requestedReturns').doc(code).get()
         let data = getDoc.data()
-        let setDoc = db.collection('history').doc().set(data)
+        let setDoc = db.collection('historyReturns').doc().set(data)
         let deleteDoc = db.collection('requestedReturns').doc(code).delete()
 
         ctx.body = {'success':true}
@@ -140,7 +142,8 @@ router.get('/pending/itemList', async ctx=>{
 //make new entry in requested returns
 router.post('/requested/new', async ctx=>{
         db = ctx.db
-        const { shop, accessToken } = getShopHeaders(ctx);
+        const shop = ctx.query.shop.substring(8,100)
+        console.log('THE SHOP IS ' + shop)
         const rawItems = ctx.query.items
         const orderNum = ctx.query.orderNum
         const date = ctx.query.date
@@ -236,19 +239,19 @@ router.post('/pending/new', async ctx=>{
     let oldDoc = await myRef.get()
     let newDate = await expiredHelper.getCurrentDate()
     let data = {
-        order_status: oldDoc._fieldsProto.order_status.stringValue,
-        email: oldDoc._fieldsProto.email.stringValue,
-        processEnd: oldDoc._fieldsProto.processEnd.stringValue,
-        createdDate: oldDoc._fieldsProto.createdDate.stringValue,
         code: oldDoc._fieldsProto.code.stringValue,
+        createdDate: oldDoc._fieldsProto.createdDate.stringValue,
+        email: oldDoc._fieldsProto.email.stringValue,
         emailOriginal: oldDoc._fieldsProto.emailOriginal .stringValue,
-        order : oldDoc._fieldsProto.order.stringValue,
-        shop: oldDoc._fieldsProto.shop.stringValue,
-        received_by: oldDoc._fieldsProto.received_by.stringValue,
+        items:[],
         itemsDropped: oldDoc._fieldsProto.itemsDropped.stringValue,
+        order : oldDoc._fieldsProto.order.stringValue,
+        order_status: oldDoc._fieldsProto.order_status.stringValue,
         processBegin: oldDoc._fieldsProto.processBegin.stringValue,
+        processEnd: oldDoc._fieldsProto.processEnd.stringValue,
         receivedDate: newDate,
-        items:[]
+        received_by: oldDoc._fieldsProto.received_by.stringValue,
+        shop: oldDoc._fieldsProto.shop.stringValue,   
     }
     for (var i = 0;i<oldDoc._fieldsProto.items.arrayValue.values.length;i++){
         let tempItem = {

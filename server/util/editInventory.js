@@ -3,7 +3,7 @@ const { api_link } = require('../default-shopify-api.json');
 const expired = require('./expiredHelper')
 
 //edit inventory in shopify
-async function editInventory(change, store, varID, torontoLocation, dbIn){
+async function editInventory(change, store, varID, locoIn, dbIn){
     let {accessToken, torontoLocation} = await getAccessToken(dbIn, store)
     let invId = await getInvID(store, varID, accessToken)
     increment(change, torontoLocation, invId, store)
@@ -38,7 +38,6 @@ async function getInvID(store, varID, accessToken){
 
 //actually increment inventory
 async function increment(quantity, torontoLocation, invId, store){
-    console.log('hello')
     let option2 = {
         method: 'POST',
         url: `https://${store}/${api_link}/inventory_levels/adjust.json`,

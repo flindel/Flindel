@@ -8,8 +8,8 @@ let reloadFunction;
 let fixes = 0;
 
 const gitPara = {
-                  name:["fulfillment_service", "grams", "inventory_management", "weight"],
-                  value:["flindel", 0, "shopify", 0],
+                  name:["fulfillment_service", "grams", "inventory_management", "weight", "inventory_policy"],
+                  value:["flindel", 0, "shopify", 0, "deny"],
                 }
 
 

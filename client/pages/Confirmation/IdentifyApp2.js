@@ -66,6 +66,17 @@ class IdentifyApp extends Component {
     //load return policy - have to expand this to multiple stores once we load
     async componentDidMount(){
         shop = window.location.hostname
+        this.setState({
+            shopDomain: shop
+        })
+        if(shop.indexOf('myshopify')==-1){
+            //if the hostname is not a .myshopify domain, get myshopifyDomain from DB
+            let domain = await fetch(`https://${serveoname}/shop/myshopifydomain?shop=${encodeURIComponent(shop)}`, {
+                method: 'get',
+            })
+            let domainJson = await domain.json()
+            shop = domainJson.myshopifyDomain
+        }
         console.log(shop)
         //get return policy from db
         let temp = await fetch(`https://${serveoname}/shop/returnPolicy?shop=${encodeURIComponent(shop)}`, {
@@ -73,15 +84,6 @@ class IdentifyApp extends Component {
         })
         let json = await temp.json()
         this.setState({step:1,returnPolicy: json.res.mapValue.fields, defaultReturn: json.default.stringValue})
-        //get shop domain from db
-        let domainTemp = await fetch(`https://${serveoname}/shop/domain?shop=${encodeURIComponent(shop)}`, {
-            method: 'get',
-        })
-        let domainJson = await domainTemp.json()
-        this.setState({
-            shopDomain: `https://${domainJson.domain}`
-        })
-
     }
 
     //generate usable unique codes
@@ -227,7 +229,7 @@ class IdentifyApp extends Component {
         let currentDate = ''
         currentDate += (new Date().getMonth()+1)+'/'+ new Date().getDate() + '/'+  new Date().getFullYear()
         let items = JSON.stringify(this.state.returnlist)
-        fetch(`https://${serveoname}/return/requested/new?date=${encodeURIComponent(currentDate)}&code=${encodeURIComponent(this.state.code)}&orderNum=${encodeURIComponent(this.state.orderNum)}&emailOriginal=${encodeURIComponent(this.state.emailOriginal)}&email=${encodeURIComponent(this.state.email)}&items=${encodeURIComponent(items)}`, {
+        fetch(`https://${serveoname}/return/requested/new?shop=${encodeURIComponent(this.state.shopDomain)}&date=${encodeURIComponent(currentDate)}&code=${encodeURIComponent(this.state.code)}&orderNum=${encodeURIComponent(this.state.orderNum)}&emailOriginal=${encodeURIComponent(this.state.emailOriginal)}&email=${encodeURIComponent(this.state.email)}&items=${encodeURIComponent(items)}`, {
             method: 'POST',
         })
     }
@@ -269,16 +271,15 @@ class IdentifyApp extends Component {
       }
 
       //check returns database to see if return already exists
-    async checkReturnsFromDB(orderNum,emailAdd){
-        orderNum =1
-        let temp = await fetch(`https://${serveoname}/return/requested/exists?orderNum=${encodeURIComponent(orderNum)}&emailAdd=${encodeURIComponent(emailAdd)}`, {
+    async checkReturnsFromDB(orderNum,shopDomain){
+        let temp = await fetch(`https://${serveoname}/return/requested/exists?orderNum=${encodeURIComponent(orderNum)}&shopDomain=${encodeURIComponent(shopDomain)}`, {
             method: 'get',
         })
         let json = await temp.json()
         if(json.exist){
             //set information if it already does
             const returnInfo = {'code':json.code,
-                                'email': emailAdd,
+                                'email': json.email,
                                 'orderNum': orderNum,
                                 'items': json.items,
                             }
@@ -342,7 +343,7 @@ class IdentifyApp extends Component {
                     //if order doesn't already exist in db
                     let returnInfo = false
                     if(checkDB){
-                      returnInfo = await this.checkReturnsFromDB(data.orderNumber, data.emailAddress)
+                      returnInfo = await this.checkReturnsFromDB(data.orderNumber, this.state.shopDomain)
                     }
                         //redirect if item already exists
                         if(returnInfo){
@@ -491,6 +492,8 @@ class IdentifyApp extends Component {
                 viewPage2 = {this.viewPage2.bind(this)}
                 shopName = {this.state.shopName}/> 
                 <CheckPage
+                shop = {shop}
+                shopName = {this.state.shopName}
                 serveoname = {serveoname}
                 setReason = {this.setReason.bind(this)}
                 items={this.returnItemList}
