@@ -35,17 +35,19 @@ router.get('/requested/uuid', async ctx => {
 //see if order exists for review/restart
 router.get('/requested/exists', async ctx=>{
     order = ctx.query.orderNum
-    customerEmail = ctx.query.emailAdd
+    shopDomain = ctx.query.shopDomain
+    console.log("DB+++"+shopDomain)
     db = ctx.db
     myRef = db.collection('requestedReturns')
     ctx.body = {
             'code':'none',
             'exsit':false
         }
-        let querySnapshot = await myRef.where('order','==',order).where('email','==',customerEmail).get()
+        let querySnapshot = await myRef.where('order','==',order).where('shop','==',shopDomain).get()
         if (!querySnapshot.empty){
             //data.items is the origianl items Array in db, which may contain repeat items
             const data = querySnapshot.docs[0].data()
+            const email = data.email
             //returnItems is the return array without repeated item
             let returnItems = [data.items[0]]
             returnItems[0].quantity = 1
@@ -60,7 +62,7 @@ router.get('/requested/exists', async ctx=>{
             returnItems.forEach(e =>{
                 e.productID = e.productid
             })
-            ctx.body = {"exist":true, 'code':data.code, 'items':returnItems}
+            ctx.body = {"exist":true, 'code':data.code, 'items':returnItems, 'email':email}
     }
 })
 
