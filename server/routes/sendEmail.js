@@ -196,7 +196,7 @@ router.post("/brand", async ctx => {
       parsedJSON[i].quantity +
       "\n\n";
   }
-
+  console.log(emailString)
   const option = {
     method: "POST",
     url: "https://api.sendgrid.com/v3/mail/send",
@@ -207,7 +207,7 @@ router.post("/brand", async ctx => {
         {
           to: [
             {
-              email: "cengizsirlan.cs@gmail.com"
+              email: "ludiwang66@gmail.com"
             }
           ],
           subject: "GIT ITEM INCORRECTLY SOLD REFUND REQUIRED"

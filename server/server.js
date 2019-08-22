@@ -21,6 +21,7 @@ const rp = require("request-promise");
 const errors = require("request-promise/errors");
 /////////////
 
+//new CronJob("*/30 * * * * *", warehouseOrder, null, true);
 //second (0-59) - minute (0-59) - hour(0-23) - day of month (1-31) - Month (1-12) - Day of Week (0-6, Sun-Sat)
 new CronJob(
   "*/10 * * * * *",
@@ -72,7 +73,7 @@ app.prepare().then(() => {
     //}
     //server.use(proxy('feritas.serveo.net'))
     
-    app.setAssetPrefix('flindel-returns');
+    //app.setAssetPrefix('flindel-returns');
     //console.log(ctx)
 
     await next();
@@ -82,7 +83,7 @@ app.prepare().then(() => {
   server.use(
     createShopifyAuth({
       //THIS KEEPS GETTING DELETED AND I NEED IT
-      prefix:'/app/flindel-returns',
+      //prefix:'/app/flindel-returns',
       apiKey: SHOPIFY_API_KEY,
       secret: SHOPIFY_API_SECRET_KEY,
       scopes: [
@@ -116,7 +117,7 @@ app.prepare().then(() => {
         ctx.redirect("/");
         //HAS TO BE IN SERVER.js
         const registration = await registerWebhook({
-          address: `https://${SERVEO_NAME}.serveo.net/hookendpoint`,
+          address: `https://${SERVEO_NAME}/hookendpoint`,
           topic: "FULFILLMENTS_CREATE",
           accessToken,
           shop
@@ -133,7 +134,7 @@ app.prepare().then(() => {
           console.log("Failed to webhook ", registration.result);
         }
         const registration1 = await registerWebhook({
-          address: `https://${SERVEO_NAME}.serveo.net/hookorderendpoint`,
+          address: `https://${SERVEO_NAME}/hookorderendpoint`,
           topic: "ORDERS_CREATE",
           accessToken,
           shop
@@ -145,7 +146,7 @@ app.prepare().then(() => {
         }
 
         const registration2 = await registerWebhook({
-          address: `https://${SERVEO_NAME}.serveo.net/hookthemeendpoint`,
+          address: `https://${SERVEO_NAME}/hookthemeendpoint`,
           topic: "THEMES_PUBLISH",
           accessToken,
           shop

@@ -34,7 +34,7 @@ router.post("/hookendpoint", webhookFulfillment, ctx => {
       let fJSON = ctx.request.body.line_items;
       ///sendEmail(fJSON);
       fetch(
-        `https://${SERVEO_NAME}.serveo.net/dbcall/update_order_database?items=${encodeURIComponent(
+        `https://${SERVEO_NAME}/dbcall/update_order_database?items=${encodeURIComponent(
           JSON.stringify(hookload.line_items)
         )}&destination=${encodeURIComponent(
           JSON.stringify(hookload.destination)
@@ -83,14 +83,14 @@ router.post("/hookorderendpoint", webhookOrder, async ctx => {
       hookload.shipping_address.province;
 
     let latlng = await getLatLng(address);
-    // console.log("WHY ", latlng);
+     console.log("WHY ", latlng);
     latlng = latlng.results[0].geometry.location;
     let validLocation = calculateDistance(latlng);
     //console.log(distance);
     if (validLocation == false) {
       console.log("TOO FAR");
       fetch(
-        `https://${SERVEO_NAME}.serveo.net/sendEmail/brand?package=${encodeURIComponent(
+        `https://${SERVEO_NAME}/send/brand?package=${encodeURIComponent(
           JSON.stringify(flindelItems)
         )}`,
         {
@@ -102,7 +102,7 @@ router.post("/hookorderendpoint", webhookOrder, async ctx => {
     } else {
       //location is valid
       fetch(
-        `https://${SERVEO_NAME}.serveo.net/orders/fulfill?location_id=${encodeURIComponent(
+        `https://${SERVEO_NAME}/orders/fulfill?location_id=${encodeURIComponent(
           hookload.location_id
         )}&lineitem_id=${encodeURIComponent(
           JSON.stringify(lineItemsID)
