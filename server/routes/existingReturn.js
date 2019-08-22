@@ -239,19 +239,19 @@ router.post('/pending/new', async ctx=>{
     let oldDoc = await myRef.get()
     let newDate = await expiredHelper.getCurrentDate()
     let data = {
-        order_status: oldDoc._fieldsProto.order_status.stringValue,
-        email: oldDoc._fieldsProto.email.stringValue,
-        processEnd: oldDoc._fieldsProto.processEnd.stringValue,
-        createdDate: oldDoc._fieldsProto.createdDate.stringValue,
         code: oldDoc._fieldsProto.code.stringValue,
+        createdDate: oldDoc._fieldsProto.createdDate.stringValue,
+        email: oldDoc._fieldsProto.email.stringValue,
         emailOriginal: oldDoc._fieldsProto.emailOriginal .stringValue,
-        order : oldDoc._fieldsProto.order.stringValue,
-        shop: oldDoc._fieldsProto.shop.stringValue,
-        received_by: oldDoc._fieldsProto.received_by.stringValue,
+        items:[],
         itemsDropped: oldDoc._fieldsProto.itemsDropped.stringValue,
+        order : oldDoc._fieldsProto.order.stringValue,
+        order_status: oldDoc._fieldsProto.order_status.stringValue,
         processBegin: oldDoc._fieldsProto.processBegin.stringValue,
+        processEnd: oldDoc._fieldsProto.processEnd.stringValue,
         receivedDate: newDate,
-        items:[]
+        received_by: oldDoc._fieldsProto.received_by.stringValue,
+        shop: oldDoc._fieldsProto.shop.stringValue,   
     }
     for (var i = 0;i<oldDoc._fieldsProto.items.arrayValue.values.length;i++){
         let tempItem = {
