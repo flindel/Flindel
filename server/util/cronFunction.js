@@ -140,6 +140,7 @@ async function updateInventory(items, dbIn){
     for (var i = 0;i<items.length;i++){
         let idActive = items[i].variantid.stringValue//let idActive = items[i].variantidGIT CHANGE IT TO THIS ONE WHEN WE ACTUALLY HAVE DUPLICATES
         let storeActive = items[i].store
+        console.log(idActive + ' - '+ storeActive)
         let {accessToken, torontoLocation} = await inv.getAccessToken(db,storeActive)
         let invId = await inv.getInvID(storeActive, idActive, accessToken)
         inv.increment(1,torontoLocation,invId,storeActive)
