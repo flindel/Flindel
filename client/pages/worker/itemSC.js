@@ -74,7 +74,7 @@ class Item extends Component {
 
     //get information 
     async getItemInformation(varID){
-        let temp = await fetch(`https://${this.props.serveoname}/products/all?store=${(encodeURIComponent(this.props.item.store))}`, {
+        let temp = await fetch(`https://${this.props.serveoname}/products/all?shop=${(encodeURIComponent(this.props.item.store))}`, {
             method: 'get',
             })
         let productID = '0'
@@ -145,7 +145,7 @@ class Item extends Component {
      async loadImage(){
         //get image
         let imageID = this.props.item.productid
-        fetch(`https://${this.props.serveoname}/products/img?id=${encodeURIComponent(imageID)}`, {
+        fetch(`https://${this.props.serveoname}/products/img?shop=${encodeURIComponent(this.props.item.store)}&id=${encodeURIComponent(imageID)}`, {
         method: 'GET',})
         .then(response => response.json())
         .then(resData=>{

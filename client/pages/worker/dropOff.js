@@ -10,6 +10,7 @@ class DropOff extends Component {
     constructor(props){
         super(props);
         this.state = {
+            storeName: '',
             code: '',
             step: 0,
             workerID: '',
@@ -121,7 +122,7 @@ class DropOff extends Component {
                 }
             tempList.push(tempItem)
             }
-            this.setState({items:tempList, step: 2})
+            this.setState({items:tempList, step: 2,storeName: t2.res.shop.stringValue})
             }
         else{
             //if code isn't valid
@@ -181,6 +182,7 @@ class DropOff extends Component {
                         serveoname = {serveoname}
                         items = {this.state.items}
                         orderNum = {this.state.orderNum}
+                        shop = {this.state.storeName}
                         review = {true}/>
                     <button onClick = {this.selectOrder}>BACK</button>
                     <button onClick = {this.receiveOrder}>RECEIVE ORDER</button>
