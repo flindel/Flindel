@@ -66,6 +66,16 @@ class IdentifyApp extends Component {
     //load return policy - have to expand this to multiple stores once we load
     async componentDidMount(){
         shop = window.location.hostname
+        this.setState({
+            shopDomain: shop
+        })
+        if(shop.indexOf('myshopify')==-1){
+            let domain = await fetch(`https://${serveoname}/shop/myshopifydomain?shop=${encodeURIComponent(shop)}`, {
+                method: 'get',
+            })
+            let domainJson = await domain.json()
+            shop = domainJson.myshopifyDomain
+        }
         console.log(shop)
         //get return policy from db
         let temp = await fetch(`https://${serveoname}/shop/returnPolicy?shop=${encodeURIComponent(shop)}`, {
@@ -78,9 +88,6 @@ class IdentifyApp extends Component {
             method: 'get',
         })
         let domainJson = await domainTemp.json()
-        this.setState({
-            shopDomain: `https://${domainJson.domain}`
-        })
     }
 
     //generate usable unique codes
