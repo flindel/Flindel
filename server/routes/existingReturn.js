@@ -125,7 +125,7 @@ router.put('/requested/orderStatus', async ctx=>{
         })
         let getDoc = await db.collection('requestedReturns').doc(code).get()
         let data = getDoc.data()
-        let setDoc = db.collection('history').doc().set(data)
+        let setDoc = db.collection('historyReturns').doc().set(data)
         let deleteDoc = db.collection('requestedReturns').doc(code).delete()
 
         ctx.body = {'success':true}

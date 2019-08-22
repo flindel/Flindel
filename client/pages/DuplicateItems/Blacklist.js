@@ -38,7 +38,7 @@ class Blacklist extends Component {
         this.setState({deleteIn:e.target.value})
     }
     async doesProductExist(ID){
-        let temp = await fetch(`${serveo_name}/products?id=${encodeURIComponent(ID)}`, {
+        let temp = await fetch(`${serveo_name}/products?shop=${encodeURIComponent(this.state.storeName)}id=${encodeURIComponent(ID)}`, {
             method: 'get',
         })
         let response = await temp.json()
