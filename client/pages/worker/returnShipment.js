@@ -14,7 +14,10 @@ class returnShipment extends Component {
             store: '',
             items: [],
             returnList:[],
-            start: true
+            start: true,
+            code: '',
+            existing: '',
+            existingBrand: ''
         }
         this.goBeginning = this.goBeginning.bind(this)
         this.selectItems = this.selectItems.bind(this)
@@ -24,6 +27,10 @@ class returnShipment extends Component {
         this.confirmReturn = this.confirmReturn.bind(this)
         this.sendEmails = this.sendEmails.bind(this)
         this.updateDB = this.updateDB.bind(this)
+        this.generateCode = this.generateCode.bind(this)
+        this.isCodeUnique = this.isCodeUnique.bind(this)
+        this.confirmShipment = this.confirmShipment.bind(this)
+        this.handleChangeExisting = this.handleChangeExisting.bind(this)
     }
     //go back to beinning
     goBeginning(){
@@ -60,6 +67,24 @@ class returnShipment extends Component {
         }
     }
 
+    handleChangeExisting(e){
+        this.setState({existing: e.target.value.toUpperCase()})
+    }
+
+    async confirmShipment(){
+        let temp = await fetch(`https://${serveoname}/item/confirmDelivery?code=${encodeURIComponent(this.state.existing)}`, {
+            method: 'put',
+        })
+        let tJSON = await temp.json()
+        if (tJSON.store != ''){
+            this.setState({step:5, existingBrand: tJSON.store})
+        }
+        else{
+            this.setState({existing: ''})
+            alert('There is no active return associated with this code.')
+        }
+    }
+
     //after store is selected, continue
     selectItems(){
         if (this.state.store != ''){
@@ -70,9 +95,38 @@ class returnShipment extends Component {
             this.setState({step:2,})
         }
     }
+
+    async isCodeUnique(code){
+        let temp = await fetch(`https://${serveoname}/item/code/unique?code=${encodeURIComponent(code)}`, {
+            method: 'get',
+        })
+        let tJSON = await temp.json()
+        return (tJSON.valid)
+    }
+
+    async generateCode(){
+         //alphabet, vowels removed for censoring
+        const alphabet = "BCDFGHJKLMNPQRSTVWXZ123456789";
+        const codeLength = 6;
+        let code = "";
+        for (var i = 0;i<codeLength;i++)
+          {
+            let index = Math.floor((Math.random() * alphabet.length));
+            code += alphabet[index]
+            //search here instead of manually setting
+          }
+        let valid = await this.isCodeUnique(code)
+        if (valid){
+            this.setState({code:code})
+        }
+        else{
+            await this.generateCode()
+        }
+    }
     //when entire return is confirmed
-    confirmReturn(){
-        this.sendEmails()
+    async confirmReturn(){
+        await this.generateCode()
+        //this.sendEmails()
         this.updateDB()
         this.setState({step:4})
     }
@@ -80,7 +134,7 @@ class returnShipment extends Component {
     sendEmails(){
         //send email to flindel and brand about items
         let itemString = JSON.stringify(this.state.returnList)
-        fetch(`https://${serveoname}/send/returnShipment?store=${encodeURIComponent(this.state.store)}&items=${encodeURIComponent(itemString)}`, {
+        fetch(`https://${serveoname}/send/returnShipment?code=${encodeURIComponent(this.state.code)}&store=${encodeURIComponent(this.state.store)}&items=${encodeURIComponent(itemString)}`, {
             method: 'post',
         })
     }
@@ -91,7 +145,7 @@ class returnShipment extends Component {
             let tempItem = this.state.returnList[i]
             let qty = tempItem.value
             let id = tempItem.variantid
-            fetch(`https://${serveoname}/item/returned?quantity=${encodeURIComponent(qty)}&store=${encodeURIComponent(this.state.store)}&id=${encodeURIComponent(id)}`, {
+            fetch(`https://${serveoname}/item/returned?quantity=${encodeURIComponent(qty)}&code=${encodeURIComponent(this.state.code)}&store=${encodeURIComponent(this.state.store)}&id=${encodeURIComponent(id)}`, {
             method: 'put',
             })
         }
@@ -133,10 +187,10 @@ class returnShipment extends Component {
         }
         for (var i =0;i<items.length;i++){
             items[i].index = i
+            items[i].store = this.state.store
             items[i].productid = items[i].productID
         }
         this.setState({items:items})
-        console.log(items)
     }
 
     //conditional render - step1 for enter store, step2 for doing stuff
@@ -156,6 +210,10 @@ class returnShipment extends Component {
                     </select>
                     <button onClick = {this.selectItems}>SUBMIT</button>
                     <br/><br/><br/>
+                    <p>After receiving confirmation from a partner that a shipment arrived, please enter the code below.</p>
+                    <input value = {this.state.existing} onChange = {this.handleChangeExisting}/>
+                    <button onClick = {this.confirmShipment}>CONFIRM SHIPMENT</button>
+                    <br/><br/><br/><br/><br/>
                     <button onClick = {this.props.back}>BACK</button>
                 </div>
             )
@@ -264,6 +322,20 @@ class returnShipment extends Component {
                     <h4 className = 'scHeader'>Store: {this.state.store}</h4>
                     <br/>
                     <p>This return has been confirmed and {this.state.store} has been notified of the shipment.</p>
+                    <br/>
+                    <p>The code for this return is: {this.state.code}</p>
+                    <br/><br/>
+                    <button onClick = {this.goBeginning}>HOME</button>
+                </div>
+            )
+        }
+        else if (this.state.step == 5){
+            return(
+                <div>
+                    <h1 className = 'scHeader'>RETURN SHIPMENT</h1>
+                    <br/>
+                    <br/>
+                    <p>You have marked that return #{this.state.existing} was successfully delivered and received by {this.state.existingBrand}.</p>
                     <br/><br/>
                     <button onClick = {this.goBeginning}>HOME</button>
                 </div>

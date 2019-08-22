@@ -164,6 +164,7 @@ async function addItems(items, status, dbIn){
             store: item.store,
             status: status,
             dateProcessed: currentDate,
+            shipmentCode: ''
             };
         setDoc = db.collection('items').doc()
         batch.set(setDoc,data)

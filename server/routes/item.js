@@ -40,11 +40,41 @@ router.put('/returned', async ctx=>{
     await query.forEach(async doc=>{
       if (count < quantity){
         count ++
-        batch.update(doc.ref, {status: 'returned'})
+        batch.update(doc.ref, {status: 'shipping', returnShipment: ctx.query.code})
       }
     })
     batch.commit()
     ctx.body = true
+})
+
+router.get('/code/unique', async ctx=>{
+  const code = ctx.query.code
+  db = ctx.db
+  let valid = false
+  let myRef = db.collection('items')
+  let query = await myRef.where('status','==','shipping').where('returnShipment','==',code).get()
+  if (query.empty){
+      valid = true
+  }
+  else{
+    valid = false
+  }
+  ctx.body = {'valid':valid}
+})
+
+router.put('/confirmDelivery', async ctx=>{
+  const code = ctx.query.code
+  db = ctx.db
+  let batch = db.batch()
+  let store = ''
+  let myRef = db.collection('items')
+  let query = await myRef.where('status','==','shipping').where('returnShipment','==',code).get()
+  await query.forEach(async doc=>{
+    store = doc._fieldsProto.store.stringValue
+    batch.update(doc.ref, {status: 'returned'})
+  })
+  batch.commit()
+  ctx.body = {'store':store}
 })
 
 module.exports = router;
