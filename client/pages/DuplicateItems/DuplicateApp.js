@@ -3,6 +3,7 @@ import FindIssues from './FindIssues'
 import SetupGit from './SetupGit'
 import Blacklist from './Blacklist'
 import OnboardProcess from './OnboardProcess'
+import Revert from './Revert'
 import {serveo_name} from '../config'
 import { post, put, postCollection, getSmartCollections} from './Shopify'
 
@@ -92,6 +93,38 @@ class DuplicateApp extends Component {
       })
   }
 
+  publishAllGit(){
+    var confirmed = confirm("This will make all Get it Today Products avaliable to your customers. \nAre you sure you want to proceed?")
+    if (!confirmed){
+      return;
+    }
+    this.setState({isUnpublishing:true})
+
+    //Publish ALl Get it Today
+    fetch(`${serveo_name}/collections?id=${encodeURIComponent(this.state.gitCollectionId)}`, {
+      method: 'GET',
+      })
+      .then((response) => {
+        if(response.ok){return response.json()}
+        else{throw Error(response.statusText)}
+      })
+      .then(resData=> {
+        let gitProductIds = resData.products.map((product) => {
+          return product.id;
+        })
+        this.setState({gitProductIds: gitProductIds});
+        console.log("PUBLISHING GET IT TODAY: ", gitProductIds);
+        gitProductIds.map(id => {
+          put(id,
+            {"product":{
+              "id": id,
+              "published_at": "2007-12-31T19:00:00-05:00",
+            }
+          }, this.finishUnpublish)
+        })
+      })
+  }
+
   finishUnpublish(data, args){
     let numOfGitProducts = args[0];
     unpublished += 1;
@@ -153,15 +186,22 @@ class DuplicateApp extends Component {
             <div>
               <button onClick={() => this.setState({ui:0})}>Product Updates</button>
               <button onClick={() => this.unpublishAllGit()}>UNPUBLISH GET IT TODAY PRODUCTS</button>
+              <button onClick={() => this.publishAllGit()}>PUBLISH GET IT TODAY PRODUCTS</button>
+              <button onClick={() => this.setState({ui:4})}>Revert</button>
             </div>
           }
           {this.state.isUnpublishing &&
             <div>
-              <h1>Unpublishing Get it Today Products, Please do not close this tab.</h1>
+              <h1>Making changes to Get it Today Products, Please do not close this tab.</h1>
               <h1>{this.state.unpublished}/{this.state.gitProductIds.length}</h1>
             </div>
           }
         </div>
+      )
+    }
+    if(this.state.ui == 4){
+      return(
+        <Revert />
       )
     }
   }

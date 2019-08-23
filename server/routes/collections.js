@@ -70,7 +70,6 @@ router.get('/', async ctx => {
   router.get('/all/', async ctx => {
     const { cookies } = ctx;
     const shop = cookies.get('shop_id');
-    console.log("SHOP ID:", shop);
     const accessToken = cookies.get('accessToken');
     const option = {
         method: 'GET',

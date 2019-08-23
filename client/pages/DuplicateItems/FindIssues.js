@@ -282,6 +282,16 @@ class FindIssues extends Component {
     //doesn't include variants
     const para = ["product_type", "published_scope", "tags", "template_suffix", "body_html",
     "vendor"];
+
+    const gitTitle = git.title.substring(0, git.title.length - 15);
+    if (norm.title !== gitTitle){
+      productIssues.push(
+        {
+          parameter: "title",
+          norm: norm.title,
+          git: git.title,
+        });
+    }
     const norm_para = para.map(parameter => "norm."+parameter);
     const git_para = para.map(parameter => "git."+parameter);
     for (let i = 0; i < para.length; i++) {

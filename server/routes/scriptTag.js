@@ -112,7 +112,7 @@ const router = Router({
 
 
     //delete certain doc in scripttag collection, should be called after deleting scriptTag from Shopify API when uninstall APP
-    router.put('/db/status', async ctx =>{
+    router.get('/db/status', async ctx =>{
         const { shop, accessToken } = getShopHeaders(ctx);
         db = ctx.db
         let myRef = db.collection('scripttag').doc(shop)

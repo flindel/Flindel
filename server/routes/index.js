@@ -18,6 +18,7 @@ const priceRule = require("./priceRule");
 const itemRouter = require('./item')
 const fulfillmentRouter = require('./fulfillment')
 const workerRouter = require('./worker')
+const revertRouter = require('./revert')
 
 router = combineRouters(
   rootRouter,
@@ -38,7 +39,8 @@ router = combineRouters(
   priceRule,
   itemRouter,
   fulfillmentRouter,
-  workerRouter
+  workerRouter,
+  revertRouter,
 );
 
 module.exports = router;
