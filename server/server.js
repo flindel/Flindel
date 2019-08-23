@@ -75,7 +75,7 @@ app.prepare().then(() => {
     //}
     //server.use(proxy('feritas.serveo.net'))
 
-    //app.setAssetPrefix('flindel-returns');
+    app.setAssetPrefix('flindel-returns');
     //console.log(ctx)
 
     await next();

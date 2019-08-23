@@ -62,7 +62,7 @@ router.get('/requested/exists', async ctx=>{
             returnItems.forEach(e =>{
                 e.productID = e.productid
             })
-            ctx.body = {"exist":true, 'code':data.code, 'items':returnItems, 'email':email}
+            ctx.body = {"exist":true, 'code':data.code, 'items':returnItems, 'email':email, 'emailOriginal':data.emailOriginal}
     }
 })
 
@@ -142,7 +142,8 @@ router.get('/pending/itemList', async ctx=>{
 //make new entry in requested returns
 router.post('/requested/new', async ctx=>{
         db = ctx.db
-        const shop = ctx.query.shop.substring(8,100)
+        const shop = ctx.query.shop
+        //.substring(8,100)
         console.log('THE SHOP IS ' + shop)
         const rawItems = ctx.query.items
         const orderNum = ctx.query.orderNum

@@ -152,7 +152,7 @@ class Item extends Component {
                         </div>
                         <div className = 'container3'>
                         <label >Quantity for Return: </label>
-                            <Select className = 'qty dropDown' placeholder = {'0'}value={this.state.activeQuantity} onChange={this.handleQuantityChange} options = {this.state.quantities} menuContainerStyle={{'zIndex': 999}}>
+                            <Select className = 'qty dropDown' isSearchable = {false} placeholder = {'0'}value={this.state.activeQuantity} onChange={this.handleQuantityChange} options = {this.state.quantities} menuContainerStyle={{'zIndex': 999}}>
                             </Select>
                         </div>
                       
@@ -176,7 +176,7 @@ class Item extends Component {
                     <div className = 'container3'>
                         {/* dropdown menu to choose return reason */}
                         <label>Reason for return:
-                            <Select className = "reasonSelect" placeholder = {'Reason'}value={this.state.activeReason} onChange={this.handleReasonChange} options = {this.state.reasons} maxMenuHeight={120}>
+                            <Select className = "reasonSelect" isSearchable = {false} placeholder = {'Reason'}value={this.state.activeReason} onChange={this.handleReasonChange} options = {this.state.reasons} maxMenuHeight={120}>
                             </Select>
                         </label>
                     </div>

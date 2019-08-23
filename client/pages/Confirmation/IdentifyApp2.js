@@ -30,7 +30,8 @@ class IdentifyApp extends Component {
             returnPolicy: [],
             defaultReturn: '',
             shopDomain: '',
-            emailOriginal:''
+            emailOriginal:'',
+            restartEmail:'',
         };
         this.returnItemList= []
         this.identifyItems=this.identifyItems.bind(this) 
@@ -66,16 +67,19 @@ class IdentifyApp extends Component {
     //load return policy - have to expand this to multiple stores once we load
     async componentDidMount(){
         shop = window.location.hostname
+        console.log('shop-----'+shop)
         this.setState({
             shopDomain: shop
         })
         if(shop.indexOf('myshopify')==-1){
+            console.log("shop====="+shop)
             //if the hostname is not a .myshopify domain, get myshopifyDomain from DB
             let domain = await fetch(`https://${serveoname}/shop/myshopifydomain?shop=${encodeURIComponent(shop)}`, {
                 method: 'get',
             })
             let domainJson = await domain.json()
             shop = domainJson.myshopifyDomain
+            console.log('shop++++'+shop)
         }
         console.log(shop)
         //get return policy from db
@@ -282,6 +286,7 @@ class IdentifyApp extends Component {
                                 'email': json.email,
                                 'orderNum': orderNum,
                                 'items': json.items,
+                                'emailOriginal': json.emailOriginal,
                             }
             return returnInfo
          }
@@ -348,11 +353,12 @@ class IdentifyApp extends Component {
                         //redirect if item already exists
                         if(returnInfo){
                             this.setState({
-                                'code':returnInfo.code,
-                                'email': returnInfo.email,
-                                'orderNum': returnInfo.orderNum,
-                                'existReturn': true,
-                                'returnList': returnInfo.items
+                                code:returnInfo.code,
+                                email: returnInfo.email,
+                                orderNum: returnInfo.orderNum,
+                                existReturn: true,
+                                returnList: returnInfo.items,
+                                restartEmail: returnInfo.emailOriginal
                             })
                         }else{
                         this.setState({
@@ -427,11 +433,11 @@ class IdentifyApp extends Component {
                     <div>
                        <NB
                        shopName = {this.state.shopName}
-                       shopDomain = {this.state.shopDomain}/>
+                       shopDomain = {shop}/>
                        <Review 
                         restart = {this.restart.bind(this)} 
                         code={this.state.code}
-                        email = {this.state.email} 
+                        email = {this.state.restartEmail} 
                         orderNum = {this.state.orderNum} 
                         items = {this.state.returnList}
                         serveoname = {serveoname}
@@ -451,7 +457,7 @@ class IdentifyApp extends Component {
                     show = {false}
                     findOrderPage = {true}
                     shopName = {this.state.shopName}
-                    shopDomain = {this.state.shopDomain}/>
+                    shopDomain = {shop}/>
                     <p className = 'errorMessage'>{this.state.errorMessage}</p>
                       <Search 
                       identifyCustomerID={this.identifyCustomerID} 
@@ -538,7 +544,7 @@ class IdentifyApp extends Component {
                 step3={''}
                 show = {false}
                 shopName = {this.state.shopName}
-                shopDomain = {this.state.shopDomain}/> 
+                shopDomain = {shop}/> 
                 <ConfirmationPage
                 serveoname = {serveoname}
                 code = {this.state.code} 
