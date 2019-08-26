@@ -1,0 +1,4 @@
+.git*
+.env
+client/.next
+node_modules/
