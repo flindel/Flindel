@@ -213,7 +213,9 @@ router.post("/brand", async ctx => {
               email: email
             }
           ],
-          subject: "GIT ITEM INCORRECTLY SOLD REFUND REQUIRED"
+          subject:
+            "GIT ITEM INCORRECTLY SOLD REFUND REQUIRED FOR ORDER#" +
+            ctx.query.orderid
         }
       ],
       from: {

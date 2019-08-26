@@ -77,7 +77,7 @@ router.post("/update_order_database", async ctx => {
   const orderId = ctx.query.order_id;
   let payload = {
     orderid: orderId,
-    store: items[0].vendor, //this does not work
+    store: ctx.query.source, //this does not work
     fulfillmentid: fulfId,
     shippingAddress:
       destination.address1 + " " + destination.city + " " + destination.zip

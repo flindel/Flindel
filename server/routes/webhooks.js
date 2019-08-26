@@ -40,7 +40,9 @@ router.post("/hookendpoint", webhookFulfillment, ctx => {
           JSON.stringify(hookload.destination)
         )}&fulf_id=${encodeURIComponent(
           hookload.id
-        )}&order_id=${encodeURIComponent(hookload.order_id)}`,
+        )}&order_id=${encodeURIComponent(
+          hookload.order_id
+        )}&source=${encodeURIComponent(ctx.header["x-shopify-shop-domain"])}`,
         {
           method: "post"
         }
@@ -83,7 +85,7 @@ router.post("/hookorderendpoint", webhookOrder, async ctx => {
       hookload.shipping_address.province;
 
     let latlng = await getLatLng(address);
-     console.log("WHY ", latlng);
+    console.log("WHY ", latlng);
     latlng = latlng.results[0].geometry.location;
     let validLocation = calculateDistance(latlng);
     //console.log("OOOOOOO", ctx.header["x-shopify-shop-domain"]);
@@ -92,7 +94,9 @@ router.post("/hookorderendpoint", webhookOrder, async ctx => {
       fetch(
         `https://${SERVEO_NAME}/send/brand?package=${encodeURIComponent(
           JSON.stringify(flindelItems)
-        )}&store=${encodeURIComponent(ctx.header["x-shopify-shop-domain"])}`,
+        )}&store=${encodeURIComponent(
+          ctx.header["x-shopify-shop-domain"]
+        )}&orderid=${encodeURIComponent(hookload.id)}`,
         {
           method: "post"
         }
