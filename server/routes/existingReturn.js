@@ -43,6 +43,7 @@ router.get('/requested/exists', async ctx=>{
             'code':'none',
             'exsit':false
         }
+        console.log(order + ' - '+ shopDomain)
         let querySnapshot = await myRef.where('order','==',order).where('shop','==',shopDomain).get()
         if (!querySnapshot.empty){
             //data.items is the origianl items Array in db, which may contain repeat items

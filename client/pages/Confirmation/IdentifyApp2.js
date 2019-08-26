@@ -67,7 +67,6 @@ class IdentifyApp extends Component {
     //load return policy - have to expand this to multiple stores once we load
     async componentDidMount(){
         shop = window.location.hostname
-        console.log('shop-----'+shop)
         this.setState({
             shopDomain: shop
         })
@@ -276,7 +275,8 @@ class IdentifyApp extends Component {
 
       //check returns database to see if return already exists
     async checkReturnsFromDB(orderNum,shopDomain){
-        let temp = await fetch(`https://${serveoname}/return/requested/exists?orderNum=${encodeURIComponent(orderNum)}&shopDomain=${encodeURIComponent(shopDomain)}`, {
+        console.log(this.state.shopDomain + ' ------A-----')
+        let temp = await fetch(`https://${serveoname}/return/requested/exists?orderNum=${encodeURIComponent(orderNum)}&shopDomain=${encodeURIComponent(this.state.shopDomain)}`, {
             method: 'get',
         })
         let json = await temp.json()
