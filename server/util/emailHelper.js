@@ -256,7 +256,7 @@ async function sendFulfillmentEmail(fulfillments) {
     message += "The following GIT orders have been received in the last day.";
     message += "\n\n";
     for (var i = 0; i < fulfillments.length; i++) {
-      message += fulfillments[i].store + ' - ' + fulfillments[i].orderid + ' - ' + fulfillments[i].name + ' - ' + fulfillments[i].shippingAddress + ": ";
+      message += fulfillments[i].store + ' - ' + fulfillments[i].orderid + ' - ' + fulfillments[i].name + ' - ' + fulfillments[i].shippingAddress + ' - ' + fulfillments[i].comment + ": ";
       message += '\n' + 'Items: (name-productID-variantID) ' + '\n'
       for (var j = 0; j < fulfillments[i].items.length; j++) {
         message += "\n";
@@ -277,7 +277,7 @@ async function sendFulfillmentEmail(fulfillments) {
         {
           to: [
             {
-              email: 'booleafs17@yahoo.ca'
+              email: 'ludiwang66@gmail.com'
             }
           ],
           subject: "Recent Fulfillments"

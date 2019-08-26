@@ -91,9 +91,10 @@ async function fulfillmentReport(dbIn){
             tempOrder = {
                 orderid : doc._fieldsProto.orderid.stringValue,
                 name : doc._fieldsProto.name.stringValue,
-                shippingAddress : doc._fieldsProto.name.stringValue,
+                shippingAddress : doc._fieldsProto.shippingAddress.stringValue,
                 store : doc._fieldsProto.store.stringValue,
-                items : []
+                items : [],
+                comment: doc._fieldsProto.comment.stringValue
             }
             for (var i = 0;i<doc._fieldsProto.items.arrayValue.values.length;i++){
                 let tempItem = {
