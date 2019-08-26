@@ -99,8 +99,8 @@ async function fulfillmentReport(dbIn){
                 let tempItem = {
                     name: doc._fieldsProto.items.arrayValue.values[i].mapValue.fields.name.stringValue,
                     quantity: doc._fieldsProto.items.arrayValue.values[i].mapValue.fields.quantity.integerValue,
-                    productid: doc._fieldsProto.items.arrayValue.values[i].mapValue.fields.productid.integerValue.toString(),
-                    variantid: doc._fieldsProto.items.arrayValue.values[i].mapValue.fields.variantid.integerValue.toString(),
+                    productid: doc._fieldsProto.items.arrayValue.values[i].mapValue.fields.productid.stringValue,
+                    variantid: doc._fieldsProto.items.arrayValue.values[i].mapValue.fields.variantid.stringValue,
                 }
                 tempOrder.items.push(tempItem)
             }

@@ -77,7 +77,7 @@ router.post("/update_order_database", async ctx => {
   const orderId = ctx.query.order_id;
   let payload = {
     orderid: orderId,
-    store: items[0].vendor,
+    store: items[0].vendor, //this does not work
     fulfillmentid: fulfId,
     shippingAddress:
       destination.address1 + " " + destination.city + " " + destination.zip
@@ -92,8 +92,8 @@ router.post("/update_order_database", async ctx => {
   for (let i = 0; i < items.length; i++) {
     itemList[i] = {
       itemid: items[i].id,
-      variantid: items[i].variant_id,
-      quantity: items[i].quantity,
+      variantid: items[i].variant_id.toString(),
+      quantity: items[i].quantity.toString(),
       name: items[i].title,
       fulfilled: 0,
       productid: items[i].product_id
