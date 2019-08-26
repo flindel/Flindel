@@ -55,9 +55,9 @@ router.get('/myshopifydomain', async ctx =>{
 })
 
 router.get('/returnPolicy', async ctx =>{
-    console.log(ctx)
-    const { shop, accessToken } = getShopHeaders(ctx);
+    //console.log("find return policy")
     //const { cookies } = ctx;
+    const shop = ctx.query.shop
     //const shop = cookies.get('shop_id');
     db = ctx.db
     myRef = db.collection('store')
