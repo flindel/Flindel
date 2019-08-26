@@ -31,6 +31,7 @@ new CronJob(
     //await cronUtil.itemUpdate(db)
     //await cronUtil.refundInformation(db)
     //await cronUtil.clearPending(db);
+    //await cronUtil.fulfillmentReport(db)
   },
   null,
   true

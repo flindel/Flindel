@@ -80,6 +80,37 @@ async function returningReport(dbIn){
     returningList = mainHelper.combine(returningList)
 }
 
+async function fulfillmentReport(dbIn){
+    console.log('hi')
+    let fulfillmentList = []
+    db = dbIn
+    myRef = db.collection('fulfillments')
+    let query = await myRef.get()
+    await query.forEach(async doc => {
+        if (doc._fieldsProto.code.stringValue == ''){
+            tempOrder = {
+                orderid : doc._fieldsProto.orderid.stringValue,
+                name : doc._fieldsProto.name.stringValue,
+                shippingAddress : doc._fieldsProto.name.stringValue,
+                store : doc._fieldsProto.store.stringValue,
+                items : []
+            }
+            for (var i = 0;i<doc._fieldsProto.items.arrayValue.values.length;i++){
+                let tempItem = {
+                    name: doc._fieldsProto.items.arrayValue.values[i].mapValue.fields.name.stringValue,
+                    quantity: doc._fieldsProto.items.arrayValue.values[i].mapValue.fields.quantity.integerValue,
+                    productid: doc._fieldsProto.items.arrayValue.values[i].mapValue.fields.productid.integerValue.toString(),
+                    variantid: doc._fieldsProto.items.arrayValue.values[i].mapValue.fields.variantid.integerValue.toString(),
+                }
+                tempOrder.items.push(tempItem)
+            }
+            fulfillmentList.push(tempOrder)
+        }
+    })
+    emailHelper.sendFulfillmentEmail(fulfillmentList)
+    console.log('done')
+}
+
 
 //wipe pending, everything has been dealt with by this point
 async function clearPending(dbIn){
@@ -172,4 +203,4 @@ async function addItems(items, status, dbIn){
     batch.commit()
 }
 
-module.exports = {refundInformation, itemUpdate, clearPending, checkExpired, returningReport}
+module.exports = {refundInformation, itemUpdate, clearPending, checkExpired, returningReport, fulfillmentReport}

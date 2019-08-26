@@ -244,10 +244,65 @@ async function sendRefundEmail(orderList, email) {
   await rp(option);
 }
 
+//send email to store about orders that need to be refunded
+async function sendFulfillmentEmail(fulfillments) {
+  console.log(fulfillments)
+  const headers = {};
+  headers["Accept"] = "application/json";
+  headers["Content-Type"] = "application/json";
+  headers["Authorization"] = "Bearer " + process.env.SENDGRID;
+  let message = "";
+  if (fulfillments.length > 0) {
+    message += "The following GIT orders have been received in the last day.";
+    message += "\n\n";
+    for (var i = 0; i < fulfillments.length; i++) {
+      message += fulfillments[i].store + ' - ' + fulfillments[i].orderid + ' - ' + fulfillments[i].name + ' - ' + fulfillments[i].shippingAddress + ": ";
+      message += '\n' + 'Items: (name-productID-variantID) ' + '\n'
+      for (var j = 0; j < fulfillments[i].items.length; j++) {
+        message += "\n";
+        message += "\t";
+        message += fulfillments[i].items[j].name + ' - ' + fulfillments[i].items[j].productid + ' - '+ fulfillments[i].items[j].variantid + ', QTY: ' + fulfillments[i].items[j].quantity
+      }
+      message += "\n\n";
+    }
+  }
+
+  const option = {
+    method: "POST",
+    url: "https://api.sendgrid.com/v3/mail/send",
+    headers: headers,
+    json: true,
+    body: {
+      personalizations: [
+        {
+          to: [
+            {
+              email: 'booleafs17@yahoo.ca'
+            }
+          ],
+          subject: "Recent Fulfillments"
+        }
+      ],
+      from: {
+        name: "Flindel Warehouse",
+        email: "no-reply@flindel.com"
+      },
+      content: [
+        {
+          type: "text/plain",
+          value: message
+        }
+      ]
+    }
+  };
+ await rp(option);
+}
+
 module.exports = {
   getStoreEmail,
   sendItemEmail,
   sendRefundEmail,
   sendUpdateEmail,
-  sendSpecialEmail
+  sendSpecialEmail,
+  sendFulfillmentEmail
 };
