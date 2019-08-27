@@ -29,7 +29,7 @@ admin.initializeApp({
 });
 const db = admin.firestore();
 
-const { SHOPIFY_API_SECRET_KEY, SHOPIFY_API_KEY, DEBUG } = process.env;
+const { SHOPIFY_API_SECRET_KEY, SHOPIFY_API_KEY, DEBUG, APP_PROXY_PREFIX, API_URL} = process.env;
 
 app.prepare().then(() => {
   const server = new Koa();
@@ -48,7 +48,7 @@ app.prepare().then(() => {
     //app.setAssetPrefix('flindel-returns');
     //}
     //server.use(proxy('feritas.serveo.net'))
-    //app.setAssetPrefix('flindel-returns');
+    //app.setAssetPrefix(APP_PROXY_PREFIX);
     //console.log(ctx)
 
     await next();
@@ -63,6 +63,6 @@ app.prepare().then(() => {
   });
 
   server.listen(port, () => {
-    console.log(`> Ready on http://localhost:${port}`);
+    console.log(`> Ready on ${API_URL}${APP_PROXY_PREFIX}:${port}`);
   });
 });
