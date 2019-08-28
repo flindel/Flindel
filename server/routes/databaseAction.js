@@ -85,7 +85,7 @@ router.post("/update_order_database", async ctx => {
   payload["dateCreated"] = getTime();
   payload["workerid"] = "";
   payload["code"] = "";
-  payload["status"] = "";
+  payload["status"] = "incomplete";
   payload["name"] = destination.name;
   payload["comment"] = "";
 

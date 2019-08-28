@@ -185,6 +185,7 @@ class Item extends Component {
             this.checkBlacklist()
             this.loadMessages()
         }
+        if (this.props.step != 8)
         this.loadImage()
     }
 

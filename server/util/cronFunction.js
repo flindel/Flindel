@@ -12,6 +12,26 @@ async function checkExpired(db){
     expiredHelper.clearExpiredOrders(db)
 }
 
+//handle anything in pending after confirming checkover is done
+async function handlePending(db){
+    let checked = true
+    let myRef = db.collection('pendingReturns').limit(1)
+    let query = await myRef.get()
+    //see if the checkover has been done
+    await query.forEach(doc=>{
+        if (doc._fieldsProto.items.arrayValue.values[0].mapValue.fields.value.integerValue == 0){
+            checked = false
+        }
+    })
+    //only move forward if the checkover is done
+    if (checked == true){
+        itemUpdate(db)
+        refundInformation(db)
+        clearPending()
+    }
+    
+}
+
 //send information about which items need to be refunded
 async function refundInformation(db){
     let myRef = db.collection('pendingReturns')
@@ -204,4 +224,4 @@ async function addItems(items, status, dbIn){
     batch.commit()
 }
 
-module.exports = {refundInformation, itemUpdate, clearPending, checkExpired, returningReport, fulfillmentReport}
+module.exports = {checkExpired,fulfillmentReport, handlePending}

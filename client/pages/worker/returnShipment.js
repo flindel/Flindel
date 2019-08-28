@@ -208,7 +208,7 @@ class returnShipment extends Component {
                         <option value="flindel-demo-1.myshopify.com">Flindel Demo 1</option>
                     </select>
                     <button onClick = {this.selectItems}>SUBMIT</button>
-                    <br/><br/><br/>
+                    <br/><br/><br/><br/><br/><br/><br/><br/>
                     <p>After receiving confirmation from a partner that a shipment arrived, please enter the code below.</p>
                     <input value = {this.state.existing} onChange = {this.handleChangeExisting}/>
                     <button onClick = {this.confirmShipment}>CONFIRM SHIPMENT</button>

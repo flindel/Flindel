@@ -205,6 +205,9 @@ class assembleOrders extends Component {
                     index: j,
                     backgroundColor: 'itemOrder'
                 }
+                if (tempItem.fulfilled == 1){
+                    tempItem.backgroundColor = 'itemOrderGreen'
+                }
                 tempOrder.items.push(tempItem)
             }
             //push to master list
