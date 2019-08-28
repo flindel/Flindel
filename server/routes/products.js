@@ -183,7 +183,9 @@ router.post('/', async ctx => {
 router.post('/variant/', async ctx => {
     const product_id = ctx.query.id;
     // Create a product
-    const { shop, accessToken } = getShopHeaders(ctx);
+    const { cookies } = ctx;
+    const shop = cookies.get('shop_id');
+    const accessToken = cookies.get('accessToken');
     const headers = {};
     if (process.env.DEBUG) {
         headers['Authorization'] = process.env.SHOP_AUTH;

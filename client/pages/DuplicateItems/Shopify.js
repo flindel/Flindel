@@ -138,7 +138,7 @@ export function getSmartCollections(callback = doNothing){
 export function postGitVariant(product_id, variants, update, callback = doNothing){
   console.log("Product ID: ", product_id);
   console.log("Variants: ", variants);
-  console.log("Update: ", update.git.variants, update.norm.variants);
+  console.log("Update: ", update);
   let body = null;
   let orig = update.norm;
   let git = update.git;
