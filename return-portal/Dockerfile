@@ -5,5 +5,4 @@ RUN npm install
 COPY . .
 RUN npm run build
 ENV PORT 8080
-ENV API_URL https://returnportal1-wpdlsr3nmq-ue.a.run.app
 CMD [ "npm", "start" ]

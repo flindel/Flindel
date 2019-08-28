@@ -7,10 +7,6 @@ import NB from './navbar.js'
 import PriceDisplay from './finalConfirmation.js'
 import Review from './reviewRestart'
 import '@shopify/polaris/styles.css';
-//const serveoname = '04071318.serveo.net';
-import {serveo_name} from '../config.js'
-const sname = serveo_name;
-//const serveoname = serveo_name;
 let serveoname = '';
 let shop = ''
 

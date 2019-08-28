@@ -25,4 +25,5 @@ API_URL=[url from google run]
 APP_PROXY_PREFIX=flindel-returns    //Currently not used, but if you want to set up app proxy, set the prefix here and use this variable in the code
 ```
 When app proxy is used, set APP_PROXY_PREFIX = SubpathOfYourAppProxy (only put subpath here without Subpath prefix), uncomment line 51 `app.setAssetPrefix(APP_PROXY_PREFIX);` in `server.js`
+
 9. When you make changes and want to test, build the image again, push to gcloud and deploy.

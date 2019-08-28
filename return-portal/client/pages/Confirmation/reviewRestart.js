@@ -31,9 +31,10 @@ class ReviewRestart extends Component {
         this.props.restartReturn(this.state.orderNum, this.state.email, this.state.code)
     }
 
-    componentDidMount(){
-        console.log(this.props)
-    }
+    //Used to check if restart info matchs with shopify api order info
+    // componentDidMount(){
+    //     console.log(this.props)
+    // }
 
     render(){
         return (
