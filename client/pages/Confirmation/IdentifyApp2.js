@@ -9,9 +9,7 @@ import Review from './reviewRestart'
 import '@shopify/polaris/styles.css';
 //const serveoname = '04071318.serveo.net';
 import {serveo_name} from '../config.js'
-const sname = serveo_name
-const serveoname = sname.substring(8)
-let shop = ''
+const serveoname = serveo_name
 
 class IdentifyApp extends Component {
     //constructor and binding methods

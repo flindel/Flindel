@@ -9,8 +9,8 @@ import DropOff from './dropOff'
 import DeliverOrders from './deliverOrders'
 import Revert from './Revert'
 import {serveo_name} from '../config'
-const sname = serveo_name
-const serveoname = sname.substring(8)
+const serveoname = serveo_name
+
 
 //MAIN DASHBOARD FOR FLINDEL WORKER AP
 

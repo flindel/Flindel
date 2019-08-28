@@ -1,8 +1,7 @@
 import React, { Component } from 'react';
 import '../Confirmation/universal.css'
 import {serveo_name} from '../config'
-const sname = serveo_name
-const serveoname = sname.substring(8)
+const serveoname = serveo_name
 //for error message - alows page to stand alone
 const myStyle = {
     color: 'red'

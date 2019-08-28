@@ -91,12 +91,12 @@ router.post("/update_order_database", async ctx => {
 
   for (let i = 0; i < items.length; i++) {
     itemList[i] = {
-      itemid: items[i].id,
+      itemid: items[i].id.toString(),
       variantid: items[i].variant_id.toString(),
-      quantity: items[i].quantity.toString(),
+      quantity: items[i].quantity,
       name: items[i].title,
       fulfilled: 0,
-      productid: items[i].product_id
+      productid: items[i].product_id.toString()
     };
   }
   payload["items"] = itemList;

@@ -3,8 +3,7 @@ import '../Confirmation/universal.css'
 import './flindelInterface.css'
 import Order from './order'
 import {serveo_name} from '../config'
-const sname = serveo_name
-const serveoname = sname.substring(8)
+const serveoname = serveo_name
 
 class assembleOrders extends Component {
     constructor(props){
@@ -109,16 +108,6 @@ class assembleOrders extends Component {
         else if (failed){
             tempList[orderIndex].status = 'failed'
         }
-        for (var i = 0;i<tempList.length;i++){
-            for (var j = i+1;j<tempList.length;j++){
-                //sort list based on whether orders are completed
-                if ((tempList[i].status == 'successful'|| tempList[i].status == 'complete' || tempList[i].status == 'failed') && tempList[j].status == 'incomplete'){
-                    let tempOrder = tempList[i]
-                    tempList[i] = tempList[j]
-                    tempList[j] = tempOrder
-                }
-            }
-        }
         //reset indexes
         for (var i = 0;i<tempList.length;i++){
             tempList[i].index = i
@@ -167,6 +156,19 @@ class assembleOrders extends Component {
         this.setState({orderList:tempList})
     }
 
+    generateCode(){
+        const alphabet = "0123456789";
+        const codeLength = 5;
+        let code = "";
+        for (var i = 0;i<codeLength;i++)
+          {
+            let index = Math.floor((Math.random() * alphabet.length));
+            code += alphabet[index]
+            //search here instead of manually setting
+          }
+        return code
+    }
+
     async loadFulfillments(){
         //load fulfillments here
         let temp = await fetch(`https://${serveoname}/fulfillment/assemble?workerID=${encodeURIComponent(this.state.workerID)}`, {
@@ -206,6 +208,9 @@ class assembleOrders extends Component {
                 tempOrder.items.push(tempItem)
             }
             //push to master list
+            if (tempOrder.code == ''){
+                tempOrder.code = this.generateCode()
+            }
             orders.push(tempOrder)
         }
         this.setState({loadingMessage:'', orderList:orders})

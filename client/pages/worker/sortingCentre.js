@@ -2,8 +2,8 @@ import React, {Component} from 'react';
 import Item from './itemSC'
 import {serveo_name} from '../config'
 import './sorting.css'
-const sname = serveo_name
-const serveoname = sname.substring(8)
+const serveoname = serveo_name
+
 
 class sortingCentre extends Component{
     constructor(props){

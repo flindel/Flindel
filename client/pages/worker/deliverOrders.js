@@ -3,8 +3,8 @@ import '../Confirmation/universal.css'
 import './flindelInterface.css'
 import Order from './order'
 import {serveo_name} from '../config'
-const sname = serveo_name
-const serveoname = sname.substring(8)
+const serveoname = serveo_name
+
 
 class deliverOrders extends Component {
     constructor(props){

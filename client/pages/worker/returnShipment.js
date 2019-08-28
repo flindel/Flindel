@@ -3,8 +3,7 @@ import '../Confirmation/universal.css'
 import './flindelInterface.css'
 import {serveo_name} from '../config'
 import Item from './itemSC'
-const sname = serveo_name
-const serveoname = sname.substring(8)
+const serveoname = serveo_name
 
 class returnShipment extends Component {
     constructor(props){
@@ -171,7 +170,7 @@ class returnShipment extends Component {
 
     //load items when store is selected
     async loadItems(){
-        let temp = await fetch(`https://${serveoname}/item/storeList/?store=${encodeURIComponent(this.state.store)}`, {
+        let temp = await fetch(`https://${serveoname}/item/storeList?store=${encodeURIComponent(this.state.store)}`, {
             method: 'get',
         })
         let items = await temp.json()

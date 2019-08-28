@@ -99,6 +99,11 @@ router.get('/dropoffSummary',async ctx=>{
     await query.forEach(async doc=>{
         codes.push(doc._fieldsProto.code.stringValue)
     })
+    myRef = db.collection('requestedReturns')
+    query = await myRef.where('received_by', '==', id).get()
+    await query.forEach(async doc=>{
+        codes.push(doc._fieldsProto.code.stringValue)
+    })
     ctx.body = {codes: codes}
 })
 
