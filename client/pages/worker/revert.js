@@ -1,6 +1,5 @@
 import React from "react"
 import {serveo_name} from '../config'
-let api_name = "https://"+serveo_name;
 
 class Revert extends React.Component{
   constructor(props){
@@ -15,36 +14,32 @@ class Revert extends React.Component{
     this.finishedReverting = this.finishedReverting.bind(this);
   }
 
-  async revert(shop){
+  async revert(){
     this.setState({isReverting: true})
     //get fulfillment service ID
-    const fulservId = await this.getFulfillmentService(shop);
-    console.log("Hello");
+    const fulservId = await this.getFulfillmentService();
     console.log("fulservId: ", fulservId)
-    this.deleteFulserv(fulservId, shop);
-    this.revertScriptTag(shop);
-    this.getGitCollectionId(shop);
+    this.deleteFulserv(fulservId);
+    this.revertScriptTag();
+    this.getGitCollectionId();
     //in callback it deletes all git products and deletes git collection
   }
 
   async getFulfillmentService(shop = this.state.shop){
-    console.log("Shop", shop);
-    var temp = await fetch(`${api_name}/revert/fulserv/firestore/id?shop=${encodeURIComponent(shop)}`, {
+    var temp;
+    temp = await fetch(`https://${serveo_name}/revert/fulserv/firestore/id?shop=${encodeURIComponent(shop)}`, {
       method: 'get',
-    })
-    console.log("temp: ", temp);
-    if(temp){
-      var json  = await temp.json();
-      if(json._fieldsProto){
-        if(json._fieldsProto.fulfillment_service){
-          return json._fieldsProto.fulfillment_service.integerValue;
-        }
+    }).catch((error) => {return undefined;})
+    var json  = await temp.json();
+    if(json._fieldsProto){
+      if(json._fieldsProto.fulfillment_service){
+        return json._fieldsProto.fulfillment_service.integerValue;
       }
     }
-  }
+   }
 
-   del(product_id, shop, callback = doNothing){
-     fetch(`${api_name}/revert/products?id=${encodeURIComponent(product_id)}&shop=${encodeURIComponent(shop)}`, {
+   del(product_id, callback = doNothing){
+     fetch(`https://${serveo_name}/products?id=${encodeURIComponent(product_id)}`, {
        method: 'delete',
        })
        .then((response) => {
@@ -61,13 +56,13 @@ class Revert extends React.Component{
 
     async delProduct(gitID){
      var temp;
-     temp = await fetch(`${api_name}/firestore/product/git/?gitID=${encodeURIComponent(gitID)}`, {
+     temp = await fetch(`https://${serveo_name}/firestore/product/git/?gitID=${encodeURIComponent(gitID)}`, {
        method: 'delete',
      })
    }
 
-  async getGitCollectionId(shop) {
-    fetch(`${api_name}/revert/collections/all/?shop=${encodeURIComponent(shop)}`, {
+  async getGitCollectionId() {
+    fetch(`https://${serveo_name}/revert/collections/all/?shop=${encodeURIComponent(this.state.shop)}`, {
       method: 'get',
       })
       .then((response) => {
@@ -81,8 +76,8 @@ class Revert extends React.Component{
         for (let i = 0; i < smart_collections.length; i++){
           if(smart_collections[i].title == "Get it Today"){
             console.log("Git Collection ID", smart_collections[i].id);
-            this.deleteAllGitProducts(smart_collections[i].id, shop);
-            this.deleteGitCollect(smart_collections[i].id, shop);
+            this.deleteAllGitProducts(smart_collections[i].id);
+            this.deleteGitCollect(smart_collections[i].id);
           }
         }
       })
@@ -90,8 +85,8 @@ class Revert extends React.Component{
 
   }
 
-  deleteGitCollect(gitCollectionId, shop){
-    fetch(`${api_name}/revert/collections?id=${encodeURIComponent(gitCollectionId)}&shop=${encodeURIComponent(shop)}`, {
+  deleteGitCollect(gitCollectionId){
+    fetch(`https://${serveo_name}/revert/collections?id=${encodeURIComponent(gitCollectionId)}&shop=${encodeURIComponent(this.state.shop)}`, {
       method: 'delete',
       })
       .then((response) => {
@@ -104,8 +99,8 @@ class Revert extends React.Component{
       .catch((error) => console.log(error));
   }
 
-  deleteFulserv(fulservId, shop){
-    fetch(`${api_name}/revert/fulserv?id=${encodeURIComponent(fulservId)}&shop=${encodeURIComponent(shop)}`, {
+  deleteFulserv(fulservId){
+    fetch(`https://${serveo_name}/revert/fulserv?id=${encodeURIComponent(fulservId)}&shop=${encodeURIComponent(this.state.shop)}`, {
       method: 'delete',
       })
       .then((response) => {
@@ -118,9 +113,9 @@ class Revert extends React.Component{
       .catch((error) => console.log(error));
   }
 
-  deleteAllGitProducts(gitCollectionId, shop){
+  deleteAllGitProducts(gitCollectionId){
     //Delete all Get it Today
-    fetch(`${api_name}/revert/collections?id=${encodeURIComponent(gitCollectionId)}&shop=${encodeURIComponent(shop)}`, {
+    fetch(`https://${serveo_name}/revert/collections?id=${encodeURIComponent(gitCollectionId)}&shop=${encodeURIComponent(this.state.shop)}`, {
       method: 'GET',
       })
       .then((response) => {
@@ -131,15 +126,15 @@ class Revert extends React.Component{
         let gitProductIds = resData.products.map((product) => {return product.id;})
         this.setState({revertTotal: gitProductIds.length})
         console.log("DELETE GIT Products: ", gitProductIds)
-        gitProductIds.map(id => {this.del(id, shop, this.finishedReverting)})
+        gitProductIds.map(id => {this.del(id, this.finishedReverting)})
       })
       .catch((error) => console.log(error))
   }
 
   //1.get all ids from db 2.delete scriptTag from Shopify by id 3. Update status as "revert" in DB
-  async revertScriptTag(shop){
+  async revertScriptTag(){
     //get all ids and save in idsArray
-    let scripttagIDTemp = await fetch(`${api_name}/revert/scriptTag/db/ids?shop=${encodeURIComponent(shop)}`, {
+    let scripttagIDTemp = await fetch(`https://${serveo_name}/revert/scriptTag/db/ids?shop=${encodeURIComponent(this.state.shop)}`, {
       method: 'get',
     })
     let scripttagIDJson = await scripttagIDTemp.json()
@@ -147,14 +142,14 @@ class Revert extends React.Component{
     //for each id, delete from shopify
     for(let i=0;i<idsArray.length; i++){
       console.log(idsArray[i])
-      let deleteTemp = await fetch(`${api_name}/revert/scriptTag/shopify?id=${encodeURIComponent(idsArray[i])}&shop=${encodeURIComponent(shop)}`,{
+      let deleteTemp = await fetch(`https://${serveo_name}/revert/scriptTag/shopify?id=${encodeURIComponent(idsArray[i])}&shop=${encodeURIComponent(this.state.shop)}`,{
         method:'delete'
       })
       let deleteJson = await deleteTemp.json()
       console.log(`${idsArray[i]} is deleted ${deleteJson}`)
     }
     //update status as "revert" in database
-    let statusTemp = await fetch(`${api_name}/revert/scriptTag/db/status?shop=${encodeURIComponent(shop)}`, {
+    let statusTemp = await fetch(`https://${serveo_name}/revert/scriptTag/db/status?shop=${encodeURIComponent(this.state.shop)}`, {
       method: 'get',
     })
     let revertResp = await statusTemp.json()
@@ -165,6 +160,7 @@ class Revert extends React.Component{
 
   async handleClick(){
     let textValue = document.getElementById("storeName").value;
+    console.log(document.getElementById("storeName").value);
     var confirmed = confirm("This will remove all Flidel Services from "+textValue+". \nAre you sure you want to proceed?")
     if (confirmed){
       textValue = textValue+".myshopify.com"
@@ -172,13 +168,13 @@ class Revert extends React.Component{
       const fulservId = await this.getFulfillmentService(textValue);
       if (fulservId){
         console.log("fulservId +", fulservId);
-        console.log("this.state.shop", this.state.shop)
-        this.revert(textValue);
+        this.revert();
       }
       else{
         alert("Invalid Store Name, Please do not include \".myshopify.com\" in the text box.")
         console.log("fulservId -", fulservId);
       }
+
       //this.revert();
     }
   }
@@ -225,4 +221,5 @@ class Revert extends React.Component{
     }
   }
 }
+
 export default Revert;

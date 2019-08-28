@@ -1,9 +1,8 @@
 import React, { Component } from 'react';
-import {serveo_name} from '../config';
+import {serveo_name, published} from '../config';
 import {post, put, get, del, postGIT, postGitVariant, delGitVariant} from './Shopify';
 import {getGitProduct} from './Firestore'
 
-const published = true;
 let updates = [];
 let reloadFunction;
 let fixes = 0;

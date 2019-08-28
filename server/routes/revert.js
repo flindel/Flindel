@@ -8,56 +8,18 @@ const router = Router({
     prefix: '/revert'
 });
 
-
-router.delete('/products/', async ctx => {
-  ctx.set('Access-Control-Allow-Origin', '*');
-  ctx.set('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept');
-  ctx.set('Access-Control-Allow-Methods', 'POST, GET, PUT, DELETE, OPTIONS');
-  const productid = ctx.query.id;
-  const shop = ctx.query.shop;
-  console.log("productID:---------"+productid)
-  const { cookies } = ctx;
-  const accessToken = await accessTokenDB(ctx);
-  const option = {
-      method: 'delete',
-      url: `https://${shop}/${api_link}/products/${productid}.json`,
-      headers: {
-          'X-Shopify-Access-Token': accessToken
-      },
-      json: true,
-  }
-  try {
-      ctx.body = await rp(option);
-      //console.log("body..."+JSON.stringify(ctx.body));
-  } catch (err) {
-      console.log(err.message);
-      if (err instanceof errors.StatusCodeError) {
-          ctx.status = err.statusCode;
-          ctx.message = err.message;
-      } else if (err instanceof errors.RequestError) {
-          ctx.status = 500;
-          ctx.message = err.message;
-      }
-  }
-});
-
 router.get('/fulserv/firestore/id', async ctx => {
   ctx.set('Access-Control-Allow-Origin', '*');
   ctx.set('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept');
   ctx.set('Access-Control-Allow-Methods', 'POST, GET, PUT, DELETE, OPTIONS');
-  console.log("HELLO")
   db = ctx.db
   const shop = ctx.query.shop;
   let myRef = db.collection('store').doc(shop);
-  getDoc = await myRef.get();
-  console.log("getDoc", getDoc);
+  getDoc = await myRef.get()
   ctx.body = getDoc;
 })
 
 router.get('/collections/all/', async ctx => {
-  ctx.set('Access-Control-Allow-Origin', '*');
-  ctx.set('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept');
-  ctx.set('Access-Control-Allow-Methods', 'POST, GET, PUT, DELETE, OPTIONS');
   const { cookies } = ctx;
   const shop = ctx.query.shop;
   const accessToken = await accessTokenDB(ctx);
@@ -84,9 +46,6 @@ router.get('/collections/all/', async ctx => {
 });
 
 router.delete('/collections/', async ctx => {
-  ctx.set('Access-Control-Allow-Origin', '*');
-  ctx.set('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept');
-  ctx.set('Access-Control-Allow-Methods', 'POST, GET, PUT, DELETE, OPTIONS');
   const smart_collection_id = ctx.query.id;
   console.log("collection ID:---------"+smart_collection_id)
   const { cookies } = ctx;
@@ -116,9 +75,6 @@ router.delete('/collections/', async ctx => {
 });
 
 router.delete("/fulserv", async ctx => {
-  ctx.set('Access-Control-Allow-Origin', '*');
-  ctx.set('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept');
-  ctx.set('Access-Control-Allow-Methods', 'POST, GET, PUT, DELETE, OPTIONS');
   const fulservId = ctx.query.id;
   console.log("fulfillment service id:---------" + fulservId);
   const shop = ctx.query.shop;
@@ -151,9 +107,6 @@ router.delete("/fulserv", async ctx => {
 });
 
 router.get('/collections/', async ctx => {
-  ctx.set('Access-Control-Allow-Origin', '*');
-  ctx.set('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept');
-  ctx.set('Access-Control-Allow-Methods', 'POST, GET, PUT, DELETE, OPTIONS');
     //Gets products all products from a collection
     const collectionid = ctx.query.id;
     console.log("collectionid:---------", collectionid)
@@ -184,9 +137,6 @@ router.get('/collections/', async ctx => {
 
     //getting all scriptTag id. !!!!!TESTING function for Aug 1st meeting
      router.get('/scriptTag/db/ids', async ctx =>{
-       ctx.set('Access-Control-Allow-Origin', '*');
-       ctx.set('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept');
-       ctx.set('Access-Control-Allow-Methods', 'POST, GET, PUT, DELETE, OPTIONS');
           // get all scripTag ids
           let ids = []
           const shop = ctx.query.shop;
@@ -203,9 +153,6 @@ router.get('/collections/', async ctx => {
 
      //delete a scriptTag from shopify API
      router.delete('/scriptTag/shopify', async ctx => {
-       ctx.set('Access-Control-Allow-Origin', '*');
-       ctx.set('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept');
-       ctx.set('Access-Control-Allow-Methods', 'POST, GET, PUT, DELETE, OPTIONS');
          console.log('call delete shopify')
          const shop = ctx.query.shop;
          const accessToken = await accessTokenDB(ctx);
@@ -239,9 +186,6 @@ router.get('/collections/', async ctx => {
 
     //delete certain doc in scripttag collection, should be called after deleting scriptTag from Shopify API when uninstall APP
     router.get('/scriptTag/db/status', async ctx =>{
-      ctx.set('Access-Control-Allow-Origin', '*');
-      ctx.set('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept');
-      ctx.set('Access-Control-Allow-Methods', 'POST, GET, PUT, DELETE, OPTIONS');
       const shop = ctx.query.shop;
       const accessToken = await accessTokenDB(ctx);
         db = ctx.db

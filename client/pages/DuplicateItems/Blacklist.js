@@ -1,6 +1,5 @@
 import React, { Component } from 'react';
-import {serveo_name} from '../config'
-let api_name = "https://"+serveo_name;
+import {serveo_name} from '../config';
 import {getShopID} from './Shopify';
 
 
@@ -39,7 +38,7 @@ class Blacklist extends Component {
         this.setState({deleteIn:e.target.value})
     }
     async doesProductExist(ID){
-        let temp = await fetch(`${api_name}/products?shop=${encodeURIComponent(this.state.storeName)}&id=${encodeURIComponent(ID)}`, {
+        let temp = await fetch(`${serveo_name}/products?shop=${encodeURIComponent(this.state.storeName)}&id=${encodeURIComponent(ID)}`, {
             method: 'get',
         })
         let response = await temp.json()
@@ -65,7 +64,7 @@ class Blacklist extends Component {
                 let itemString = JSON.stringify(tempList)
                 //save to db
                 this.setState({items:tempList})
-                fetch(`${api_name}/blacklist?items=${encodeURIComponent(itemString)}&store=${encodeURIComponent(this.state.storeName)}`, {
+                fetch(`${serveo_name}/blacklist?items=${encodeURIComponent(itemString)}&store=${encodeURIComponent(this.state.storeName)}`, {
                 method: 'put',
                 })
             }
@@ -102,7 +101,7 @@ class Blacklist extends Component {
         let itemString = JSON.stringify(tempList)
         //save to db
         this.setState({items:tempList})
-        fetch(`${api_name}/blacklist?items=${encodeURIComponent(itemString)}&store=${encodeURIComponent(this.state.storeName)}`, {
+        fetch(`${serveo_name}/blacklist?items=${encodeURIComponent(itemString)}&store=${encodeURIComponent(this.state.storeName)}`, {
             method: 'put',
         })
         }
@@ -117,7 +116,7 @@ class Blacklist extends Component {
 
     //get items on blacklist of current store
     async getItems(){
-        let temp = await fetch(`${api_name}/blacklist?store=${encodeURIComponent(this.state.storeName)}`, {
+        let temp = await fetch(`${serveo_name}/blacklist?store=${encodeURIComponent(this.state.storeName)}`, {
             method: 'get',
         })
         let json = await temp.json()
