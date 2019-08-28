@@ -1,6 +1,6 @@
 import React from "react"
 import {serveo_name} from '../config'
-
+let api_name = "https://"+serveo_name;
 class Revert extends React.Component{
   constructor(props){
     super(props);
@@ -27,7 +27,7 @@ class Revert extends React.Component{
 
   async getFulfillmentService(shop = this.state.shop){
     var temp;
-    temp = await fetch(`${serveo_name}/revert/fulserv/firestore/id?shop=${encodeURIComponent(shop)}`, {
+    temp = await fetch(`${api_name}/revert/fulserv/firestore/id?shop=${encodeURIComponent(shop)}`, {
       method: 'get',
     }).catch((error) => {return undefined;})
     var json  = await temp.json();
@@ -39,7 +39,7 @@ class Revert extends React.Component{
    }
 
    del(product_id, callback = doNothing){
-     fetch(`${serveo_name}/products?id=${encodeURIComponent(product_id)}`, {
+     fetch(`${api_name}/products?id=${encodeURIComponent(product_id)}`, {
        method: 'delete',
        })
        .then((response) => {
@@ -56,13 +56,13 @@ class Revert extends React.Component{
 
     async delProduct(gitID){
      var temp;
-     temp = await fetch(`${serveo_name}/firestore/product/git/?gitID=${encodeURIComponent(gitID)}`, {
+     temp = await fetch(`${api_name}/firestore/product/git/?gitID=${encodeURIComponent(gitID)}`, {
        method: 'delete',
      })
    }
 
   async getGitCollectionId() {
-    fetch(`${serveo_name}/revert/collections/all/?shop=${encodeURIComponent(this.state.shop)}`, {
+    fetch(`${api_name}/revert/collections/all/?shop=${encodeURIComponent(this.state.shop)}`, {
       method: 'get',
       })
       .then((response) => {
@@ -86,7 +86,7 @@ class Revert extends React.Component{
   }
 
   deleteGitCollect(gitCollectionId){
-    fetch(`${serveo_name}/revert/collections?id=${encodeURIComponent(gitCollectionId)}&shop=${encodeURIComponent(this.state.shop)}`, {
+    fetch(`${api_name}/revert/collections?id=${encodeURIComponent(gitCollectionId)}&shop=${encodeURIComponent(this.state.shop)}`, {
       method: 'delete',
       })
       .then((response) => {
@@ -100,7 +100,7 @@ class Revert extends React.Component{
   }
 
   deleteFulserv(fulservId){
-    fetch(`${serveo_name}/revert/fulserv?id=${encodeURIComponent(fulservId)}&shop=${encodeURIComponent(this.state.shop)}`, {
+    fetch(`${api_name}/revert/fulserv?id=${encodeURIComponent(fulservId)}&shop=${encodeURIComponent(this.state.shop)}`, {
       method: 'delete',
       })
       .then((response) => {
@@ -115,7 +115,7 @@ class Revert extends React.Component{
 
   deleteAllGitProducts(gitCollectionId){
     //Delete all Get it Today
-    fetch(`${serveo_name}/revert/collections?id=${encodeURIComponent(gitCollectionId)}&shop=${encodeURIComponent(this.state.shop)}`, {
+    fetch(`${api_name}/revert/collections?id=${encodeURIComponent(gitCollectionId)}&shop=${encodeURIComponent(this.state.shop)}`, {
       method: 'GET',
       })
       .then((response) => {
@@ -134,7 +134,7 @@ class Revert extends React.Component{
   //1.get all ids from db 2.delete scriptTag from Shopify by id 3. Update status as "revert" in DB
   async revertScriptTag(){
     //get all ids and save in idsArray
-    let scripttagIDTemp = await fetch(`${serveo_name}/revert/scriptTag/db/ids?shop=${encodeURIComponent(this.state.shop)}`, {
+    let scripttagIDTemp = await fetch(`${api_name}/revert/scriptTag/db/ids?shop=${encodeURIComponent(this.state.shop)}`, {
       method: 'get',
     })
     let scripttagIDJson = await scripttagIDTemp.json()
@@ -142,14 +142,14 @@ class Revert extends React.Component{
     //for each id, delete from shopify
     for(let i=0;i<idsArray.length; i++){
       console.log(idsArray[i])
-      let deleteTemp = await fetch(`${serveo_name}/revert/scriptTag/shopify?id=${encodeURIComponent(idsArray[i])}&shop=${encodeURIComponent(this.state.shop)}`,{
+      let deleteTemp = await fetch(`${api_name}/revert/scriptTag/shopify?id=${encodeURIComponent(idsArray[i])}&shop=${encodeURIComponent(this.state.shop)}`,{
         method:'delete'
       })
       let deleteJson = await deleteTemp.json()
       console.log(`${idsArray[i]} is deleted ${deleteJson}`)
     }
     //update status as "revert" in database
-    let statusTemp = await fetch(`${serveo_name}/revert/scriptTag/db/status?shop=${encodeURIComponent(this.state.shop)}`, {
+    let statusTemp = await fetch(`${api_name}/revert/scriptTag/db/status?shop=${encodeURIComponent(this.state.shop)}`, {
       method: 'get',
     })
     let revertResp = await statusTemp.json()

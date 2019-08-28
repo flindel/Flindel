@@ -7,7 +7,7 @@ import ReturnShipment from './returnShipment'
 import AssembleOrders from './assembleOrders'
 import DropOff from './dropOff'
 import DeliverOrders from './deliverOrders'
-import Revert from './revert'
+import Revert from './Revert'
 import {serveo_name} from '../config'
 const sname = serveo_name
 const serveoname = sname.substring(8)
@@ -63,7 +63,7 @@ class Interface extends Component {
     goRevert(){
         this.setState({step:8})
     }
-    
+
     //conditional render - step1 for enter store, step2 for doing stuff
     render() {
         if (this.state.step == 1){
