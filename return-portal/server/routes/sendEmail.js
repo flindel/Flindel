@@ -53,7 +53,7 @@ router.post("/update", async ctx => {
         {
           to: [
             {
-              email: "booleafs17@yahoo.ca" //change to EMAIL once live
+              email: email //change to EMAIL once live
             }
           ],
           subject: "Status Update"

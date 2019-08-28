@@ -20,4 +20,7 @@ module.exports = withCSS({
     HACK_removeMinimizeOptionFromCssLoaders(config);
     return config;
   },
+  publicRuntimeConfig: {
+    API_URL: process.env.API_URL
+  }
 });

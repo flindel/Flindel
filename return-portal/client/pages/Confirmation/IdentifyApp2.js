@@ -11,7 +11,7 @@ import '@shopify/polaris/styles.css';
 import {serveo_name} from '../config.js'
 const sname = serveo_name;
 //const serveoname = serveo_name;
-const serveoname = `${process.env.API_URL}`.substring(8);
+let serveoname = '';
 let shop = ''
 
 class IdentifyApp extends Component {
@@ -67,6 +67,8 @@ class IdentifyApp extends Component {
 
     //load return policy - have to expand this to multiple stores once we load
     async componentDidMount(){
+        serveoname = this.props.serveoname.substring(8)
+        console.log("serveoname++++++"+serveoname)
         shop = window.location.hostname
         console.log('shop-----'+shop)
         this.setState({
