@@ -5,6 +5,9 @@ import Blacklist from './Blacklist'
 import OnboardProcess from './OnboardProcess'
 import Revert from './Revert'
 import {serveo_name} from '../config'
+let api_name = "https://"+serveo_name;
+
+
 import { post, put, postCollection, getSmartCollections} from './Shopify'
 
 let unpublished = 0;
@@ -69,7 +72,7 @@ class DuplicateApp extends Component {
       return;
     }
     this.setState({isUnpublishing:true})
-    fetch(`${serveo_name}/collections?id=${encodeURIComponent(this.state.gitCollectionId)}`, {
+    fetch(`${api_name}/collections?id=${encodeURIComponent(this.state.gitCollectionId)}`, {
       method: 'GET',
       })
       .then((response) => {
@@ -101,7 +104,7 @@ class DuplicateApp extends Component {
     this.setState({isUnpublishing:true})
 
     //Publish ALl Get it Today
-    fetch(`${serveo_name}/collections?id=${encodeURIComponent(this.state.gitCollectionId)}`, {
+    fetch(`${api_name}/collections?id=${encodeURIComponent(this.state.gitCollectionId)}`, {
       method: 'GET',
       })
       .then((response) => {

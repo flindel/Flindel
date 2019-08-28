@@ -2,6 +2,9 @@ import React, { Component } from 'react';
 import DisplayIssue from './DisplayIssue';
 import FixIssues from './FixIssues';
 import {serveo_name} from '../config'
+let api_name = "https://"+serveo_name;
+
+
 import {get} from './Shopify'
 import {getGitProduct, getOrigProduct, delProduct} from './Firestore'
 
@@ -51,7 +54,7 @@ class FindIssues extends Component {
       displayUpdates: [],
     })
     //Assumption, Brand has less than 250 inventory item/product variations
-    fetch(`${serveo_name}/collections?id=${encodeURIComponent(collection_all_products_id)}`, {
+    fetch(`${api_name}/collections?id=${encodeURIComponent(collection_all_products_id)}`, {
       method: 'GET',
       })
       .then((response) => {
@@ -65,7 +68,7 @@ class FindIssues extends Component {
       })
       .catch((error) => console.log(error))
 
-    fetch(`${serveo_name}/collections?id=${encodeURIComponent(collection_get_it_today_id)}`, {
+    fetch(`${api_name}/collections?id=${encodeURIComponent(collection_get_it_today_id)}`, {
       method: 'GET',
       })
       .then((response) => {
