@@ -1,8 +1,9 @@
 import {serveo_name} from '../config'
+let api_name = "https://"+serveo_name;
 import {postProduct, delProduct, getGitProduct} from './Firestore'
 
 export function get(product_id, callback = doNothing){
-  fetch(`${serveo_name}/products?id=${encodeURIComponent(product_id)}`, {
+  fetch(`${api_name}/products?id=${encodeURIComponent(product_id)}`, {
     method: 'get',
     })
     .then((response) => {
@@ -17,7 +18,7 @@ export function get(product_id, callback = doNothing){
 }
 
 export function getShopID(callback, args = []){
-  fetch(`${serveo_name}/shop/id/`, {
+  fetch(`${api_name}/shop/id/`, {
     method: 'get',
     })
     .then((response) => {
@@ -36,7 +37,7 @@ export function getShopID(callback, args = []){
 }
 
 export function del(product_id, callback = doNothing){
-  fetch(`${serveo_name}/products?id=${encodeURIComponent(product_id)}`, {
+  fetch(`${api_name}/products?id=${encodeURIComponent(product_id)}`, {
     method: 'delete',
     })
     .then((response) => {
@@ -60,7 +61,7 @@ export function put(product_id, body, callback = doNothing, args = []){
     },
       body: JSON.stringify(body),
   }
-  fetch(`${serveo_name}/products?id=${encodeURIComponent(product_id)}`, options)
+  fetch(`${api_name}/products?id=${encodeURIComponent(product_id)}`, options)
     .then((response) => {
       if(response.ok){return response.json()}
       else{throw Error(response.statusText)}
@@ -85,7 +86,7 @@ export function post(body, callback = doNothing){
     },
       body: JSON.stringify(body),
   }
-  fetch(`${serveo_name}/products`, options)
+  fetch(`${api_name}/products`, options)
     .then((response) => {
       if(response.ok){return response.json()}
       else{throw Error(response.statusText)}
@@ -106,7 +107,7 @@ export function postCollection(body, callback = doNothing){
     },
       body: JSON.stringify(body),
   }
-  fetch(`${serveo_name}/collections/`, options)
+  fetch(`${api_name}/collections/`, options)
     .then((response) => {
       if(response.ok){return response.json()}
       else{throw Error(response.statusText)}
@@ -120,7 +121,7 @@ export function postCollection(body, callback = doNothing){
 }
 
 export function getSmartCollections(callback = doNothing){
-  fetch(`${serveo_name}/collections/all/`, {
+  fetch(`${api_name}/collections/all/`, {
     method: 'get',
     })
     .then((response) => {
@@ -156,7 +157,7 @@ export function postGitVariant(product_id, variants, update, callback = doNothin
     },
       body: JSON.stringify(body),
   }
-  fetch(`${serveo_name}/products/variant?id=${encodeURIComponent(product_id)}`, options)
+  fetch(`${api_name}/products/variant?id=${encodeURIComponent(product_id)}`, options)
     .then((response) => {
       if(response.ok){return response.json()}
       else{throw Error(response.statusText)}
@@ -177,7 +178,7 @@ export function delGitVariant(product_id, variant_id, update, callback = doNothi
       'Content-Type': 'application/json'
     },
   }
-  fetch(`${serveo_name}/products/variant?id=${encodeURIComponent(product_id)}&variant_id=${encodeURIComponent(variant_id)}`, options)
+  fetch(`${api_name}/products/variant?id=${encodeURIComponent(product_id)}&variant_id=${encodeURIComponent(variant_id)}`, options)
     .then((response) => {
       if(response.ok){return response.json()}
       else{throw Error(response.statusText)}
@@ -227,7 +228,7 @@ export function postGIT(body, orig, callback = doNothing){
     },
       body: JSON.stringify(body),
   }
-  fetch(`${serveo_name}/products`, options)
+  fetch(`${api_name}/products`, options)
     .then((response) => {
       if(response.ok){return response.json()}
       else{throw Error(response.statusText)}
@@ -260,7 +261,7 @@ export function postScriptTag(url){
         }
       }),
   }
-  fetch(`${serveo_name}/scriptTag/`, options)
+  fetch(`${api_name}/scriptTag/`, options)
     .then((response) => {
       if(response.ok){return response.json()}
       else{throw Error(response.statusText)}
@@ -281,7 +282,7 @@ export function postFulfillmentService() {
       "Content-Type": "application/json"
     }
   };
-  fetch(`${serveo_name}/fulserv`, options)
+  fetch(`${api_name}/fulserv`, options)
     .then(response => {
       if (response.ok) {
         return response.json();
@@ -291,7 +292,7 @@ export function postFulfillmentService() {
     })
     .then(data => {
       console.log("POST Fulfillment Service: ", data)
-      fetch(`${serveo_name}/fulserv/firestore/id?body=${encodeURIComponent(JSON.stringify({"fulfillment_service": data.fulfillment_service.id}))}`, {
+      fetch(`${api_name}/fulserv/firestore/id?body=${encodeURIComponent(JSON.stringify({"fulfillment_service": data.fulfillment_service.id}))}`, {
         method: 'post',
       })
     })

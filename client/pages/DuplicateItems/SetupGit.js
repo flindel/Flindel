@@ -1,7 +1,6 @@
 import React, { Component } from 'react';
 import {postCollection, getShopID, postFulfillmentService} from './Shopify';
 import {postInstallTime} from './Firestore';
-import {serveo_name} from '../config.js'
 const text = {
   textAlign: 'left',
 }
@@ -28,23 +27,6 @@ class SetupGit extends Component {
     this.callbackOrig = this.callbackOrig.bind(this);
     this.setShopID = this.setShopID.bind(this);
     getShopID(this.setShopID);
-
-    const options = {
-      method: 'get',
-      headers: {
-        'Accept': 'application/json, text/plain, */*',
-        'Content-Type': 'application/json'
-      },
-    }
-    fetch(`${serveo_name}/priceRule/all/`, options)
-      .then((response) => {
-        if(response.ok){return response.json()}
-        else{throw Error(response.statusText)}
-      })
-      .then((data) => {
-        console.log('ALL PRICE RULES: ', data);
-      })
-      .catch((error) => console.log(error))
   }
 
   setShopID(data){
