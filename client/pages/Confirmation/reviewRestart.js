@@ -31,10 +31,6 @@ class ReviewRestart extends Component {
         this.props.restartReturn(this.state.orderNum, this.state.email, this.state.code)
     }
 
-    componentDidMount(){
-        console.log(this.props)
-    }
-
     render(){
         return (
             <div className = 'pageReviewRestart'>

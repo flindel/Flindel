@@ -69,16 +69,13 @@ class IdentifyApp extends Component {
             shopDomain: shop
         })
         if(shop.indexOf('myshopify')==-1){
-            console.log("shop====="+shop)
             //if the hostname is not a .myshopify domain, get myshopifyDomain from DB
             let domain = await fetch(`https://${serveoname}/shop/myshopifydomain?shop=${encodeURIComponent(shop)}`, {
                 method: 'get',
             })
             let domainJson = await domain.json()
             shop = domainJson.myshopifyDomain
-            console.log('shop++++'+shop)
         }
-        console.log(shop)
         //get return policy from db
         let temp = await fetch(`https://${serveoname}/shop/returnPolicy?shop=${encodeURIComponent(shop)}`, {
             method: 'get',
@@ -273,7 +270,6 @@ class IdentifyApp extends Component {
 
       //check returns database to see if return already exists
     async checkReturnsFromDB(orderNum,shopDomain){
-        console.log(this.state.shopDomain + ' ------A-----')
         let temp = await fetch(`https://${serveoname}/return/requested/exists?orderNum=${encodeURIComponent(orderNum)}&shopDomain=${encodeURIComponent(this.state.shopDomain)}`, {
             method: 'get',
         })
