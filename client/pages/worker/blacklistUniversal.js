@@ -64,14 +64,24 @@ class Blacklist extends Component {
     }
     //check if product actually exists
     async doesProductExist(ID){
+        let valid = false
         let temp = await fetch(`https://${serveoname}/products?shop=${encodeURIComponent(this.state.storeName)}&id=${encodeURIComponent(ID)}`, {
             method: 'get',
         })
         let response = await temp.json()
         if (response){
-            response = true
+            valid = true
         }
-        return response
+        else{
+            let temp2 = await fetch(`https://${serveoname}/products/variant/exists?store=${encodeURIComponent(this.state.storeName)}&id=${encodeURIComponent(ID)}`, {
+                method: 'get',
+            })
+           let response2 = await temp2.json()
+           if (response2){
+               valid = true
+           }
+        }
+        return valid
     }
 
     //add item to blacklist (on submit of add)
@@ -183,11 +193,11 @@ class Blacklist extends Component {
             <div>
                 <h1 className = 'scHeader'>Blacklist - {this.state.storeName} </h1>
                 <br/>
-                <label>Add item (PRODUCT ID):
+                <label>Add item (ID):
                     <input value = {this.state.addIn} onChange = {this.handleChangeAdd} type = 'text'></input>
                 </label>
                 <button onClick = {this.addToBlacklist}>ADD</button>
-                <label> Delete item (PRODUCT ID):
+                <label> Delete item (ID):
                     <input onChange = {this.handleChangeDelete} value = {this.state.deleteIn} type = 'text'></input>
                 </label>
                 <button onClick = {this.deleteFromBlacklist}>DELETE</button>

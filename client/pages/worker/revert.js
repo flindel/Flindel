@@ -165,7 +165,7 @@ class Revert extends React.Component{
 
   async handleClick(){
     let textValue = document.getElementById("storeName").value;
-    var confirmed = confirm("This will remove all Flidel Services from "+textValue+". \nAre you sure you want to proceed?")
+    var confirmed = confirm("This will remove all Flindel Services from "+textValue+". \nAre you sure you want to proceed?")
     if (confirmed){
       textValue = textValue+".myshopify.com"
       this.setState({shop: textValue})

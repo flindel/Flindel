@@ -246,7 +246,6 @@ async function sendRefundEmail(orderList, email) {
 
 //send email to store about orders that need to be refunded
 async function sendFulfillmentEmail(fulfillments) {
-  console.log(fulfillments)
   const headers = {};
   headers["Accept"] = "application/json";
   headers["Content-Type"] = "application/json";

@@ -45,7 +45,6 @@ async function completeReturnItem(db, orderId, varId, itemId, quantity, store, c
 async function updateFulfillment(db, store, orderId, itemId, quantity){
     //get access token to update fulfillment
     let {accessToken, torontoLocation} = await inv.getAccessToken(db, store)
-    //console.log(temp.fulfillment.line_items)
     const option = {
         method: 'post',
         url: `https://${store}/${api_link}/orders/${orderId}/fulfillments.json`,
