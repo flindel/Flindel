@@ -1,13 +1,8 @@
 import {serveo_name} from '../config'
 let api_name = "https://"+serveo_name;
 
-export async function postInstallTime(data){
-  var temp;
-  temp = await fetch(`${api_name}/shop/install_time/?body=${encodeURIComponent(JSON.stringify(data))}`, {
-    method: 'post',
-  })
-}
 
+//posts Get it today product ID and original product ID to firestore.
 export async function postProduct(data, callback = doNothing){
   var temp;
   temp = await fetch(`${api_name}/firestore/product/git/?body=${encodeURIComponent(JSON.stringify(data))}`, {
@@ -16,6 +11,7 @@ export async function postProduct(data, callback = doNothing){
   callback(data);
 }
 
+//gets pair of Git and Original product IDs, using a GIT ID.
 export async function getGitProduct(gitID, callback = doNothing, args = []){
   var temp;
   temp = await fetch(`${api_name}/firestore/product/git/?gitID=${encodeURIComponent(gitID)}`, {
@@ -30,6 +26,7 @@ export async function getGitProduct(gitID, callback = doNothing, args = []){
   }
 }
 
+//deletes pair of GIT and Original product using GIT product ID.
 export async function delProduct(gitID){
   var temp;
   temp = await fetch(`${api_name}/firestore/product/git/?gitID=${encodeURIComponent(gitID)}`, {
@@ -37,6 +34,7 @@ export async function delProduct(gitID){
   })
 }
 
+//gets pair of Git and Original product IDs, using a Original product ID.
 export async function getOrigProduct(orig_id, callback = doNothing){
  var temp;
  temp = await fetch(`${api_name}/firestore/product/orig/?origID=${encodeURIComponent(orig_id)}`, {

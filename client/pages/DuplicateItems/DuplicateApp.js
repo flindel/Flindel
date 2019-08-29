@@ -11,6 +11,8 @@ let api_name = "https://"+serveo_name;
 import { post, put, postCollection, getSmartCollections} from './Shopify'
 
 let unpublished = 0;
+
+//Parent Component to onboarding, and admin app.
 class DuplicateApp extends Component {
   constructor(props){
     super(props);
@@ -35,11 +37,13 @@ class DuplicateApp extends Component {
     getSmartCollections(this.setIsGitSetup);
   }
 
+  //Allows child components to set state of Duplicate App
   extSetState(json){
     this.setState(json);
     getSmartCollections(this.setIsGitSetup);
   }
 
+  //Makes sure the Get it Today and Original collections are in store
   setIsGitSetup(data){
     const collections = data.smart_collections;
     let isGitCollect = false;
@@ -66,6 +70,7 @@ class DuplicateApp extends Component {
     this.setState({isBlackList: bool});
   }
 
+  //Unbublises all Get it Today products
   unpublishAllGit(){
     var confirmed = confirm("This will stop all customers from viewing and purchasing Get it Today Products.\nAre you sure you want to proceed?")
     if (!confirmed){
@@ -96,6 +101,7 @@ class DuplicateApp extends Component {
       })
   }
 
+  //Publishes all get it today products
   publishAllGit(){
     var confirmed = confirm("This will make all Get it Today Products avaliable to your customers. \nAre you sure you want to proceed?")
     if (!confirmed){
@@ -128,6 +134,7 @@ class DuplicateApp extends Component {
       })
   }
 
+  //Tracks progress of unpublishing and publishing.
   finishUnpublish(data, args){
     let numOfGitProducts = args[0];
     unpublished += 1;
@@ -182,7 +189,7 @@ class DuplicateApp extends Component {
         </div>
       )
     }
-    if (this.state.ui == 3){
+    if (this.state.ui == 3){//Unpublishing/Publishing progress screen
       return(
         <div>
           {!this.state.isUnpublishing &&
@@ -202,7 +209,7 @@ class DuplicateApp extends Component {
         </div>
       )
     }
-    if(this.state.ui == 4){
+    if(this.state.ui == 4){//Revert Function Should be removed from ADMIN APP
       return(
         <Revert />
       )

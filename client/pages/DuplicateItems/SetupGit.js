@@ -1,6 +1,5 @@
 import React, { Component } from 'react';
 import {postCollection, getShopID, postFulfillmentService} from './Shopify';
-import {postInstallTime} from './Firestore';
 const text = {
   textAlign: 'left',
 }
