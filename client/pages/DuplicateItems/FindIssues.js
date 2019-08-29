@@ -14,6 +14,8 @@ let collection_get_it_today_id = "97721155681";
 
 let key = 1;
 
+//Goes through all products on store and finds any discrepancies between original and GIT products
+//Passes this.state.updates to Fix issues after user clicks Update Products
 class FindIssues extends Component {
   constructor(props){
     collection_all_products_id = props.collection_all_products_id;

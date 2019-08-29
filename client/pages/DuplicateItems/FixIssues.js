@@ -20,6 +20,8 @@ const normPara = {
                   defaultCorrection:["manual", 100, .1]
                 }
 
+//Takes in update array from parent component FindIssues
+//Goes through each update in update array and applies fixes.
 class FixIssues extends Component {
   constructor(props){
     super(props);
@@ -32,6 +34,7 @@ class FixIssues extends Component {
     this.fixGitVarDne2 = this.fixGitVarDne2.bind(this);
   }
 
+  //tracks the number of fixes that have been completed.
   finishedFixing(data){
     fixes += 1
     console.log("Fixes", fixes)
@@ -42,6 +45,7 @@ class FixIssues extends Component {
     }
   }
 
+  //After user clicks update products, trigger loop to go through each individual update and apply fix
   handleClick(updates1, reloadFunction1){
     fixes = 0;
     updates = updates1;
@@ -72,7 +76,8 @@ class FixIssues extends Component {
     }
   }
 
-  //PUT REQUEST
+  //Fixes any unequal parameters between GIT and original
+  //Copies over information from original and replaces GIT info
   fixUnequalParameters(update){
     let gitBody = update.norm;
     gitBody.title = update.norm.title + " - Get it Today";
@@ -80,6 +85,7 @@ class FixIssues extends Component {
     getGitProduct(update.git.id, this.fixUnequalVariants, [update, gitBody]);
   }
 
+  //Fixes any unequal variants, copies original var info and replaces git var info.
   fixUnequalVariants(fsData, args){
     let update = args[0];
     let gitBody = args[1];
@@ -88,22 +94,29 @@ class FixIssues extends Component {
     put(update.git.id, body, this.finishedFixing);
   }
 
+  //Fixes if a normal variant does not exist.
+  //Fix will delete git variant.
   fixNormVarDne(update){
     const product_id = update.git.id;
     const variant_id = update.variantIssues[0].gitVar;
     delGitVariant(product_id, variant_id, update, this.finishedFixing);
   }
 
+  //Fixes if a git variant does not exist
+  //Fix will create a git variant with the same info as the original variant
   fixGitVarDne(update){
     getGitProduct(update.git.id, this.fixGitVarDne2, [update])
   }
 
+  //callback function for fixGitVarDne
   fixGitVarDne2(fsData, args){
     let update = args[0];
     const variants = this.normVarToGitVar(update, fsData);
     postGitVariant(update.git.id, variants, update, this.finishedFixing);
   }
 
+  //Converts an original variant to a GIT variant.
+  //Copies over the majority of information except for fulfillment service and weight.
   normVarToGitVar(update, fsData){
     let normVariants = update.norm.variants.slice();
     let newVariants = [];
@@ -132,6 +145,7 @@ class FixIssues extends Component {
     return newVariants.slice();
   }
 
+  //from a normal variant ID and firestore data, find git variant ID
   findGitVarID(fsData, normVarID){
     for (let j = 0; j < fsData.variants.length; j++){
       if (fsData.variants[j].orig_var+"" == normVarID+"") {
@@ -140,6 +154,7 @@ class FixIssues extends Component {
     }
   }
 
+  //With a git variant ID find git variant info.
   findGitVar(gitVariants, gitVarID){
     for (let k = 0; k < gitVariants.length; k++){
       if(gitVariants[k].id == gitVarID){
@@ -148,6 +163,8 @@ class FixIssues extends Component {
     }
   }
 
+  //Fixes if a git product does not have the correct parameters for get it Today
+  //Changes fulfillment service and weight.
   fixGitDefaultPara(update){
     let gitBody = update.git;
     for(let j = 0; j < update.git.variants.length; j++){
@@ -159,6 +176,9 @@ class FixIssues extends Component {
     put(update.git.id, body, this.finishedFixing);
   }
 
+  //Fixes if a Original product has parameters that conflict with Get it Today
+  //Changes value for fulfillment service to manual if set to flindel.
+  //Changes value for weight to 100g if set to 0g.
   fixNormDefaultPara(update){
     let normBody = update.norm;
     for(let j = 0; j < update.norm.variants.length; j++){

@@ -34,8 +34,6 @@ router.post("/", async ctx => {
   };
   try {
     ctx.body = await rp(option);
-
-    console.log("ME " + JSON.stringify(ctx.body));
   } catch (err) {
     console.log(err.message);
     if (err instanceof errors.StatusCodeError) {
@@ -58,8 +56,8 @@ router.get("/", async ctx => {
     url: `https://${shop}/${api_link}/fulfillment_services.json?scope=all`,
     headers: {
       "X-Shopify-Access-Token": accessToken,
-      'Accept': 'application/json',
-      'Content-Type': 'application/json',
+      Accept: "application/json",
+      "Content-Type": "application/json"
     },
     json: true
   };
@@ -126,19 +124,18 @@ router.post("/firestore/id", async ctx => {
   ctx.body = "success";
 });
 
-router.get('/firestore/id', async ctx => {
-  ctx.set('Access-Control-Allow-Origin', '*');
-  ctx.set('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept');
-  ctx.set('Access-Control-Allow-Methods', 'POST, GET, PUT, DELETE, OPTIONS');
-  db = ctx.db
+router.get("/firestore/id", async ctx => {
+  ctx.set("Access-Control-Allow-Origin", "*");
+  ctx.set(
+    "Access-Control-Allow-Headers",
+    "Origin, X-Requested-With, Content-Type, Accept"
+  );
+  ctx.set("Access-Control-Allow-Methods", "POST, GET, PUT, DELETE, OPTIONS");
+  db = ctx.db;
   const { shop } = await getShopHeaders(ctx);
   console.log("SHOP:", shop);
-  let myRef = db.collection('store').doc(shop);
-  getDoc = await myRef.get()
+  let myRef = db.collection("store").doc(shop);
+  getDoc = await myRef.get();
   ctx.body = getDoc;
-})
-
-//next get a listner for webhook that will provide json info of what fullfilment was created and make email to email to us
-//give tracking numbers
-
+});
 module.exports = router;

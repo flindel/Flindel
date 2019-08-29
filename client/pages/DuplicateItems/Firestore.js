@@ -48,6 +48,7 @@ export async function getOrigProduct(orig_id, callback = doNothing){
  }
 }
 
+//Gets fulfillment service id from firestore
 export async function getFulfillmentService(){
   var temp;
   temp = await fetch(`${api_name}/fulserv/firestore/id`, {
@@ -74,5 +75,5 @@ function formatJSON(json){
   }
   return newJSON;
 }
-
+//helper for formatJSON
 function formatJSONArray(array){return array.map(x => formatJSON(x.mapValue.fields));}

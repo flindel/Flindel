@@ -5,12 +5,8 @@ const text = {
 }
 
 import Button from '@material-ui/core/Button';
-import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
-import DateTimePicker from 'material-ui-datetimepicker';
-import DatePickerDialog from 'material-ui/DatePicker/DatePickerDialog'
-import TimePickerDialog from 'material-ui/TimePicker/TimePickerDialog';
 
-//Dynamic Setup Process, only runs if the brand accidentally deletes GIT and Orig Collection
+//Dynamic Setup Process, only runs if the brand accidentally deletes GIT or Orig Collection
 class SetupGit extends Component {
   constructor(props){
     super(props);
@@ -32,22 +28,12 @@ class SetupGit extends Component {
     this.setState(
       {
         shop_id: data.shop_id,
-        install_time: data.install_time,
       }
     )
   }
 
-  setDate(dateTime){
-    this.setState({install_time: dateTime})
-    console.log("dateTime", dateTime);
-    const body = {
-      shop_id: this.state.shop_id,
-      install_time: dateTime,
-    }
-    console.log("BODY: ", body)
-    postInstallTime(body);
-  }
-
+  //Posts GIT and original Collections
+  //Posts fulfillment service
   setup(){
     if (!this.state.isGitCollectSetup) {
       postCollection({
@@ -80,10 +66,12 @@ class SetupGit extends Component {
     postFulfillmentService();
   }
 
+  //Stores git collection ID in parent component DuplicateApp
   callbackGit(data){
     this.state.extSetState({gitCollectionId: data.smart_collection.id})
   }
 
+  //Stores orig collection ID in parent component DuplicateApp
   callbackOrig(data){
     this.state.extSetState({origCollectionId: data.smart_collection.id})
   }

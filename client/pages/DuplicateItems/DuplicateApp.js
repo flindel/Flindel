@@ -3,7 +3,6 @@ import FindIssues from './FindIssues'
 import SetupGit from './SetupGit'
 import Blacklist from './Blacklist'
 import OnboardProcess from './OnboardProcess'
-import Revert from './Revert'
 import {serveo_name} from '../config'
 let api_name = "https://"+serveo_name;
 
@@ -70,7 +69,7 @@ class DuplicateApp extends Component {
     this.setState({isBlackList: bool});
   }
 
-  //Unbublises all Get it Today products
+  //Unbublishes all Get it Today products
   unpublishAllGit(){
     var confirmed = confirm("This will stop all customers from viewing and purchasing Get it Today Products.\nAre you sure you want to proceed?")
     if (!confirmed){
@@ -197,7 +196,6 @@ class DuplicateApp extends Component {
               <button onClick={() => this.setState({ui:0})}>Product Updates</button>
               <button onClick={() => this.unpublishAllGit()}>UNPUBLISH GET IT TODAY PRODUCTS</button>
               <button onClick={() => this.publishAllGit()}>PUBLISH GET IT TODAY PRODUCTS</button>
-              <button onClick={() => this.setState({ui:4})}>Revert</button>
             </div>
           }
           {this.state.isUnpublishing &&
@@ -207,11 +205,6 @@ class DuplicateApp extends Component {
             </div>
           }
         </div>
-      )
-    }
-    if(this.state.ui == 4){//Revert Function Should be removed from ADMIN APP
-      return(
-        <Revert />
       )
     }
   }
