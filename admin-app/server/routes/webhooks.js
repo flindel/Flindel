@@ -88,7 +88,8 @@ router.post("/hookorderendpoint", webhookOrder, async ctx => {
           JSON.stringify(flindelItems)
         )}&store=${encodeURIComponent(
           ctx.header["x-shopify-shop-domain"]
-        )}&orderid=${encodeURIComponent(hookload.id)}`,
+          //use order name for refund email
+        )}&orderid=${encodeURIComponent(hookload.name)}`,
         {
           method: "post"
         }
