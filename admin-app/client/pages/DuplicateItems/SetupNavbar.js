@@ -1,5 +1,5 @@
 import React, {Component} from 'react';
-import '../Confirmation/universal.css'
+import './universal.css'
 import './adminApp.css'
 
 //Progress bar used for onboarding process
