@@ -1,5 +1,5 @@
 FROM node:12.8.1
-WORKDIR /Users/ludi/Desktop/Flindel-intern/Fldl 2/return-portal
+WORKDIR /usr/src/return-portal
 COPY package*.json ./
 RUN npm install
 COPY . .
