@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import '../Confirmation/universal.css'
 import './flindelInterface.css'
 import {serveo_name} from '../config'
+import Select from 'react-select'
 import Item from './itemSC'
 const serveoname = serveo_name
 
@@ -16,7 +17,9 @@ class returnShipment extends Component {
             start: true,
             code: '',
             existing: '',
-            existingBrand: ''
+            existingBrand: '',
+            stores: [],
+            activeStore:[]
         }
         this.goBeginning = this.goBeginning.bind(this)
         this.selectItems = this.selectItems.bind(this)
@@ -30,10 +33,21 @@ class returnShipment extends Component {
         this.isCodeUnique = this.isCodeUnique.bind(this)
         this.confirmShipment = this.confirmShipment.bind(this)
         this.handleChangeExisting = this.handleChangeExisting.bind(this)
+        this.handleStoreChange = this.handleStoreChange.bind(this)
+
     }
     //go back to beinning
     goBeginning(){
         this.setState({step:1, store: ''})
+    }
+
+    handleStoreChange(option){
+        this.setState(state => {
+            return {
+              activeStore: option
+            };
+          });
+        this.setState({store: option.value + '.myshopify.com'})
     }
 
     //go to confirmation page
@@ -191,6 +205,22 @@ class returnShipment extends Component {
         }
         this.setState({items:items})
     }
+    
+    async componentDidMount(){
+        let temp = await fetch(`https://${serveoname}/shop/all`, {
+            method: 'get',
+        })
+        let tJSON = await temp.json()
+        let stores = []
+        for (var i = 0;i<tJSON.length;i++){
+            let tempStore = {
+                value: tJSON[i],
+                label: tJSON[i] + '.myshopify.com'
+            }
+            stores.push(tempStore)
+        }
+        this.setState({stores:stores})
+    }
 
     //conditional render - step1 for enter store, step2 for doing stuff
     render() {
@@ -201,12 +231,9 @@ class returnShipment extends Component {
                     <br/>
                     <h4>Please select desired store from the list below.</h4>
                     <br/>
-                    <select value={this.state.store} onChange={this.handleStoreSelect}>
-                        <option value="">---</option>
-                        <option value="getordertest.myshopify.com">GetOrderTest</option>
-                        <option value="ds-test-yash-kini.myshopify.com">DS Test Yash Kini</option>
-                        <option value="flindel-demo-1.myshopify.com">Flindel Demo 1</option>
-                    </select>
+                    <div className = 'workerStoreBar'>
+                    <Select placeholder = {'Select store...'} isSearchable = {false} value = {this.state.activeStore} options = {this.state.stores} onChange = {this.handleStoreChange}/>
+                    </div>
                     <button onClick = {this.selectItems}>SUBMIT</button>
                     <br/><br/><br/><br/><br/><br/><br/><br/>
                     <p>After receiving confirmation from a partner that a shipment arrived, please enter the code below.</p>

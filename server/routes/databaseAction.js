@@ -5,6 +5,7 @@ const router = Router({
 const rp = require("request-promise");
 const errors = require("request-promise/errors");
 const { getTime } = require("../serverFunctions");
+const Helper = require ('../util/webhookHelper')
 
 router.get("/fetch_stock", async ctx => {
   ctx.set("Access-Control-Allow-Origin", "*");
@@ -90,6 +91,7 @@ router.post("/update_order_database", async ctx => {
   payload["comment"] = "";
 
   for (let i = 0; i < items.length; i++) {
+    Helper.sellReturnItem(ctx.db, items[i].variant_id.toString(),ctx.query.source,orderId)
     itemList[i] = {
       itemid: items[i].id.toString(),
       variantid: items[i].variant_id.toString(),

@@ -1,5 +1,6 @@
 import React from "react"
 import {serveo_name} from '../config'
+import Select from 'react-select'
 let api_name = "https://"+serveo_name;
 
 class Revert extends React.Component{
@@ -10,10 +11,29 @@ class Revert extends React.Component{
       isReverting: false,
       revertProgress: 0,
       revertTotal: 0,
+      stores: [],
+      activeStore:[]
     }
 
+    this.handleStoreChange = this.handleStoreChange.bind(this)
     this.finishedReverting = this.finishedReverting.bind(this);
   }
+
+  async componentDidMount(){
+    let temp = await fetch(`https://${serveo_name}/shop/all`, {
+        method: 'get',
+    })
+    let tJSON = await temp.json()
+    let stores = []
+    for (var i = 0;i<tJSON.length;i++){
+        let tempStore = {
+            value: tJSON[i],
+            label: tJSON[i] + '.myshopify.com'
+        }
+        stores.push(tempStore)
+    }
+    this.setState({stores:stores})
+}
 
   async revert(shop){
     this.setState({isReverting: true})
@@ -26,6 +46,15 @@ class Revert extends React.Component{
     this.getGitCollectionId(shop);
     //in callback it deletes all git products and deletes git collection
   }
+
+  handleStoreChange(option){
+    this.setState(state => {
+        return {
+          activeStore: option
+        };
+      });
+    this.setState({shop: option.value})
+    }
 
   async getFulfillmentService(shop = this.state.shop){
     console.log("Shop", shop);
@@ -204,11 +233,10 @@ class Revert extends React.Component{
         <div>
           <center><h1>Input name of store below</h1></center>
           <center><h1>Reverting will remove all Flindel services from the store</h1></center>
-          <input
-            id="storeName"
-            type="text"
-         />
-         <button onClick={() => this.handleClick()}>Revert Store</button>
+          <div className = 'workerStoreBar'>
+                <Select placeholder = {'Select store...'} isSearchable = {false} value = {this.state.activeStore} options = {this.state.stores} onChange = {this.handleStoreChange}/>
+          </div>         
+          <button onClick={() => this.handleClick()}>Revert Store</button>
          <br/><br/><br/>
          <button onClick = {this.props.back}>BACK</button>
         </div>
