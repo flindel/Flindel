@@ -1,11 +1,13 @@
 import React, { Component } from 'react';
 import {postCollection, getShopID, postFulfillmentService, postGIT, put} from './Shopify';
-import {serveo_name} from '../config'
-let api_name = "https://"+serveo_name;
+//import {serveo_name} from '../config'
 import SetupNavbar from './SetupNavbar';
 import {getUpdates} from './FindIssues';
 import Button from '@material-ui/core/Button';
-
+import getConfig from 'next/config';
+const {publicRuntimeConfig} = getConfig()
+const{API_URL} = publicRuntimeConfig
+let api_name = API_URL;
 
 const text = {
   textAlign: 'center',

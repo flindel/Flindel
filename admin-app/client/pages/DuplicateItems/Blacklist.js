@@ -1,6 +1,9 @@
 import React, { Component } from 'react';
-import {serveo_name} from '../config'
-let api_name = "https://"+serveo_name;
+import getConfig from 'next/config';
+//import {serveo_name} from '../config'
+const {publicRuntimeConfig} = getConfig()
+const{API_URL} = publicRuntimeConfig
+let api_name = API_URL;
 import {getShopID} from './Shopify';
 
 

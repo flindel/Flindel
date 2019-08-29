@@ -1,5 +1,8 @@
-import {serveo_name} from '../config'
-let api_name = "https://"+serveo_name;
+//import {serveo_name} from '../config'
+import getConfig from 'next/config';
+const {publicRuntimeConfig} = getConfig()
+const{API_URL} = publicRuntimeConfig
+let api_name = API_URL;
 
 
 //posts Get it today product ID and original product ID to firestore.

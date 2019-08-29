@@ -3,9 +3,11 @@ import FindIssues from './FindIssues'
 import SetupGit from './SetupGit'
 import Blacklist from './Blacklist'
 import OnboardProcess from './OnboardProcess'
-import {serveo_name} from '../config'
-let api_name = "https://"+serveo_name;
-
+//import {serveo_name} from '../config'
+import getConfig from 'next/config';
+const {publicRuntimeConfig} = getConfig()
+const{API_URL} = publicRuntimeConfig
+let api_name = API_URL;
 
 import { post, put, postCollection, getSmartCollections} from './Shopify'
 

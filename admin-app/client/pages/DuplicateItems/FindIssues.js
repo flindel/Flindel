@@ -1,9 +1,11 @@
 import React, { Component } from 'react';
 import DisplayIssue from './DisplayIssue';
 import FixIssues from './FixIssues';
-import {serveo_name} from '../config'
-let api_name = "https://"+serveo_name;
-
+//import {serveo_name} from '../config'
+import getConfig from 'next/config';
+const {publicRuntimeConfig} = getConfig()
+const{API_URL} = publicRuntimeConfig
+let api_name = API_URL;
 
 import {get} from './Shopify'
 import {getGitProduct, getOrigProduct, delProduct} from './Firestore'

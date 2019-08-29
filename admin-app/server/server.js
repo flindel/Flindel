@@ -9,7 +9,7 @@ const session = require("koa-session");
 const bodyParser = require("koa-bodyparser");
 const { warehouseOrder } = require("./serverFunctions");
 const { registerWebhook } = require("@shopify/koa-shopify-webhooks");
-const { SERVEO_NAME } = process.env;
+//const { SERVEO_NAME } = process.env;
 dotenv.config();
 const cronUtil = require("./util/cronFunction");
 const whTest = require("./util/webhookHelper"); //////////////////////
@@ -54,7 +54,8 @@ admin.initializeApp({
 });
 const db = admin.firestore();
 
-const { SHOPIFY_API_SECRET_KEY, SHOPIFY_API_KEY, DEBUG } = process.env;
+const { SHOPIFY_API_SECRET_KEY, SHOPIFY_API_KEY, API_URL, DEBUG } = process.env;
+const SERVEO_NAME = API_URL.substring(8)
 
 app.prepare().then(() => {
   const server = new Koa();
@@ -119,7 +120,7 @@ app.prepare().then(() => {
         ctx.redirect("/");
         //HAS TO BE IN SERVER.js
         const registration = await registerWebhook({
-          address: `https://${SERVEO_NAME}/hookendpoint`,
+          address: `${API_URL}/hookendpoint`,
           topic: "FULFILLMENTS_CREATE",
           accessToken,
           shop
@@ -130,7 +131,7 @@ app.prepare().then(() => {
           console.log("Failed to webhook ", registration.result);
         }
         const registration1 = await registerWebhook({
-          address: `https://${SERVEO_NAME}/hookorderendpoint`,
+          address: `${API_URL}/hookorderendpoint`,
           topic: "ORDERS_CREATE",
           accessToken,
           shop
@@ -142,7 +143,7 @@ app.prepare().then(() => {
         }
 
         const registration2 = await registerWebhook({
-          address: `https://${SERVEO_NAME}/hookthemeendpoint`,
+          address: `${API_URL}/hookthemeendpoint`,
           topic: "THEMES_PUBLISH",
           accessToken,
           shop
@@ -166,6 +167,6 @@ app.prepare().then(() => {
   });
 
   server.listen(port, () => {
-    console.log(`> Ready on http://localhost:${port}`);
+    console.log(`> Ready on ${API_URL}:${port}`);
   });
 });
