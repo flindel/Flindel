@@ -1,7 +1,10 @@
+//A bunch of front end functions that connect to shopify api
+
 import {serveo_name} from '../config'
 let api_name = "https://"+serveo_name;
 import {postProduct, delProduct, getGitProduct} from './Firestore'
 
+//gets product by id
 export function get(product_id, callback = doNothing){
   fetch(`${api_name}/products?id=${encodeURIComponent(product_id)}`, {
     method: 'get',
@@ -17,6 +20,7 @@ export function get(product_id, callback = doNothing){
     .catch((error) => console.log(error))
 }
 
+//gets shop id
 export function getShopID(callback, args = []){
   fetch(`${api_name}/shop/id/`, {
     method: 'get',
@@ -36,6 +40,7 @@ export function getShopID(callback, args = []){
     .catch((error) => console.log(error))
 }
 
+//deletes product by id, in shopify and firestore
 export function del(product_id, callback = doNothing){
   fetch(`${api_name}/products?id=${encodeURIComponent(product_id)}`, {
     method: 'delete',
@@ -52,6 +57,7 @@ export function del(product_id, callback = doNothing){
     .catch((error) => console.log(error));
 }
 
+//Puts new data in existing product
 export function put(product_id, body, callback = doNothing, args = []){
   const options = {
     method: 'put',
@@ -77,6 +83,7 @@ export function put(product_id, body, callback = doNothing, args = []){
     .catch((error) => console.log(error))
 }
 
+//posts a new product to shopify
 export function post(body, callback = doNothing){
   const options = {
     method: 'post',
@@ -98,6 +105,7 @@ export function post(body, callback = doNothing){
     .catch((error) => console.log(error))
 }
 
+//Posts smart collection
 export function postCollection(body, callback = doNothing){
   const options = {
     method: 'post',
@@ -120,6 +128,7 @@ export function postCollection(body, callback = doNothing){
     .catch((error) => console.log(error))
 }
 
+//gets smart collection
 export function getSmartCollections(callback = doNothing){
   fetch(`${api_name}/collections/all/`, {
     method: 'get',
@@ -135,6 +144,7 @@ export function getSmartCollections(callback = doNothing){
     .catch((error) => console.log(error))
 }
 
+//posts git variant from shopify and Firestore
 export function postGitVariant(product_id, variants, update, callback = doNothing){
   console.log("Product ID: ", product_id);
   console.log("Variants: ", variants);
@@ -168,6 +178,7 @@ export function postGitVariant(product_id, variants, update, callback = doNothin
     .catch((error) => console.log(error))
 }
 
+//deletes GIT variant, and callsback to delete gitVariant from firestore
 export function delGitVariant(product_id, variant_id, update, callback = doNothing){
   let orig = update.norm;
   let git = update.git;
@@ -190,6 +201,8 @@ export function delGitVariant(product_id, variant_id, update, callback = doNothi
 
 }
 
+//Helper function for delGitVariant
+//DO NOT CALL THIS FUNCTION DIRECTLY
 function delGitVariantFromFireStore(json, args){
   console.log("Firestore JSON: ", json);
   let update = args[0];
@@ -204,6 +217,8 @@ function delGitVariantFromFireStore(json, args){
   postProduct(json, callback);
 }
 
+//Helper function for delGitVariant
+//DO NOT CALL THIS FUNCTION DIRECTLY
 function postGitVariantToFirestore(json, args){
   console.log("Firestore JSON: ", json);
   let update = args[0];
@@ -247,6 +262,7 @@ function doNothing(data){
   return;
 }
 
+//posts script tags to shopify
 export function postScriptTag(url){
   const options = {
     method: 'post',
@@ -273,7 +289,7 @@ export function postScriptTag(url){
     .catch((error) => console.log(error))
 }
 
-//MOVE to SETUP APP
+//posts fulfillment service to shopify
 export function postFulfillmentService() {
   const options = {
     method: "post",
@@ -299,6 +315,8 @@ export function postFulfillmentService() {
     .catch(error => console.log(error));
 }
 
+//helper functions
+//Creates an entry for firestore from GIT and Original products
 function convertToFirestoreData(git, orig){
   console.log("POST DATA: ", git, orig);
   let out = {};

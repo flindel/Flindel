@@ -53,6 +53,9 @@ class OnboardProcess extends Component {
     this.getSetupStep();
   }
 
+  //Step 1 of onboarding Process
+  //Post GIT and Original collections
+  //Post flindel fulfillment service
   async setup(){
     //store shop primary domain with .myshopify doamin in db
     //storeShopDomain();
@@ -90,21 +93,18 @@ class OnboardProcess extends Component {
     postFulfillmentService();
   }
 
-  // async storeShopDomain(){
-  //   let domainTemp = await fetch(`${api_name}/shop/domain`,{
-  //     method: 'GET',
-  //   })
-  //   let domainJson = await domainTemp.json()
-  // }
 
+  //Step 4 of the onboarding Process
+  //Publish all Get it Today Products
+  //Posts script tags
   publish(){
     this.setState({isLoading: true});
     this.publishAllGit();
     this.setupScriptTag();
   }
 
+  //Publish ALl Get it Today
   publishAllGit(){
-    //Publish ALl Get it Today
     fetch(`${api_name}/collections?id=${encodeURIComponent(this.state.gitCollectionId)}`, {
       method: 'GET',
       })
@@ -129,6 +129,7 @@ class OnboardProcess extends Component {
       })
   }
 
+  //tracks progress of publishing
   finishPublish(){
     gitPublished += 1
     if(gitPublished == this.state.gitProductIds.length){
@@ -173,15 +174,20 @@ class OnboardProcess extends Component {
       let putDBJson = await putDBTemp.json()
   }
 
+  //stores id of GIT collection after it has been creates
   callbackGit(data){
     this.setState({gitCollectionId: data.smart_collection.id})
   }
 
+  //stores id of Original Collection after it has been collected
+  //Makes api request to shopify to get origianl products and create GIT products unpublished
   callbackOrig(data){
     this.setState({origCollectionId: data.smart_collection.id})
     this.getOrigProducts(data.smart_collection.id);
   }
 
+  //Gets onboarding step from firestore.
+  //Moves Brand to correct onboarding step based on firestore value
   async getSetupStep(){
     var temp;
     temp = await fetch(`${api_name}/shop/onboardingStep`, {
@@ -202,7 +208,7 @@ class OnboardProcess extends Component {
     return json;
   }
 
-
+  //Writes step to firestore onboardingStep
   postSetupStep(step){
     fetch(`${api_name}/shop/onboardingStep?body=${encodeURIComponent(JSON.stringify({"onboardingStep": step}))}`, {
       method: 'post',
@@ -285,9 +291,10 @@ class OnboardProcess extends Component {
       }
     }
     let body = {product: normBody};
-    put(norm.id, body, this.finishedFixing);
+    put(norm.id, body);
   }
 
+  //Tracks progress of the posting of git products
   finishedFixing(){
     gitProducts += 1;
     console.log("Fixed: ",gitProducts)
