@@ -1,8 +1,6 @@
 const Router = require("koa-router");
 const rp = require("request-promise");
 const errors = require("request-promise/errors");
-const { api_link } = require("../default-shopify-api.json");
-const { getShopHeaders } = require("../util/shop-headers");
 const emailHelper = require("../util/emailHelper");
 const expiredHelper = require("../util/expiredHelper");
 const router = Router({
@@ -176,7 +174,7 @@ router.post("/returnShipment", async ctx => {
   };
   ctx.body = await rp(option);
 });
-
+//email sent to brand to inform of invalid GIT location being sold and refunding required
 router.post("/brand", async ctx => {
   const parsedJSON = await JSON.parse(ctx.query.package);
   const db = ctx.db;
@@ -199,7 +197,6 @@ router.post("/brand", async ctx => {
       parsedJSON[i].quantity +
       "\n\n";
   }
-  console.log(emailString);
   const option = {
     method: "POST",
     url: "https://api.sendgrid.com/v3/mail/send",
@@ -243,10 +240,8 @@ router.post("/brand", async ctx => {
     }
   }
 });
-
+//email to warehouse of what items to fulfill
 router.post("/warehouse", async ctx => {
-  console.log("sending email");
-
   const package = ctx.query.package;
   const option = {
     method: "POST",

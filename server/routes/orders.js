@@ -2,7 +2,6 @@ const Router = require("koa-router");
 const rp = require("request-promise");
 const errors = require("request-promise/errors");
 const { api_link } = require("../default-shopify-api.json");
-const { getShopHeaders } = require("../util/shop-headers");
 const { accessTokenDB } = require("../util/acessTokenDB");
 const router = Router({
   prefix: "/orders"
@@ -34,7 +33,7 @@ router.get("/", async ctx => {
     }
   }
 });
-
+//change order products to be marked as a fulfillment on shopify
 router.post("/fulfill", async ctx => {
   const store = ctx.query.store;
   const headers = {};
@@ -54,9 +53,7 @@ router.post("/fulfill", async ctx => {
   }
   const option = {
     method: "POST",
-    url: `https://${store}/${api_link}/orders/${
-      ctx.query.orderid
-    }/fulfillments.json`,
+    url: `https://${store}/${api_link}/orders/${ctx.query.orderid}/fulfillments.json`,
     headers: headers,
     json: true,
     body: {

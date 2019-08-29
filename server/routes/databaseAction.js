@@ -7,6 +7,7 @@ const errors = require("request-promise/errors");
 const { getTime } = require("../serverFunctions");
 
 router.get("/fetch_stock", async ctx => {
+  //not neccessary for launch but maybe in future
   ctx.set("Access-Control-Allow-Origin", "*");
   ctx.set(
     "Access-Control-Allow-Headers",
@@ -62,7 +63,7 @@ router.get("/fetch_stock", async ctx => {
     //only for paticular sku
   }
 });
-
+//update database to store new orders
 router.post("/update_order_database", async ctx => {
   ctx.set("Access-Control-Allow-Origin", "*");
   ctx.set(
@@ -77,7 +78,7 @@ router.post("/update_order_database", async ctx => {
   const orderId = ctx.query.order_id;
   let payload = {
     orderid: orderId,
-    store: ctx.query.source, //this does not work
+    store: ctx.query.source,
     fulfillmentid: fulfId,
     shippingAddress:
       destination.address1 + " " + destination.city + " " + destination.zip
@@ -106,9 +107,8 @@ router.post("/update_order_database", async ctx => {
     .doc()
     .set(payload);
   ctx.body = "success";
-  console.log("GOOOOOOOOD");
 });
-
+//send warehouse the email of orders needed to fulfil
 router.post("/warehouse_order", async ctx => {
   ctx.set("Access-Control-Allow-Origin", "*");
   ctx.set(
@@ -116,7 +116,7 @@ router.post("/warehouse_order", async ctx => {
     "Origin, X-Requested-With, Content-Type, Accept"
   );
   ctx.set("Access-Control-Allow-Methods", "POST, GET, PUT, DELETE, OPTIONS");
-
+  //get db info
   db = ctx.db;
 
   let jsonData = [];
@@ -130,6 +130,7 @@ router.post("/warehouse_order", async ctx => {
       jsonData.push(doc.data);
     });
   });
+  //send email
   const headers = {};
   headers["Accept"] = "application/json";
   headers["Content-Type"] = "application/json";
@@ -176,7 +177,7 @@ router.post("/warehouse_order", async ctx => {
     }
   }
 });
-
+//not neccesary for launch and may never be
 router.get("/track_num", async ctx => {
   ctx.set("Access-Control-Allow-Origin", "*");
   ctx.set(
