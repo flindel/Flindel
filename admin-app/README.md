@@ -1,7 +1,7 @@
-# Return Portal
+# Admin App
 
 ## How to deploy app and obtain public url for dev purpose
-1. copy your `.secret` to this folder (your firebase credential file should in this folder)
+1. copy your `.secret` to this folder (your firebase credential file should be in this folder)
 2. In `Dockerfile`, change `WORKDIR /usr/src/retur-portal` to your return-portal folder path
 3. Setup [Google Run](https://cloud.google.com/run/docs/setup) and install `gcloud`. Your account should already invited as Editor.
 4. Install [Docker](https://docs.docker.com/install/)
@@ -24,6 +24,5 @@ GOOGLE_APPLICATION_CREDENTIALS=/usr/src/return-portal/.secret/xxxx    // locatio
 API_URL=[url from google run]
 GOOGLE_GEO_API_KEY=xxx
 ```
-When app proxy is used, set APP_PROXY_PREFIX = SubpathOfYourAppProxy (only put subpath here without Subpath prefix), uncomment line 51 `app.setAssetPrefix(APP_PROXY_PREFIX);` in `server.js`
 
 9. When you make changes and want to test, build the image again, push to gcloud and deploy.
