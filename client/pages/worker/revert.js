@@ -193,7 +193,7 @@ class Revert extends React.Component{
   }
 
   async handleClick(){
-    let textValue = document.getElementById("storeName").value;
+    let textValue = this.state.shop;
     var confirmed = confirm("This will remove all Flindel Services from "+textValue+". \nAre you sure you want to proceed?")
     if (confirmed){
       textValue = textValue+".myshopify.com"
@@ -205,7 +205,7 @@ class Revert extends React.Component{
         this.revert(textValue);
       }
       else{
-        alert("Invalid Store Name, Please do not include \".myshopify.com\" in the text box.")
+        alert("Invalid Store or Error")
         console.log("fulservId -", fulservId);
       }
       //this.revert();
@@ -235,7 +235,7 @@ class Revert extends React.Component{
           <center><h1>Reverting will remove all Flindel services from the store</h1></center>
           <div className = 'workerStoreBar'>
                 <Select placeholder = {'Select store...'} isSearchable = {false} value = {this.state.activeStore} options = {this.state.stores} onChange = {this.handleStoreChange}/>
-          </div>         
+          </div>
           <button onClick={() => this.handleClick()}>Revert Store</button>
          <br/><br/><br/>
          <button onClick = {this.props.back}>BACK</button>
