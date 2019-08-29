@@ -20,7 +20,7 @@ Your env should look like this
 ```
 SHOPIFY_API_KEY=xxx
 SHOPIFY_API_SECRET_KEY=xxxx
-GOOGLE_APPLICATION_CREDENTIALS=/usr/src/return-portal/.secret/xxxx    // location in container
+GOOGLE_APPLICATION_CREDENTIALS=/usr/src/admin-app/.secret/xxxx    // location in container
 API_URL=[url from google run]
 GOOGLE_GEO_API_KEY=xxx
 ```
