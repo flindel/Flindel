@@ -29,7 +29,7 @@ admin.initializeApp({
 });
 const db = admin.firestore();
 
-const { SHOPIFY_API_SECRET_KEY, SHOPIFY_API_KEY, DEBUG, APP_PROXY_PREFIX, API_URL} = process.env;
+const { APP_PROXY_PREFIX, API_URL } = process.env;
 
 app.prepare().then(() => {
   const server = new Koa();
@@ -53,7 +53,6 @@ app.prepare().then(() => {
 
     await next();
   });
-  server.keys = [SHOPIFY_API_SECRET_KEY];
   server.use(router());
   server.use(async ctx => {
     await handle(ctx.req, ctx.res);

@@ -18,8 +18,6 @@ docker push gcr.io/flindel-dev/[IMAGE]
 
 Your env should look like this
 ```
-SHOPIFY_API_KEY=xxx
-SHOPIFY_API_SECRET_KEY=xxxx
 GOOGLE_APPLICATION_CREDENTIALS=/usr/src/return-portal/.secret/xxxx    // location in container
 API_URL=[url from google run]
 APP_PROXY_PREFIX=flindel-returns    //Currently not used, but if you want to set up app proxy, set the prefix here and use this variable in the code
