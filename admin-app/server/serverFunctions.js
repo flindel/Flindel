@@ -1,43 +1,9 @@
 const dotenv = require("dotenv");
 const turf = require("@turf/turf");
-const rp = require("request-promise");
 dotenv.config();
+const GOOGLE_GEO_API_KEY = process.env.GOOGLE_GEOCODING_KEY;
 const serveo_name = "https://923e8fe8.ngrok.io";
-const { API_URL, GOOGLE_GEO_API_KEY } = process.env;
 
-// Create delegate token for return portal
-async function saveReturnPortalToken(db, shop, accessToken) {
-  // NOT DONE: TODO
-  // neccessary scope for return portal, please revise
-  const scopes = [
-    "read_products",
-    "read_orders",
-    "read_price_rules"
-  ];
-  const option = {
-    method: 'POST',
-    url: `https://${shop}/admin/access_tokens/delegate`,
-    headers: {
-      'X-Shopify-Access-Token': accessToken
-    },
-    json: true,
-    body: {
-      'delegate_access_scope': scopes
-    }
-  };
-  try {
-    ctx.body = await rp(option);
-  } catch (err) {
-    console.log(err.message);
-    if (err instanceof errors.StatusCodeError) {
-      ctx.status = err.statusCode;
-      ctx.message = err.message;
-    } else if (err instanceof errors.RequestError) {
-      ctx.status = 500;
-      ctx.message = err.message;
-    }
-  }
-}
 async function getLatLng(address) {
   //console.log()
   const response = await fetch(

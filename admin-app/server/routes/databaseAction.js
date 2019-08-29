@@ -5,8 +5,10 @@ const router = Router({
 const rp = require("request-promise");
 const errors = require("request-promise/errors");
 const { getTime } = require("../serverFunctions");
+const Helper = require ('../util/webhookHelper')
 
 router.get("/fetch_stock", async ctx => {
+  //not neccessary for launch but maybe in future
   ctx.set("Access-Control-Allow-Origin", "*");
   ctx.set(
     "Access-Control-Allow-Headers",
@@ -62,7 +64,7 @@ router.get("/fetch_stock", async ctx => {
     //only for paticular sku
   }
 });
-
+//update database to store new orders
 router.post("/update_order_database", async ctx => {
   ctx.set("Access-Control-Allow-Origin", "*");
   ctx.set(
@@ -77,7 +79,7 @@ router.post("/update_order_database", async ctx => {
   const orderId = ctx.query.order_id;
   let payload = {
     orderid: orderId,
-    store: items[0].vendor,
+    store: ctx.query.source,
     fulfillmentid: fulfId,
     shippingAddress:
       destination.address1 + " " + destination.city + " " + destination.zip
@@ -85,18 +87,19 @@ router.post("/update_order_database", async ctx => {
   payload["dateCreated"] = getTime();
   payload["workerid"] = "";
   payload["code"] = "";
-  payload["status"] = "";
+  payload["status"] = "incomplete";
   payload["name"] = destination.name;
   payload["comment"] = "";
 
   for (let i = 0; i < items.length; i++) {
+    Helper.sellReturnItem(ctx.db, items[i].variant_id.toString(),ctx.query.source,orderId)
     itemList[i] = {
-      itemid: items[i].id,
-      variantid: items[i].variant_id,
+      itemid: items[i].id.toString(),
+      variantid: items[i].variant_id.toString(),
       quantity: items[i].quantity,
       name: items[i].title,
       fulfilled: 0,
-      productid: items[i].product_id
+      productid: items[i].product_id.toString()
     };
   }
   payload["items"] = itemList;
@@ -106,9 +109,8 @@ router.post("/update_order_database", async ctx => {
     .doc()
     .set(payload);
   ctx.body = "success";
-  console.log("GOOOOOOOOD");
 });
-
+//send warehouse the email of orders needed to fulfil
 router.post("/warehouse_order", async ctx => {
   ctx.set("Access-Control-Allow-Origin", "*");
   ctx.set(
@@ -116,7 +118,7 @@ router.post("/warehouse_order", async ctx => {
     "Origin, X-Requested-With, Content-Type, Accept"
   );
   ctx.set("Access-Control-Allow-Methods", "POST, GET, PUT, DELETE, OPTIONS");
-
+  //get db info
   db = ctx.db;
 
   let jsonData = [];
@@ -130,6 +132,7 @@ router.post("/warehouse_order", async ctx => {
       jsonData.push(doc.data);
     });
   });
+  //send email
   const headers = {};
   headers["Accept"] = "application/json";
   headers["Content-Type"] = "application/json";
@@ -176,7 +179,7 @@ router.post("/warehouse_order", async ctx => {
     }
   }
 });
-
+//not neccesary for launch and may never be
 router.get("/track_num", async ctx => {
   ctx.set("Access-Control-Allow-Origin", "*");
   ctx.set(

@@ -3,13 +3,15 @@ import FindIssues from './FindIssues'
 import SetupGit from './SetupGit'
 import Blacklist from './Blacklist'
 import OnboardProcess from './OnboardProcess'
-import Revert from './Revert'
+import {serveo_name} from '../config'
+let api_name = "https://"+serveo_name;
+
+
 import { post, put, postCollection, getSmartCollections} from './Shopify'
-import getConfig from 'next/config';
-const {publicRuntimeConfig} = getConfig();
-const serveo_name = publicRuntimeConfig.API_URL;
 
 let unpublished = 0;
+
+//Parent Component to onboarding, and admin app.
 class DuplicateApp extends Component {
   constructor(props){
     super(props);
@@ -34,11 +36,13 @@ class DuplicateApp extends Component {
     getSmartCollections(this.setIsGitSetup);
   }
 
+  //Allows child components to set state of Duplicate App
   extSetState(json){
     this.setState(json);
     getSmartCollections(this.setIsGitSetup);
   }
 
+  //Makes sure the Get it Today and Original collections are in store
   setIsGitSetup(data){
     const collections = data.smart_collections;
     let isGitCollect = false;
@@ -65,13 +69,14 @@ class DuplicateApp extends Component {
     this.setState({isBlackList: bool});
   }
 
+  //Unbublishes all Get it Today products
   unpublishAllGit(){
     var confirmed = confirm("This will stop all customers from viewing and purchasing Get it Today Products.\nAre you sure you want to proceed?")
     if (!confirmed){
       return;
     }
     this.setState({isUnpublishing:true})
-    fetch(`${serveo_name}/collections?id=${encodeURIComponent(this.state.gitCollectionId)}`, {
+    fetch(`${api_name}/collections?id=${encodeURIComponent(this.state.gitCollectionId)}`, {
       method: 'GET',
       })
       .then((response) => {
@@ -95,6 +100,7 @@ class DuplicateApp extends Component {
       })
   }
 
+  //Publishes all get it today products
   publishAllGit(){
     var confirmed = confirm("This will make all Get it Today Products avaliable to your customers. \nAre you sure you want to proceed?")
     if (!confirmed){
@@ -103,7 +109,7 @@ class DuplicateApp extends Component {
     this.setState({isUnpublishing:true})
 
     //Publish ALl Get it Today
-    fetch(`${serveo_name}/collections?id=${encodeURIComponent(this.state.gitCollectionId)}`, {
+    fetch(`${api_name}/collections?id=${encodeURIComponent(this.state.gitCollectionId)}`, {
       method: 'GET',
       })
       .then((response) => {
@@ -127,6 +133,7 @@ class DuplicateApp extends Component {
       })
   }
 
+  //Tracks progress of unpublishing and publishing.
   finishUnpublish(data, args){
     let numOfGitProducts = args[0];
     unpublished += 1;
@@ -181,7 +188,7 @@ class DuplicateApp extends Component {
         </div>
       )
     }
-    if (this.state.ui == 3){
+    if (this.state.ui == 3){//Unpublishing/Publishing progress screen
       return(
         <div>
           {!this.state.isUnpublishing &&
@@ -189,7 +196,6 @@ class DuplicateApp extends Component {
               <button onClick={() => this.setState({ui:0})}>Product Updates</button>
               <button onClick={() => this.unpublishAllGit()}>UNPUBLISH GET IT TODAY PRODUCTS</button>
               <button onClick={() => this.publishAllGit()}>PUBLISH GET IT TODAY PRODUCTS</button>
-              <button onClick={() => this.setState({ui:4})}>Revert</button>
             </div>
           }
           {this.state.isUnpublishing &&
@@ -199,11 +205,6 @@ class DuplicateApp extends Component {
             </div>
           }
         </div>
-      )
-    }
-    if(this.state.ui == 4){
-      return(
-        <Revert />
       )
     }
   }

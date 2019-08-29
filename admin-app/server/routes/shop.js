@@ -55,14 +55,31 @@ router.get('/myshopifydomain', async ctx =>{
 })
 
 router.get('/returnPolicy', async ctx =>{
-    console.log(ctx)
-    const { shop, accessToken } = getShopHeaders(ctx);
+    //console.log("find return policy")
     //const { cookies } = ctx;
+    const shop = ctx.query.shop
     //const shop = cookies.get('shop_id');
     db = ctx.db
     myRef = db.collection('store')
     let query = await myRef.doc(shop).get()
     ctx.body = {'res': query._fieldsProto.returnPolicy, 'default':query._fieldsProto.defaultReturn}
+})
+
+router.get('/all', async ctx =>{
+    let db = ctx.db
+    let myRef = db.collection('store')
+    let query = await myRef.get()
+    let stores = []
+    await query.forEach(async doc=>{
+      stores.push(doc.id)
+    })
+    for (var i = 0;i<stores.length;i++){
+      let ind = stores[i].indexOf('.myshopify.com')
+      if (ind > 0){
+        stores[i] = stores[i].substring(0,ind)
+      }
+    }
+    ctx.body = stores
 })
 
 router.post("/onboardingStep", async ctx => {

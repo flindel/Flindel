@@ -2,6 +2,7 @@ import React, {Component} from 'react';
 import '../Confirmation/universal.css'
 import './adminApp.css'
 
+//Progress bar used for onboarding process
 function SetupNavbar(props){
     let stepActiveArray = ["", "", ""];
     for (let i = 0; i < stepActiveArray.length; i++){

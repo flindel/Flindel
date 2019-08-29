@@ -9,6 +9,7 @@ const session = require("koa-session");
 const bodyParser = require("koa-bodyparser");
 const { warehouseOrder } = require("./serverFunctions");
 const { registerWebhook } = require("@shopify/koa-shopify-webhooks");
+const { SERVEO_NAME } = process.env;
 dotenv.config();
 const cronUtil = require("./util/cronFunction");
 const whTest = require("./util/webhookHelper"); //////////////////////
@@ -27,9 +28,8 @@ new CronJob(
   async function() {
     //KEEP THIS ORDER OF STUFF. unblock all when we go live, set time '0 0 0 * * *'
     //await cronUtil.checkExpired(db);
-    //await cronUtil.itemUpdate(db)
-    //await cronUtil.refundInformation(db)
-    //await cronUtil.clearPending(db);
+    //await cronUtil.handlePending(db)
+    //await cronUtil.fulfillmentReport(db)
   },
   null,
   true
@@ -54,8 +54,7 @@ admin.initializeApp({
 });
 const db = admin.firestore();
 
-const { SHOPIFY_API_SECRET_KEY, SHOPIFY_API_KEY, API_URL } = process.env;
-const SERVEO_NAME = API_URL.substring(8);
+const { SHOPIFY_API_SECRET_KEY, SHOPIFY_API_KEY, DEBUG } = process.env;
 
 app.prepare().then(() => {
   const server = new Koa();
@@ -65,6 +64,19 @@ app.prepare().then(() => {
   //server.use(proxy('feritas.serveo.net'))
   server.use(async (ctx, next) => {
     if (ctx.db === undefined) ctx.db = db;
+    //console.log(ctx.request.host);
+    //console.log(ctx.request)
+    //----------------------------for app proxy---------------------
+    //if (ctx.request.host === 'feritas.serveo.net') {
+    //app.setAssetPrefix('');
+    //} else {
+    //app.setAssetPrefix('flindel-returns');
+    //}
+    //server.use(proxy('feritas.serveo.net'))
+
+    //app.setAssetPrefix('flindel-returns');
+    //console.log(ctx)
+
     await next();
   });
   server.keys = [SHOPIFY_API_SECRET_KEY];
@@ -107,24 +119,18 @@ app.prepare().then(() => {
         ctx.redirect("/");
         //HAS TO BE IN SERVER.js
         const registration = await registerWebhook({
-          address: `${API_URL}/hookendpoint`,
+          address: `https://${SERVEO_NAME}/hookendpoint`,
           topic: "FULFILLMENTS_CREATE",
           accessToken,
           shop
         });
-        // const registration = await registerWebhook({
-        //   address: "https://suus.serveo.net/hookendpoint",
-        //   topic: "PRODUCTS_CREATE",
-        //   accessToken,
-        //   shop
-        // });
         if (registration.success) {
           console.log("webhooks registered");
         } else {
           console.log("Failed to webhook ", registration.result);
         }
         const registration1 = await registerWebhook({
-          address: `${API_URL}/hookorderendpoint`,
+          address: `https://${SERVEO_NAME}/hookorderendpoint`,
           topic: "ORDERS_CREATE",
           accessToken,
           shop
@@ -136,7 +142,7 @@ app.prepare().then(() => {
         }
 
         const registration2 = await registerWebhook({
-          address: `${API_URL}/hookthemeendpoint`,
+          address: `https://${SERVEO_NAME}/hookthemeendpoint`,
           topic: "THEMES_PUBLISH",
           accessToken,
           shop
@@ -160,6 +166,6 @@ app.prepare().then(() => {
   });
 
   server.listen(port, () => {
-    console.log(`> Ready on ${API_URL}:${port}`);
+    console.log(`> Ready on http://localhost:${port}`);
   });
 });

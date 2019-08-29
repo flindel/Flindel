@@ -1,10 +1,12 @@
-import {postProduct, delProduct, getGitProduct} from './Firestore'
-import getConfig from 'next/config';
-const {publicRuntimeConfig} = getConfig();
-const serveo_name = publicRuntimeConfig.API_URL;
+//A bunch of front end functions that connect to shopify api
 
+import {serveo_name} from '../config'
+let api_name = "https://"+serveo_name;
+import {postProduct, delProduct, getGitProduct} from './Firestore'
+
+//gets product by id
 export function get(product_id, callback = doNothing){
-  fetch(`${serveo_name}/products?id=${encodeURIComponent(product_id)}`, {
+  fetch(`${api_name}/products?id=${encodeURIComponent(product_id)}`, {
     method: 'get',
     })
     .then((response) => {
@@ -18,8 +20,9 @@ export function get(product_id, callback = doNothing){
     .catch((error) => console.log(error))
 }
 
+//gets shop id
 export function getShopID(callback, args = []){
-  fetch(`${serveo_name}/shop/id/`, {
+  fetch(`${api_name}/shop/id/`, {
     method: 'get',
     })
     .then((response) => {
@@ -37,8 +40,9 @@ export function getShopID(callback, args = []){
     .catch((error) => console.log(error))
 }
 
+//deletes product by id, in shopify and firestore
 export function del(product_id, callback = doNothing){
-  fetch(`${serveo_name}/products?id=${encodeURIComponent(product_id)}`, {
+  fetch(`${api_name}/products?id=${encodeURIComponent(product_id)}`, {
     method: 'delete',
     })
     .then((response) => {
@@ -53,6 +57,7 @@ export function del(product_id, callback = doNothing){
     .catch((error) => console.log(error));
 }
 
+//Puts new data in existing product
 export function put(product_id, body, callback = doNothing, args = []){
   const options = {
     method: 'put',
@@ -62,7 +67,7 @@ export function put(product_id, body, callback = doNothing, args = []){
     },
       body: JSON.stringify(body),
   }
-  fetch(`${serveo_name}/products?id=${encodeURIComponent(product_id)}`, options)
+  fetch(`${api_name}/products?id=${encodeURIComponent(product_id)}`, options)
     .then((response) => {
       if(response.ok){return response.json()}
       else{throw Error(response.statusText)}
@@ -78,6 +83,7 @@ export function put(product_id, body, callback = doNothing, args = []){
     .catch((error) => console.log(error))
 }
 
+//posts a new product to shopify
 export function post(body, callback = doNothing){
   const options = {
     method: 'post',
@@ -87,7 +93,7 @@ export function post(body, callback = doNothing){
     },
       body: JSON.stringify(body),
   }
-  fetch(`${serveo_name}/products`, options)
+  fetch(`${api_name}/products`, options)
     .then((response) => {
       if(response.ok){return response.json()}
       else{throw Error(response.statusText)}
@@ -99,6 +105,7 @@ export function post(body, callback = doNothing){
     .catch((error) => console.log(error))
 }
 
+//Posts smart collection
 export function postCollection(body, callback = doNothing){
   const options = {
     method: 'post',
@@ -108,7 +115,7 @@ export function postCollection(body, callback = doNothing){
     },
       body: JSON.stringify(body),
   }
-  fetch(`${serveo_name}/collections/`, options)
+  fetch(`${api_name}/collections/`, options)
     .then((response) => {
       if(response.ok){return response.json()}
       else{throw Error(response.statusText)}
@@ -121,8 +128,9 @@ export function postCollection(body, callback = doNothing){
     .catch((error) => console.log(error))
 }
 
+//gets smart collection
 export function getSmartCollections(callback = doNothing){
-  fetch(`${serveo_name}/collections/all/`, {
+  fetch(`${api_name}/collections/all/`, {
     method: 'get',
     })
     .then((response) => {
@@ -136,10 +144,11 @@ export function getSmartCollections(callback = doNothing){
     .catch((error) => console.log(error))
 }
 
+//posts git variant from shopify and Firestore
 export function postGitVariant(product_id, variants, update, callback = doNothing){
   console.log("Product ID: ", product_id);
   console.log("Variants: ", variants);
-  console.log("Update: ", update.git.variants, update.norm.variants);
+  console.log("Update: ", update);
   let body = null;
   let orig = update.norm;
   let git = update.git;
@@ -158,7 +167,7 @@ export function postGitVariant(product_id, variants, update, callback = doNothin
     },
       body: JSON.stringify(body),
   }
-  fetch(`${serveo_name}/products/variant?id=${encodeURIComponent(product_id)}`, options)
+  fetch(`${api_name}/products/variant?id=${encodeURIComponent(product_id)}`, options)
     .then((response) => {
       if(response.ok){return response.json()}
       else{throw Error(response.statusText)}
@@ -169,6 +178,7 @@ export function postGitVariant(product_id, variants, update, callback = doNothin
     .catch((error) => console.log(error))
 }
 
+//deletes GIT variant, and callsback to delete gitVariant from firestore
 export function delGitVariant(product_id, variant_id, update, callback = doNothing){
   let orig = update.norm;
   let git = update.git;
@@ -179,7 +189,7 @@ export function delGitVariant(product_id, variant_id, update, callback = doNothi
       'Content-Type': 'application/json'
     },
   }
-  fetch(`${serveo_name}/products/variant?id=${encodeURIComponent(product_id)}&variant_id=${encodeURIComponent(variant_id)}`, options)
+  fetch(`${api_name}/products/variant?id=${encodeURIComponent(product_id)}&variant_id=${encodeURIComponent(variant_id)}`, options)
     .then((response) => {
       if(response.ok){return response.json()}
       else{throw Error(response.statusText)}
@@ -191,6 +201,8 @@ export function delGitVariant(product_id, variant_id, update, callback = doNothi
 
 }
 
+//Helper function for delGitVariant
+//DO NOT CALL THIS FUNCTION DIRECTLY
 function delGitVariantFromFireStore(json, args){
   console.log("Firestore JSON: ", json);
   let update = args[0];
@@ -205,6 +217,8 @@ function delGitVariantFromFireStore(json, args){
   postProduct(json, callback);
 }
 
+//Helper function for delGitVariant
+//DO NOT CALL THIS FUNCTION DIRECTLY
 function postGitVariantToFirestore(json, args){
   console.log("Firestore JSON: ", json);
   let update = args[0];
@@ -229,7 +243,7 @@ export function postGIT(body, orig, callback = doNothing){
     },
       body: JSON.stringify(body),
   }
-  fetch(`${serveo_name}/products`, options)
+  fetch(`${api_name}/products`, options)
     .then((response) => {
       if(response.ok){return response.json()}
       else{throw Error(response.statusText)}
@@ -248,6 +262,7 @@ function doNothing(data){
   return;
 }
 
+//posts script tags to shopify
 export function postScriptTag(url){
   const options = {
     method: 'post',
@@ -262,7 +277,7 @@ export function postScriptTag(url){
         }
       }),
   }
-  fetch(`${serveo_name}/scriptTag/`, options)
+  fetch(`${api_name}/scriptTag/`, options)
     .then((response) => {
       if(response.ok){return response.json()}
       else{throw Error(response.statusText)}
@@ -274,7 +289,7 @@ export function postScriptTag(url){
     .catch((error) => console.log(error))
 }
 
-//MOVE to SETUP APP
+//posts fulfillment service to shopify
 export function postFulfillmentService() {
   const options = {
     method: "post",
@@ -283,7 +298,7 @@ export function postFulfillmentService() {
       "Content-Type": "application/json"
     }
   };
-  fetch(`${serveo_name}/fulserv`, options)
+  fetch(`${api_name}/fulserv`, options)
     .then(response => {
       if (response.ok) {
         return response.json();
@@ -293,13 +308,15 @@ export function postFulfillmentService() {
     })
     .then(data => {
       console.log("POST Fulfillment Service: ", data)
-      fetch(`${serveo_name}/fulserv/firestore/id?body=${encodeURIComponent(JSON.stringify({"fulfillment_service": data.fulfillment_service.id}))}`, {
+      fetch(`${api_name}/fulserv/firestore/id?body=${encodeURIComponent(JSON.stringify({"fulfillment_service": data.fulfillment_service.id}))}`, {
         method: 'post',
       })
     })
     .catch(error => console.log(error));
 }
 
+//helper functions
+//Creates an entry for firestore from GIT and Original products
 function convertToFirestoreData(git, orig){
   console.log("POST DATA: ", git, orig);
   let out = {};

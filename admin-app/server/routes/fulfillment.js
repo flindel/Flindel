@@ -60,7 +60,7 @@ router.get('/deliver', async ctx => {
         })
     }
     for (var i = 0;i<orders.length;i++){
-        if (orders[i].status.stringValue == 'incomplete' || orders[i].status.stringValue == 'failed'){
+        if (orders[i].status.stringValue == 'incomplete' || orders[i].status.stringValue == '' || orders[i].status.stringValue == 'failed' || orders[i].status.stringValue == 'complete'){
             orders.splice(i,1)
             i--
         }
@@ -75,7 +75,7 @@ router.put('/update',async ctx=>{
     let myRef = db.collection('fulfillments')
     orders = await JSON.parse(ctx.query.orders)
     for (var i = 0;i<orders.length;i++){
-        let query = await myRef.where('code','==',orders[i].code).get()
+        let query = await myRef.where('orderid','==',orders[i].orderid).get()
         await query.forEach(async doc=>{
             batch.set(doc.ref,orders[i])
         })
@@ -115,7 +115,7 @@ router.post('/complete',async ctx=>{
     for (var i = 0;i<orders.length;i++){
         //set time
         orders[i].dateCompleted = currTime
-        let query = await myRef.where('code','==',orders[i].code).get()
+        let query = await myRef.where('orderid','==',orders[i].orderid).get()
         await query.forEach(async doc=>{
             //delete old
             batch.delete(doc.ref)

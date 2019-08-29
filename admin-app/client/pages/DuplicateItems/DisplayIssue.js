@@ -39,6 +39,7 @@ const text = {
   textAlign: 'left',
 }
 
+//Formats a single entry for an issue in the update products app
 function DisplayIssue(props){
   if (props.parameterIssues.length == 0
     && props.variantIssues.length == 0

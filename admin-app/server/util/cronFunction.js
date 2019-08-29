@@ -12,6 +12,26 @@ async function checkExpired(db){
     expiredHelper.clearExpiredOrders(db)
 }
 
+//handle anything in pending after confirming checkover is done
+async function handlePending(db){
+    let checked = true
+    let myRef = db.collection('pendingReturns').limit(1)
+    let query = await myRef.get()
+    //see if the checkover has been done
+    await query.forEach(doc=>{
+        if (doc._fieldsProto.items.arrayValue.values[0].mapValue.fields.value.integerValue == 0){
+            checked = false
+        }
+    })
+    //only move forward if the checkover is done
+    if (checked == true){
+        itemUpdate(db)
+        refundInformation(db)
+        clearPending()
+    }
+    
+}
+
 //send information about which items need to be refunded
 async function refundInformation(db){
     let myRef = db.collection('pendingReturns')
@@ -80,6 +100,36 @@ async function returningReport(dbIn){
     returningList = mainHelper.combine(returningList)
 }
 
+async function fulfillmentReport(dbIn){
+    let fulfillmentList = []
+    db = dbIn
+    myRef = db.collection('fulfillments')
+    let query = await myRef.get()
+    await query.forEach(async doc => {
+        if (doc._fieldsProto.code.stringValue == ''){
+            tempOrder = {
+                orderid : doc._fieldsProto.orderid.stringValue,
+                name : doc._fieldsProto.name.stringValue,
+                shippingAddress : doc._fieldsProto.shippingAddress.stringValue,
+                store : doc._fieldsProto.store.stringValue,
+                items : [],
+                comment: doc._fieldsProto.comment.stringValue
+            }
+            for (var i = 0;i<doc._fieldsProto.items.arrayValue.values.length;i++){
+                let tempItem = {
+                    name: doc._fieldsProto.items.arrayValue.values[i].mapValue.fields.name.stringValue,
+                    quantity: doc._fieldsProto.items.arrayValue.values[i].mapValue.fields.quantity.integerValue,
+                    productid: doc._fieldsProto.items.arrayValue.values[i].mapValue.fields.productid.stringValue,
+                    variantid: doc._fieldsProto.items.arrayValue.values[i].mapValue.fields.variantid.stringValue,
+                }
+                tempOrder.items.push(tempItem)
+            }
+            fulfillmentList.push(tempOrder)
+        }
+    })
+    emailHelper.sendFulfillmentEmail(fulfillmentList)
+}
+
 
 //wipe pending, everything has been dealt with by this point
 async function clearPending(dbIn){
@@ -138,9 +188,8 @@ async function clearPending(dbIn){
 async function updateInventory(items, dbIn){
     db = dbIn
     for (var i = 0;i<items.length;i++){
-        let idActive = items[i].variantid.stringValue//let idActive = items[i].variantidGIT CHANGE IT TO THIS ONE WHEN WE ACTUALLY HAVE DUPLICATES
+        let idActive = items[i].variantid.stringValue//let idActive = items[i].variantidGIT.stringValue CHANGE IT TO THIS ONE WHEN WE ACTUALLY HAVE DUPLICATES
         let storeActive = items[i].store
-        console.log(idActive + ' - '+ storeActive)
         let {accessToken, torontoLocation} = await inv.getAccessToken(db,storeActive)
         let invId = await inv.getInvID(storeActive, idActive, accessToken)
         inv.increment(1,torontoLocation,invId,storeActive)
@@ -172,4 +221,4 @@ async function addItems(items, status, dbIn){
     batch.commit()
 }
 
-module.exports = {refundInformation, itemUpdate, clearPending, checkExpired, returningReport}
+module.exports = {checkExpired,fulfillmentReport, handlePending}

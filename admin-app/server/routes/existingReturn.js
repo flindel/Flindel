@@ -43,6 +43,7 @@ router.get('/requested/exists', async ctx=>{
             'code':'none',
             'exsit':false
         }
+        console.log(order + ' - '+ shopDomain)
         let querySnapshot = await myRef.where('order','==',order).where('shop','==',shopDomain).get()
         if (!querySnapshot.empty){
             //data.items is the origianl items Array in db, which may contain repeat items
@@ -95,6 +96,11 @@ router.get('/dropoffSummary',async ctx=>{
     myRef = db.collection('pendingReturns')
     let query = await myRef.where('received_by', '==', id).get()
     let codes = []
+    await query.forEach(async doc=>{
+        codes.push(doc._fieldsProto.code.stringValue)
+    })
+    myRef = db.collection('requestedReturns')
+    query = await myRef.where('received_by', '==', id).get()
     await query.forEach(async doc=>{
         codes.push(doc._fieldsProto.code.stringValue)
     })
