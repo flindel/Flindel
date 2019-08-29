@@ -292,3 +292,8 @@ div.vert{
     padding-top: 10px;
     padding-bottom: 10px;
   }
+
+  div.workerStoreBar{
+    margin-left: 40%;
+    max-width:20%
+  }

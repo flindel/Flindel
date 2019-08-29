@@ -40,9 +40,8 @@ class universalNavBar extends Component{
                         src = 'https://anya23blog.files.wordpress.com/2016/11/pomelo-logo-square.jpg?w=820&h=312&crop=1' />
                     </a>
                     </p>
-                        <span><h1 className='top'>Returns</h1>
-                            <p>Please enter your order details to begin</p>
-                        </span>
+                    <h1 className='top'>Returns</h1>
+                    <p>Please enter your order details to begin</p>
                 </div>
                 <div className = "top-fixed"></div>
                 </div>

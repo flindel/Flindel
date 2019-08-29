@@ -9,9 +9,7 @@ import Review from './reviewRestart'
 import '@shopify/polaris/styles.css';
 //const serveoname = '04071318.serveo.net';
 import {serveo_name} from '../config.js'
-const sname = serveo_name
-const serveoname = sname.substring(8)
-let shop = ''
+const serveoname = serveo_name
 
 class IdentifyApp extends Component {
     //constructor and binding methods
@@ -67,21 +65,17 @@ class IdentifyApp extends Component {
     //load return policy - have to expand this to multiple stores once we load
     async componentDidMount(){
         shop = window.location.hostname
-        console.log('shop-----'+shop)
         this.setState({
             shopDomain: shop
         })
         if(shop.indexOf('myshopify')==-1){
-            console.log("shop====="+shop)
             //if the hostname is not a .myshopify domain, get myshopifyDomain from DB
             let domain = await fetch(`https://${serveoname}/shop/myshopifydomain?shop=${encodeURIComponent(shop)}`, {
                 method: 'get',
             })
             let domainJson = await domain.json()
             shop = domainJson.myshopifyDomain
-            console.log('shop++++'+shop)
         }
-        console.log(shop)
         //get return policy from db
         let temp = await fetch(`https://${serveoname}/shop/returnPolicy?shop=${encodeURIComponent(shop)}`, {
             method: 'get',
@@ -276,7 +270,7 @@ class IdentifyApp extends Component {
 
       //check returns database to see if return already exists
     async checkReturnsFromDB(orderNum,shopDomain){
-        let temp = await fetch(`https://${serveoname}/return/requested/exists?orderNum=${encodeURIComponent(orderNum)}&shopDomain=${encodeURIComponent(shopDomain)}`, {
+        let temp = await fetch(`https://${serveoname}/return/requested/exists?orderNum=${encodeURIComponent(orderNum)}&shopDomain=${encodeURIComponent(this.state.shopDomain)}`, {
             method: 'get',
         })
         let json = await temp.json()

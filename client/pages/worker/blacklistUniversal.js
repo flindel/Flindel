@@ -1,9 +1,9 @@
 import React, { Component } from 'react';
 import '../Confirmation/universal.css'
 import {serveo_name} from '../config'
-const sname = serveo_name
-const serveoname = sname.substring(8)
-//for error message - alows page to stand alone
+import Select from 'react-select'
+const serveoname = serveo_name
+//for error message - allows page to stand alone
 const myStyle = {
     color: 'red'
 }
@@ -21,10 +21,12 @@ class Blacklist extends Component {
             deleteIn :'',
             errorMessage: '',
             loginMessage: '',
-            valid: 0
+            valid: 0,
+            stores: [],
+            activeStore:[]
         }
         this.handleSubmit = this.handleSubmit.bind(this)
-        this.handleInputChange = this.handleInputChange.bind(this)
+        this.handleStoreChange = this.handleStoreChange.bind(this)
         this.getItems = this.getItems.bind(this)
         this.handleChangeAdd = this.handleChangeAdd.bind(this)
         this.handleChangeDelete = this.handleChangeDelete.bind(this)
@@ -49,9 +51,30 @@ class Blacklist extends Component {
         })
     }
 
+    async componentDidMount(){
+        let temp = await fetch(`https://${serveoname}/shop/all`, {
+            method: 'get',
+        })
+        let tJSON = await temp.json()
+        let stores = []
+        for (var i = 0;i<tJSON.length;i++){
+            let tempStore = {
+                value: tJSON[i],
+                label: tJSON[i] + '.myshopify.com'
+            }
+            stores.push(tempStore)
+        }
+        this.setState({stores:stores})
+    }
+
     //input field for entering store name at beginning of process
-    handleInputChange(e){
-        this.setState({storeName:e.target.value})
+    handleStoreChange(option){
+        this.setState(state => {
+            return {
+              activeStore: option
+            };
+          });
+        this.setState({storeName: option.value})
     }
 
     //input field for entering id of item to add
@@ -65,14 +88,24 @@ class Blacklist extends Component {
     }
     //check if product actually exists
     async doesProductExist(ID){
+        let valid = false
         let temp = await fetch(`https://${serveoname}/products?shop=${encodeURIComponent(this.state.storeName)}&id=${encodeURIComponent(ID)}`, {
             method: 'get',
         })
         let response = await temp.json()
         if (response){
-            response = true
+            valid = true
         }
-        return response
+        else{
+            let temp2 = await fetch(`https://${serveoname}/products/variant/exists?store=${encodeURIComponent(this.state.storeName)}&id=${encodeURIComponent(ID)}`, {
+                method: 'get',
+            })
+           let response2 = await temp2.json()
+           if (response2){
+               valid = true
+           }
+        }
+        return valid
     }
 
     //add item to blacklist (on submit of add)
@@ -165,11 +198,10 @@ class Blacklist extends Component {
                 <div>
                     <h1 className = 'scHeader'>Blacklist</h1> 
                     <br></br>
-                    <label> 
-                        Enter store name below:
-                        <br/>
-                        <input type = 'text' value = {this.state.storeName} onChange = {this.handleInputChange}></input>
-                    </label>
+                    <div className = 'workerStoreBar'>
+                    <Select placeholder = {'Select store...'} isSearchable = {false} value = {this.state.activeStore} options = {this.state.stores} onChange = {this.handleStoreChange}/>
+                    </div>
+                    <br/>
                     <button onClick = {this.handleSubmit}>SUBMIT</button>
                     <br/>
                     <br/>
@@ -184,11 +216,11 @@ class Blacklist extends Component {
             <div>
                 <h1 className = 'scHeader'>Blacklist - {this.state.storeName} </h1>
                 <br/>
-                <label>Add item (PRODUCT ID):
+                <label>Add item (ID):
                     <input value = {this.state.addIn} onChange = {this.handleChangeAdd} type = 'text'></input>
                 </label>
                 <button onClick = {this.addToBlacklist}>ADD</button>
-                <label> Delete item (PRODUCT ID):
+                <label> Delete item (ID):
                     <input onChange = {this.handleChangeDelete} value = {this.state.deleteIn} type = 'text'></input>
                 </label>
                 <button onClick = {this.deleteFromBlacklist}>DELETE</button>

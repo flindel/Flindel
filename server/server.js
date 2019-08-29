@@ -28,9 +28,8 @@ new CronJob(
   async function() {
     //KEEP THIS ORDER OF STUFF. unblock all when we go live, set time '0 0 0 * * *'
     //await cronUtil.checkExpired(db);
-    //await cronUtil.itemUpdate(db)
-    //await cronUtil.refundInformation(db)
-    //await cronUtil.clearPending(db);
+    //await cronUtil.handlePending(db)
+    //await cronUtil.fulfillmentReport(db)
   },
   null,
   true
@@ -75,7 +74,7 @@ app.prepare().then(() => {
     //}
     //server.use(proxy('feritas.serveo.net'))
 
-    app.setAssetPrefix('flindel-returns');
+    //app.setAssetPrefix('flindel-returns');
     //console.log(ctx)
 
     await next();
@@ -125,12 +124,6 @@ app.prepare().then(() => {
           accessToken,
           shop
         });
-        // const registration = await registerWebhook({
-        //   address: "https://suus.serveo.net/hookendpoint",
-        //   topic: "PRODUCTS_CREATE",
-        //   accessToken,
-        //   shop
-        // });
         if (registration.success) {
           console.log("webhooks registered");
         } else {

@@ -2,6 +2,9 @@ import React, { Component } from 'react';
 import DisplayIssue from './DisplayIssue';
 import FixIssues from './FixIssues';
 import {serveo_name} from '../config'
+let api_name = "https://"+serveo_name;
+
+
 import {get} from './Shopify'
 import {getGitProduct, getOrigProduct, delProduct} from './Firestore'
 
@@ -11,6 +14,8 @@ let collection_get_it_today_id = "97721155681";
 
 let key = 1;
 
+//Goes through all products on store and finds any discrepancies between original and GIT products
+//Passes this.state.updates to Fix issues after user clicks Update Products
 class FindIssues extends Component {
   constructor(props){
     collection_all_products_id = props.collection_all_products_id;
@@ -34,10 +39,12 @@ class FindIssues extends Component {
     this.findOrig = this.findOrig.bind(this);
   }
 
+  //empty callback function used for debugging
   callback(data) {
     console.log(data);
   }
 
+  //Gets all the GIT and Original products and validates starts the process to validate
   componentDidMount() {
     let normProducts = {};
     let gitProducts = {};
@@ -50,8 +57,8 @@ class FindIssues extends Component {
       updates: [],
       displayUpdates: [],
     })
-    //Assumption, Brand has less than 250 inventory item/product variations
-    fetch(`${serveo_name}/collections?id=${encodeURIComponent(collection_all_products_id)}`, {
+    //Assumption, Brand has less than 250 products
+    fetch(`${api_name}/collections?id=${encodeURIComponent(collection_all_products_id)}`, {
       method: 'GET',
       })
       .then((response) => {
@@ -65,7 +72,7 @@ class FindIssues extends Component {
       })
       .catch((error) => console.log(error))
 
-    fetch(`${serveo_name}/collections?id=${encodeURIComponent(collection_get_it_today_id)}`, {
+    fetch(`${api_name}/collections?id=${encodeURIComponent(collection_get_it_today_id)}`, {
       method: 'GET',
       })
       .then((response) => {
@@ -80,6 +87,7 @@ class FindIssues extends Component {
       .catch((error) => console.log(error))
   }
 
+  //After Original and GIT products have been recieved trigger compareUpdates()
   loaded(){
     if(!this.state.load_git && !this.state.load_all){
       console.log("Norm Products: ", this.state.all);
@@ -89,6 +97,7 @@ class FindIssues extends Component {
 
   }
 
+  //Concatenates validation results and stores it in this.state.updates
   compareUpdates(){
     let diff = [];
     diff = this.normalProductIssues().concat(this.gitProductIssues());
@@ -98,6 +107,7 @@ class FindIssues extends Component {
     })
   }
 
+  //Finds issues in Original products
   normalProductIssues(){
     let diff = []
     for(let i = 0; i < this.state.all.products.length; i++){
@@ -110,6 +120,7 @@ class FindIssues extends Component {
     return diff;
   }
 
+  //Takes in git product id and returns git product data
   findGit(id){
     for (let product of this.state.git.products) {
       if (product.id+"" == id){
@@ -119,6 +130,7 @@ class FindIssues extends Component {
     return null;
   }
 
+  //takes in original product id and returns original product data
   findOrig(id){
     for (let product of this.state.all.products) {
       if (product.id+"" == id){
@@ -128,7 +140,7 @@ class FindIssues extends Component {
     return null;
   }
 
-
+  //callback for normalProductIssues, uses firestore data to validate normal products
   normProductIssuesLoop(data){
     let product = this.findOrig(data.orig_id);
     if (data.git_id !== undefined) {
@@ -208,6 +220,7 @@ class FindIssues extends Component {
     return null;
   }
 
+  //finds issues in GIT products
   gitProductIssues(){
     let diff = []
     for(let i = 0; i < this.state.git.products.length; i++){
@@ -220,6 +233,7 @@ class FindIssues extends Component {
     return diff;
   }
 
+  //Callback function for gitProductIssues, validates products with firestore data
   gitProductIssuesLoop(data){
     let normProduct = this.findOrig(data.orig_id);
     let gitProduct = this.findGit(data.git_id);
@@ -383,6 +397,7 @@ class FindIssues extends Component {
     }
   }
 
+  //Validates variant parameters with shopify and firestore data
   compareVariantParameters(norm, git, fsPairs){
     const varPairs = fsPairs.variants;
     let variantIssues = [];
@@ -450,6 +465,7 @@ class FindIssues extends Component {
     return variantIssues;
   }
 
+  //check if original version of get it today product does not exist.
   checkNormDne(norm, git, fsPairs){
     for(let i = 0; i < fsPairs.variants.length; i++){
       let fsNormId = fsPairs.variants[i].orig_var
@@ -481,7 +497,7 @@ class FindIssues extends Component {
     }
   }
 
-
+  //compares parameters in each variant to make sure the GIT and original variants are the same.
   compareVariants(normVar, gitVar){
     let variantIssues = []
     const para = ["barcode", "compare_at_price", "image_id", "option1",
@@ -503,6 +519,7 @@ class FindIssues extends Component {
     return variantIssues;
   }
 
+  //returns the index of the variant in the array in firestore.
   findNormVarFirestore(fsPairs, varID){
     for(let i = 0; i < fsPairs.variants.length; i++){
       if(fsPairs.variants[i].orig_var+"" == varID){return i;}
@@ -510,6 +527,7 @@ class FindIssues extends Component {
     return -1;
   }
 
+  //returns the pair of git variant ID and original variant ID, with a single git variant ID.
   findGitVarShopify(git, varID){
     for(let i = 0; i < git.variants.length; i++){
       if(git.variants[i].id+"" == varID+""){

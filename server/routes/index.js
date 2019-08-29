@@ -14,7 +14,6 @@ const fulfservRouter = require("./fulserv");
 const sendEmailRouter = require("./sendEmail");
 const dbRouter = require("./databaseAction");
 const webhookRouter = require("./webhooks");
-const priceRule = require("./priceRule");
 const itemRouter = require('./item')
 const fulfillmentRouter = require('./fulfillment')
 const workerRouter = require('./worker')
@@ -36,7 +35,6 @@ router = combineRouters(
   sendEmailRouter,
   dbRouter,
   webhookRouter,
-  priceRule,
   itemRouter,
   fulfillmentRouter,
   workerRouter,

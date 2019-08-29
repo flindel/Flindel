@@ -40,6 +40,34 @@ router.get('/', async ctx => {
   }
 });
 
+router.get('/variant/exists',async ctx=>{
+    ctx.body = false
+    const id = ctx.query.id
+    const store = ctx.query.store
+    const {accessToken, torontoLocation} = await getAccessToken.getAccessToken(ctx.db, store)
+    const option = {
+        method: 'GET',
+        url: `https://${store}/${api_link}/variants/${id}.json`,
+        headers: {
+          'X-Shopify-Access-Token': accessToken
+        },
+        json: true,
+    }
+    try {
+        ctx.body = await rp(option);
+        //console.log("body..."+JSON.stringify(ctx.body));
+    } catch (err) {
+        console.log(err.message);
+        if (err instanceof errors.StatusCodeError) {
+            ctx.status = err.statusCode;
+            ctx.message = err.message;
+        } else if (err instanceof errors.RequestError) {
+            ctx.status = 500;
+            ctx.message = err.message;
+        }
+    }
+})
+
 router.get('/variant/productID', async ctx=>{
 const { cookies } = ctx;
 const varID = ctx.query.id
@@ -118,6 +146,8 @@ router.get('/ids/', async ctx => {
   }
 });
 
+
+
 //Only used by return portal
 router.get('/img', async ctx => {
     // Get product img src
@@ -183,7 +213,9 @@ router.post('/', async ctx => {
 router.post('/variant/', async ctx => {
     const product_id = ctx.query.id;
     // Create a product
-    const { shop, accessToken } = getShopHeaders(ctx);
+    const { cookies } = ctx;
+    const shop = cookies.get('shop_id');
+    const accessToken = cookies.get('accessToken');
     const headers = {};
     if (process.env.DEBUG) {
         headers['Authorization'] = process.env.SHOP_AUTH;

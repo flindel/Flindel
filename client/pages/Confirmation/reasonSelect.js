@@ -49,7 +49,7 @@ class confirmOrder extends React.Component{
   set1(){
     //setting state from radio button (either old or new email)
     //set the style to show the double confirmation etc
-      this.setState({selectedEmail: 1,existingStyle:'l3Off', newStyle:'l3On',hiddenStyle:'l3On', existingStyleText:'l3Off',newStyleText:'l3On'})
+      this.setState({selectedEmail: 1,errorMessage: '',existingStyle:'l3Off', newStyle:'l3On',hiddenStyle:'l3On', existingStyleText:'l3Off',newStyleText:'l3On'})
   }
 
   //update email field for email confirmation field
@@ -134,43 +134,40 @@ class confirmOrder extends React.Component{
         return(
             <div>
               <p className = 'errorMessage'>{this.state.itemErrorMessage}</p>
-              <div className = 'itemListSmall'>
-                <fieldset className = 'page2'>
-                  <p className = 'orderHeader'>Order Number: {this.props.orderNum}</p>
-                  <br/>
-                      {this.props.items.map((item,index)=>{ 
+                <div className = 'itemListSmall'>
+                  <fieldset className = 'page2'>
+                    <p className = 'orderHeader'>Order Number: {this.props.orderNum}</p>
+                    <br/>
+                    {this.props.items.map((item,index)=>{ 
                       return <Item step = {2} item={item} serveoname={this.props.serveoname} key={index}handleSelect={this.handleSelect.bind(this)} shop = {this.props.shop}/>    
-                      })} {/*show all items*/}
-                </fieldset>
-              <br/>
-                <p className = 'errorMessage'>{this.state.errorMessage}</p>
-                <div className = 'getEmail'>
-                <h3 className = 'emailHead'>Email Confirmation <span onClick = {this.showEmailConfirmInfo}><img src = "https://drive.google.com/uc?id=1muURA-zh3cbC2WLT0gX8nLRYLPilQujh"/></span></h3> {/* GET EMAIL INFO*/}
-                  {
-                    this.state.showEmailConfirmInfo? (<p>You will receive confirmation ode and updates through Email</p>):null
-                  }
-                <form>
-                  <div>
-                    <p className = 'emailText'>
-                    <label className = {this.state.existingStyle}>
-                      <span className = "emailLabel">Use existing email: </span>
-                        <input readOnly className = {this.state.existingStyleText} type="text" value={this.state.emailToPrint} onClick = {this.set0} />
-                    </label>
-                    
-                    <br/>
-                    <label className = {this.state.newStyle}> 
-                      <span className = "emailLabel">Enter new email: </span>   
-                      <input className = {this.state.newStyleText} type="text" value={this.props.newEmail} onClick = {this.set1} onChange={this.props.updatehandleChange('newEmail')} />
-                    </label>
-                    <br/>
-                    <label className = {this.state.hiddenStyle}>
-                      <span className = "emailLabel">Re-enter email: </span>
-                      <input className = 'l3On' type="text" value = {this.state.emailCopy} onChange = {this.updateEmailCopy}/>
-                    </label>
-                    </p>
+                    })} {/*show all items*/}
+                  </fieldset>
+                  <br/>
+                  <div className = 'getEmail'>
+                    <p className = 'errorMessage'>{this.state.errorMessage}</p>
+                    <h3 className = 'emailHead'>Email Confirmation <span onClick = {this.showEmailConfirmInfo}><img src = "https://drive.google.com/uc?id=1muURA-zh3cbC2WLT0gX8nLRYLPilQujh"/></span></h3> {/* GET EMAIL INFO*/}
+                    {
+                      this.state.showEmailConfirmInfo? (<p>You will receive confirmation code and updates through this email.</p>):null
+                    }
+                    <form>
+                      <p className = 'emailText'>
+                        <label className = {this.state.existingStyle}>
+                          <span className = "emailLabel">Use existing email: </span>
+                          <input readOnly className = {this.state.existingStyleText} type="text" value={this.state.emailToPrint} onClick = {this.set0} />
+                        </label>
+                        <br/>
+                        <label className = {this.state.newStyle}> 
+                          <span className = "emailLabel">Enter new email: </span>   
+                          <input className = {this.state.newStyleText} type="text" value={this.props.newEmail} onClick = {this.set1} onChange={this.props.updatehandleChange('newEmail')} />
+                        </label>
+                        <br/>
+                        <label className = {this.state.hiddenStyle}>
+                          <span className = "emailLabel">Re-enter email: </span>
+                          <input className = 'l3On' type="text" value = {this.state.emailCopy} onClick = {this.set1} onChange = {this.updateEmailCopy}/>
+                        </label>
+                      </p>
+                    </form>
                   </div>
-                </form>
-                </div>
                 </div>
               <div className = "fixed-footer-email"></div>
               <footer className = 'f1'>

@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import {postCollection, getShopID, postFulfillmentService, postGIT, put} from './Shopify';
-import {serveo_name} from '../config.js';
+import {serveo_name} from '../config'
+let api_name = "https://"+serveo_name;
 import SetupNavbar from './SetupNavbar';
 import {getUpdates} from './FindIssues';
 import Button from '@material-ui/core/Button';
@@ -52,10 +53,13 @@ class OnboardProcess extends Component {
     this.getSetupStep();
   }
 
+  //Step 1 of onboarding Process
+  //Post GIT and Original collections
+  //Post flindel fulfillment service
   async setup(){
     //store shop primary domain with .myshopify doamin in db
     //storeShopDomain();
-    fetch(`${serveo_name}/shop/domain`,{
+    fetch(`${api_name}/shop/domain`,{
       method: 'GET',
     }).then((res)=>{res.json()}).then(resj=>{
     })
@@ -89,22 +93,19 @@ class OnboardProcess extends Component {
     postFulfillmentService();
   }
 
-  // async storeShopDomain(){
-  //   let domainTemp = await fetch(`${serveo_name}/shop/domain`,{
-  //     method: 'GET',
-  //   })
-  //   let domainJson = await domainTemp.json()
-  // }
 
+  //Step 4 of the onboarding Process
+  //Publish all Get it Today Products
+  //Posts script tags
   publish(){
     this.setState({isLoading: true});
     this.publishAllGit();
     this.setupScriptTag();
   }
 
+  //Publish ALl Get it Today
   publishAllGit(){
-    //Publish ALl Get it Today
-    fetch(`${serveo_name}/collections?id=${encodeURIComponent(this.state.gitCollectionId)}`, {
+    fetch(`${api_name}/collections?id=${encodeURIComponent(this.state.gitCollectionId)}`, {
       method: 'GET',
       })
       .then((response) => {
@@ -128,6 +129,7 @@ class OnboardProcess extends Component {
       })
   }
 
+  //tracks progress of publishing
   finishPublish(){
     gitPublished += 1
     if(gitPublished == this.state.gitProductIds.length){
@@ -141,13 +143,13 @@ class OnboardProcess extends Component {
   async setupScriptTag(){
     //get urls from DB
     let respArray = []
-    let srcTemp = await fetch(`${serveo_name}/scriptTag/db/src`, {
+    let srcTemp = await fetch(`${api_name}/scriptTag/db/src`, {
       method: 'get',
     })
     let srcJson = await srcTemp.json()
     //for each url, post scriptTag to shopify endpoint
       for(let i=0; i<srcJson.length; i++){
-          let postTemp = await fetch(`${serveo_name}/scriptTag/shopify` ,{
+          let postTemp = await fetch(`${api_name}/scriptTag/shopify` ,{
             method: 'post',
             headers: {
               'Accept': 'application/json, text/plain, */*',
@@ -166,24 +168,29 @@ class OnboardProcess extends Component {
         }
       //update id and other info to DB
       let respString = JSON.stringify(respArray)
-      let putDBTemp = await fetch(`${serveo_name}/scriptTag/db/updateid?resp=${encodeURIComponent(respString)}`,{
+      let putDBTemp = await fetch(`${api_name}/scriptTag/db/updateid?resp=${encodeURIComponent(respString)}`,{
             method:'put',
           })
       let putDBJson = await putDBTemp.json()
   }
 
+  //stores id of GIT collection after it has been creates
   callbackGit(data){
     this.setState({gitCollectionId: data.smart_collection.id})
   }
 
+  //stores id of Original Collection after it has been collected
+  //Makes api request to shopify to get origianl products and create GIT products unpublished
   callbackOrig(data){
     this.setState({origCollectionId: data.smart_collection.id})
     this.getOrigProducts(data.smart_collection.id);
   }
 
+  //Gets onboarding step from firestore.
+  //Moves Brand to correct onboarding step based on firestore value
   async getSetupStep(){
     var temp;
-    temp = await fetch(`${serveo_name}/shop/onboardingStep`, {
+    temp = await fetch(`${api_name}/shop/onboardingStep`, {
       method: 'get',
     })
     var json  = await temp.json();
@@ -201,9 +208,9 @@ class OnboardProcess extends Component {
     return json;
   }
 
-
+  //Writes step to firestore onboardingStep
   postSetupStep(step){
-    fetch(`${serveo_name}/shop/onboardingStep?body=${encodeURIComponent(JSON.stringify({"onboardingStep": step}))}`, {
+    fetch(`${api_name}/shop/onboardingStep?body=${encodeURIComponent(JSON.stringify({"onboardingStep": step}))}`, {
       method: 'post',
     })
   }
@@ -212,7 +219,7 @@ class OnboardProcess extends Component {
   //Then create a Get it Today version of that product and correct the weight if it is 0kg.
   getOrigProducts(origCollectionId, loopCount = 0){
     //Assumption, Brand has less than 250 products
-    fetch(`${serveo_name}/collections?id=${encodeURIComponent(origCollectionId)}`, {
+    fetch(`${api_name}/collections?id=${encodeURIComponent(origCollectionId)}`, {
       method: 'GET',
       })
       .then((response) => {
@@ -284,9 +291,10 @@ class OnboardProcess extends Component {
       }
     }
     let body = {product: normBody};
-    put(norm.id, body, this.finishedFixing);
+    put(norm.id, body);
   }
 
+  //Tracks progress of the posting of git products
   finishedFixing(){
     gitProducts += 1;
     console.log("Fixed: ",gitProducts)
