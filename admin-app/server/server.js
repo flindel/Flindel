@@ -103,6 +103,7 @@ app.prepare().then(() => {
         "write_script_tags",
         "read_price_rules"
       ],
+      accessMode: 'offline',
       async afterAuth(ctx) {
         const { shop, accessToken } = ctx.session;
         // TODO: create the shop in the database and store the accessToken
