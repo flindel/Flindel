@@ -6,10 +6,11 @@ const dotenv = require("dotenv");
 const session = require("koa-session");
 const bodyParser = require("koa-bodyparser");
 
+const { catchError, logError } = require('./error');
 const getShopHeaders = require('./util/shop-headers');
+const { accessToken } = require('./util/acessTokenDB');
 dotenv.config();
 
-//new CronJob("* * */23 * * *", warehouseOrder, null, true);
 
 const port = parseInt(process.env.PORT, 10) || 3000;
 const dev = process.env.NODE_ENV !== "production";
@@ -33,6 +34,7 @@ const { APP_PROXY_PREFIX, API_URL } = process.env;
 
 app.prepare().then(() => {
   const server = new Koa();
+  server.use(catchError);
   server.use(session(server));
   server.use(bodyParser());
   server.use(cors());
@@ -53,6 +55,8 @@ app.prepare().then(() => {
 
     await next();
   });
+  
+  server.use(accessToken);
   server.use(router());
   server.use(async ctx => {
     await handle(ctx.req, ctx.res);
@@ -60,6 +64,8 @@ app.prepare().then(() => {
     ctx.res.statusCode = 200;
     return;
   });
+
+  server.on('error', logError);
 
   server.listen(port, () => {
     console.log(`> Ready on ${API_URL}${APP_PROXY_PREFIX}:${port}`);
