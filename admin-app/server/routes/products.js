@@ -3,9 +3,8 @@ const rp = require('request-promise');
 const errors = require('request-promise/errors');
 const { api_link } = require('../default-shopify-api.json');
 const { getShopHeaders } = require('../util/shop-headers');
-const getAccessToken = require('../util/editInventory')
-const mainHelper = require('../util/mainHelper')
-const {accessTokenDB} = require('../util/acessTokenDB');
+const getAccessToken = require('../util/editInventory');
+const mainHelper = require('../util/mainHelper');
 const router = Router({
     prefix: '/products'
 });
@@ -14,9 +13,10 @@ router.get('/', async ctx => {
     ctx.body = false;
   const productid = ctx.query.id;
   const { cookies } = ctx;
-  const shop = ctx.query.shop;
-    db = ctx.db
-    const accessToken = await accessTokenDB(ctx)
+//   const shop = ctx.query.shop;
+//   const accessToken = await accessTokenDB(ctx)
+  const {shop, accessToken} = getShopHeaders(ctx);
+  db = ctx.db
   const option = {
       method: 'GET',
       url: `https://${shop}/${api_link}/products/${productid}.json`,
@@ -93,9 +93,8 @@ router.get('/GITinformation',async ctx=>{
 
 router.get('/all', async ctx=>{
     const { cookies } = ctx;
-  const shop = ctx.query.shop
+  const {shop, accessToken} = getShopHeaders(ctx);
   console.log(shop)
-  const accessToken = await accessTokenDB(ctx)
   const option = {
       method: 'GET',
       url: `https://${shop}/${api_link}/products.json`,
@@ -153,9 +152,8 @@ router.get('/img', async ctx => {
     // Get product img src
     const productid = ctx.query.id;
     const { cookies } = ctx;
-    const shop = ctx.query.shop;
+    const {shop, accessToken} = getShopHeaders(ctx);
     db = ctx.db
-    const accessToken = await accessTokenDB(ctx)
     console.log(accessToken)
     const option = {
         url: `https://${shop}/${api_link}/products/${productid}.json`,
@@ -214,8 +212,7 @@ router.post('/variant/', async ctx => {
     const product_id = ctx.query.id;
     // Create a product
     const { cookies } = ctx;
-    const shop = cookies.get('shop_id');
-    const accessToken = cookies.get('accessToken');
+    const { shop, accessToken } = getShopHeaders(ctx);
     const headers = {};
     if (process.env.DEBUG) {
         headers['Authorization'] = process.env.SHOP_AUTH;
@@ -247,8 +244,7 @@ router.delete('/variant/', async ctx => {
   const product_id = ctx.query.id;
   const variant_id = ctx.query.variant_id
   const { cookies } = ctx;
-  const shop = cookies.get('shop_id');
-  const accessToken = cookies.get('accessToken');
+  const { shop, accessToken } = getShopHeaders(ctx);
   const option = {
       method: 'delete',
       url: `https://${shop}/${api_link}/products/${product_id}/variants/${variant_id}.json`,
@@ -308,8 +304,7 @@ router.delete('/', async ctx => {
   const productid = ctx.query.id;
   console.log("productID:---------"+productid)
   const { cookies } = ctx;
-  const shop = cookies.get('shop_id');
-  const accessToken = cookies.get('accessToken');
+  const { shop, accessToken } = getShopHeaders(ctx);
   const option = {
       method: 'delete',
       url: `https://${shop}/${api_link}/products/${productid}.json`,

@@ -11,6 +11,8 @@ const { warehouseOrder } = require("./serverFunctions");
 const { registerWebhook } = require("@shopify/koa-shopify-webhooks");
 //const { SERVEO_NAME } = process.env;
 dotenv.config();
+const { catchError, logError } = require('./error');
+const { accessToken } = require('./util/acessTokenDB');
 const cronUtil = require("./util/cronFunction");
 const whTest = require("./util/webhookHelper"); //////////////////////
 const cron = require("cron");
@@ -59,6 +61,7 @@ const SERVEO_NAME = API_URL.substring(8)
 
 app.prepare().then(() => {
   const server = new Koa();
+  server.use(catchError);
   server.use(session(server));
   server.use(bodyParser());
   server.use(cors());
@@ -77,7 +80,6 @@ app.prepare().then(() => {
 
     //app.setAssetPrefix('flindel-returns');
     //console.log(ctx)
-
     await next();
   });
   server.keys = [SHOPIFY_API_SECRET_KEY];
@@ -110,8 +112,8 @@ app.prepare().then(() => {
         //console.log('shop.............');
         //console.log(accessToken);
         //console.log(shop);
-        ctx.cookies.set("shop_id", shop);
-        ctx.cookies.set("accessToken", accessToken);
+        // ctx.cookies.set("shop_id", shop);
+        // ctx.cookies.set("accessToken", accessToken);
         let tokenRef = ctx.db.collection("shop_tokens").doc(shop);
         try {
           await tokenRef.set({ token: accessToken });
@@ -158,7 +160,8 @@ app.prepare().then(() => {
     })
   );
 
-  //  server.use(verifyRequest());
+  server.use(accessToken);
+  server.use(verifyRequest());
   server.use(router());
   server.use(async ctx => {
     await handle(ctx.req, ctx.res);
@@ -166,6 +169,8 @@ app.prepare().then(() => {
     ctx.res.statusCode = 200;
     return;
   });
+
+  server.on('error', logError);
 
   server.listen(port, () => {
     console.log(`> Ready on ${API_URL}:${port}`);

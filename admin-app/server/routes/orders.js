@@ -2,7 +2,7 @@ const Router = require("koa-router");
 const rp = require("request-promise");
 const errors = require("request-promise/errors");
 const { api_link } = require("../default-shopify-api.json");
-const { accessTokenDB } = require("../util/acessTokenDB");
+const { getShopHeaders } = require('../util/shop-headers');
 const router = Router({
   prefix: "/orders"
 });
@@ -10,8 +10,7 @@ const router = Router({
 //Only used by return portal
 router.get("/", async ctx => {
   // Get order info with order name (4 digit number like 1001)
-  const shop = ctx.query.shop;
-  const accessToken = await accessTokenDB(ctx);
+  const {shop, accessToken} = getShopHeaders(ctx);
   const name = ctx.query.orderNum;
   const option = {
     url: `https://${shop}/${api_link}/orders.json?name=${name}&status=any`,

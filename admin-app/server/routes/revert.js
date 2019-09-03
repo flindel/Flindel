@@ -3,7 +3,6 @@ const rp = require('request-promise');
 const errors = require('request-promise/errors');
 const { api_link } = require('../default-shopify-api.json');
 const { getShopHeaders } = require('../util/shop-headers');
-const {accessTokenDB} = require('../util/acessTokenDB');
 const router = Router({
     prefix: '/revert'
 });
@@ -14,10 +13,9 @@ router.delete('/products/', async ctx => {
   ctx.set('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept');
   ctx.set('Access-Control-Allow-Methods', 'POST, GET, PUT, DELETE, OPTIONS');
   const productid = ctx.query.id;
-  const shop = ctx.query.shop;
+  const {shop, accessToken} = getShopHeaders(ctx);
   console.log("productID:---------"+productid)
   const { cookies } = ctx;
-  const accessToken = await accessTokenDB(ctx);
   const option = {
       method: 'delete',
       url: `https://${shop}/${api_link}/products/${productid}.json`,
@@ -59,8 +57,7 @@ router.get('/collections/all/', async ctx => {
   ctx.set('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept');
   ctx.set('Access-Control-Allow-Methods', 'POST, GET, PUT, DELETE, OPTIONS');
   const { cookies } = ctx;
-  const shop = ctx.query.shop;
-  const accessToken = await accessTokenDB(ctx);
+  const {shop, accessToken} = getShopHeaders(ctx);
   const option = {
       method: 'GET',
       url: `https://${shop}/${api_link}/smart_collections.json`,
@@ -90,8 +87,7 @@ router.delete('/collections/', async ctx => {
   const smart_collection_id = ctx.query.id;
   console.log("collection ID:---------"+smart_collection_id)
   const { cookies } = ctx;
-  const shop = ctx.query.shop;
-  const accessToken = await accessTokenDB(ctx);
+  const {shop, accessToken} = getShopHeaders(ctx);
   const option = {
       method: 'delete',
       url: `https://${shop}/${api_link}/smart_collections/${smart_collection_id}.json`,
@@ -121,8 +117,7 @@ router.delete("/fulserv", async ctx => {
   ctx.set('Access-Control-Allow-Methods', 'POST, GET, PUT, DELETE, OPTIONS');
   const fulservId = ctx.query.id;
   console.log("fulfillment service id:---------" + fulservId);
-  const shop = ctx.query.shop;
-  const accessToken = await accessTokenDB(ctx);
+  const {shop, accessToken} = getShopHeaders(ctx);
   const headers = {};
   if (process.env.DEBUG) {
     headers["Authorization"] = process.env.SHOP_AUTH;
@@ -158,8 +153,7 @@ router.get('/collections/', async ctx => {
     const collectionid = ctx.query.id;
     console.log("collectionid:---------", collectionid)
     const { cookies } = ctx;
-    const shop = ctx.query.shop;
-    const accessToken = await accessTokenDB(ctx);
+    const {shop, accessToken} = getShopHeaders(ctx);
     const option = {
         url: `https://${shop}/${api_link}/products.json?collection_id=${collectionid}&limit=250`,
         headers: {
@@ -189,8 +183,7 @@ router.get('/collections/', async ctx => {
        ctx.set('Access-Control-Allow-Methods', 'POST, GET, PUT, DELETE, OPTIONS');
           // get all scripTag ids
           let ids = []
-          const shop = ctx.query.shop;
-          const accessToken = await accessTokenDB(ctx);
+          const {shop, accessToken} = getShopHeaders(ctx);
           console.log("call db ids")
           db = ctx.db
           let myRef =await db.collection('scripttag').doc(shop).get();
@@ -207,8 +200,7 @@ router.get('/collections/', async ctx => {
        ctx.set('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept');
        ctx.set('Access-Control-Allow-Methods', 'POST, GET, PUT, DELETE, OPTIONS');
          console.log('call delete shopify')
-         const shop = ctx.query.shop;
-         const accessToken = await accessTokenDB(ctx);
+         const {shop, accessToken} = getShopHeaders(ctx);
          const headers = {};
        if (process.env.DEBUG) {
            headers['Authorization'] = process.env.SHOP_AUTH;
@@ -242,8 +234,7 @@ router.get('/collections/', async ctx => {
       ctx.set('Access-Control-Allow-Origin', '*');
       ctx.set('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept');
       ctx.set('Access-Control-Allow-Methods', 'POST, GET, PUT, DELETE, OPTIONS');
-      const shop = ctx.query.shop;
-      const accessToken = await accessTokenDB(ctx);
+      const {shop, accessToken} = getShopHeaders(ctx);
         db = ctx.db
         let myRef = db.collection('scripttag').doc(shop)
         let updateFields = myRef.update({status:"revert"})

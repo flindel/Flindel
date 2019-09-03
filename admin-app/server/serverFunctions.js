@@ -1,9 +1,38 @@
 const dotenv = require("dotenv");
 const turf = require("@turf/turf");
 dotenv.config();
-const GOOGLE_GEO_API_KEY = process.env.GOOGLE_GEOCODING_KEY;
 const serveo_name = "https://923e8fe8.ngrok.io";
 const { API_URL, GOOGLE_GEO_API_KEY } = process.env;
+
+async function generateReturnPortalToken(db, shop, accessToken) {
+  const option = {
+    method: 'POST',
+    url: `https://${shop}/admin/access_tokens/delegate`,
+    headers: {
+      'X-Shopify-Access-Token': accessToken
+    },
+    json: true,
+  }
+  try {
+      const result = await rp(option);
+      let tokenRef = db.collection("shop_tokens").doc(shop);
+      try {
+        await tokenRef.set({ return_portal_token: accessToken }, { merge: true });
+      } catch (err) {
+        console.log(err);
+      }
+      //console.log("body..."+JSON.stringify(ctx.body));
+  } catch (err) {
+      console.log(err.message);
+      if (err instanceof errors.StatusCodeError) {
+          ctx.status = err.statusCode;
+          ctx.message = err.message;
+      } else if (err instanceof errors.RequestError) {
+          ctx.status = 500;
+          ctx.message = err.message;
+      }
+  }
+}
 
 async function getLatLng(address) {
   //console.log()
