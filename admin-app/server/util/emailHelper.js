@@ -255,12 +255,29 @@ async function sendFulfillmentEmail(fulfillments) {
     message += "The following GIT orders have been received in the last day.";
     message += "\n\n";
     for (var i = 0; i < fulfillments.length; i++) {
-      message += fulfillments[i].store + ' - ' + fulfillments[i].orderid + ' - ' + fulfillments[i].name + ' - ' + fulfillments[i].shippingAddress + ' - ' + fulfillments[i].comment + ": ";
-      message += '\n' + 'Items: (name-productID-variantID) ' + '\n'
+      message +=
+        fulfillments[i].store +
+        " - " +
+        fulfillments[i].orderid +
+        " - " +
+        fulfillments[i].name +
+        " - " +
+        fulfillments[i].shippingAddress +
+        " - " +
+        fulfillments[i].comment +
+        ": ";
+      message += "\n" + "Items: (name-productID-variantID) " + "\n";
       for (var j = 0; j < fulfillments[i].items.length; j++) {
         message += "\n";
         message += "\t";
-        message += fulfillments[i].items[j].name + ' - ' + fulfillments[i].items[j].productid + ' - '+ fulfillments[i].items[j].variantid + ', QTY: ' + fulfillments[i].items[j].quantity
+        message +=
+          fulfillments[i].items[j].name +
+          " - " +
+          fulfillments[i].items[j].productid +
+          " - " +
+          fulfillments[i].items[j].variantid +
+          ", QTY: " +
+          fulfillments[i].items[j].quantity;
       }
       message += "\n\n";
     }
@@ -276,7 +293,7 @@ async function sendFulfillmentEmail(fulfillments) {
         {
           to: [
             {
-              email: 'ludiwang66@gmail.com'
+              email: "ludiwang66@gmail.com"
             }
           ],
           subject: "Recent Fulfillments"
@@ -294,7 +311,7 @@ async function sendFulfillmentEmail(fulfillments) {
       ]
     }
   };
- await rp(option);
+  await rp(option);
 }
 
 module.exports = {

@@ -6,18 +6,16 @@ const dotenv = require("dotenv");
 const session = require("koa-session");
 const bodyParser = require("koa-bodyparser");
 
-const { catchError, logError } = require('./error');
-const getShopHeaders = require('./util/shop-headers');
-const { accessToken } = require('./util/acessTokenDB');
+const { catchError, logError } = require("./error");
+const getShopHeaders = require("./util/shop-headers");
+const { accessToken } = require("./util/acessTokenDB");
 dotenv.config();
-
 
 const port = parseInt(process.env.PORT, 10) || 3000;
 const dev = process.env.NODE_ENV !== "production";
 const app = next({
   dev,
-  dir: "./client",
-  
+  dir: "./client"
 });
 const handle = app.getRequestHandler();
 
@@ -55,7 +53,7 @@ app.prepare().then(() => {
 
     await next();
   });
-  
+
   server.use(accessToken);
   server.use(router());
   server.use(async ctx => {
@@ -65,7 +63,7 @@ app.prepare().then(() => {
     return;
   });
 
-  server.on('error', logError);
+  server.on("error", logError);
 
   server.listen(port, () => {
     console.log(`> Ready on ${API_URL}${APP_PROXY_PREFIX}:${port}`);

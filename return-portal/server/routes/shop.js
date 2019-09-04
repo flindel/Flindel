@@ -1,31 +1,36 @@
-const Router = require('koa-router');
-const rp = require('request-promise');
-const errors = require('request-promise/errors');
-const { api_link } = require('../default-shopify-api.json');
-const { getShopHeaders } = require('../util/shop-headers');
+const Router = require("koa-router");
+const rp = require("request-promise");
+const errors = require("request-promise/errors");
+const { api_link } = require("../default-shopify-api.json");
+const { getShopHeaders } = require("../util/shop-headers");
 const router = Router({
-    prefix: '/shop'
+  prefix: "/shop"
 });
 
-router.get('/myshopifydomain', async ctx =>{
-   db = ctx.db
-   const shop = ctx.query.shop
-   console.log(shop)
-   myRef = db.collection('shopDomain')
-   let query = await myRef.doc(shop).get()
-   //console.log(query._fieldsProto.myshopifyDomain.stringValue)
-   ctx.body = {'myshopifyDomain' : query._fieldsProto.myshopifyDomain.stringValue}
-})
+router.get("/myshopifydomain", async ctx => {
+  db = ctx.db;
+  const shop = ctx.query.shop;
+  console.log(shop);
+  myRef = db.collection("shopDomain");
+  let query = await myRef.doc(shop).get();
+  //console.log(query._fieldsProto.myshopifyDomain.stringValue)
+  ctx.body = {
+    myshopifyDomain: query._fieldsProto.myshopifyDomain.stringValue
+  };
+});
 
-router.get('/returnPolicy', async ctx =>{
-    //console.log(ctx)
-    const shop = ctx.query.shop
-    //const { cookies } = ctx;
-    //const shop = cookies.get('shop_id');
-    db = ctx.db
-    myRef = db.collection('store')
-    let query = await myRef.doc(shop).get()
-    ctx.body = {'res': query._fieldsProto.returnPolicy, 'default':query._fieldsProto.defaultReturn}
-})
+router.get("/returnPolicy", async ctx => {
+  //console.log(ctx)
+  const shop = ctx.query.shop;
+  //const { cookies } = ctx;
+  //const shop = cookies.get('shop_id');
+  db = ctx.db;
+  myRef = db.collection("store");
+  let query = await myRef.doc(shop).get();
+  ctx.body = {
+    res: query._fieldsProto.returnPolicy,
+    default: query._fieldsProto.defaultReturn
+  };
+});
 
 module.exports = router;

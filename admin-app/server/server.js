@@ -11,8 +11,8 @@ const { warehouseOrder } = require("./serverFunctions");
 const { registerWebhook } = require("@shopify/koa-shopify-webhooks");
 //const { SERVEO_NAME } = process.env;
 dotenv.config();
-const { catchError, logError } = require('./error');
-const { accessToken } = require('./util/acessTokenDB');
+const { catchError, logError } = require("./error");
+const { accessToken } = require("./util/acessTokenDB");
 const cronUtil = require("./util/cronFunction");
 const whTest = require("./util/webhookHelper"); //////////////////////
 const cron = require("cron");
@@ -57,7 +57,7 @@ admin.initializeApp({
 const db = admin.firestore();
 
 const { SHOPIFY_API_SECRET_KEY, SHOPIFY_API_KEY, API_URL, DEBUG } = process.env;
-const SERVEO_NAME = API_URL.substring(8)
+const SERVEO_NAME = API_URL.substring(8);
 
 app.prepare().then(() => {
   const server = new Koa();
@@ -105,7 +105,7 @@ app.prepare().then(() => {
         "write_script_tags",
         "read_price_rules"
       ],
-      accessMode: 'offline',
+      accessMode: "offline",
       async afterAuth(ctx) {
         const { shop, accessToken } = ctx.session;
         // TODO: create the shop in the database and store the accessToken
@@ -170,7 +170,7 @@ app.prepare().then(() => {
     return;
   });
 
-  server.on('error', logError);
+  server.on("error", logError);
 
   server.listen(port, () => {
     console.log(`> Ready on ${API_URL}:${port}`);

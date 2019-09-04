@@ -14,10 +14,10 @@ const fulfservRouter = require("./fulserv");
 const sendEmailRouter = require("./sendEmail");
 const dbRouter = require("./databaseAction");
 const webhookRouter = require("./webhooks");
-const itemRouter = require('./item')
-const fulfillmentRouter = require('./fulfillment')
-const workerRouter = require('./worker')
-const revertRouter = require('./revert')
+const itemRouter = require("./item");
+const fulfillmentRouter = require("./fulfillment");
+const workerRouter = require("./worker");
+const revertRouter = require("./revert");
 
 router = combineRouters(
   rootRouter,
@@ -38,7 +38,7 @@ router = combineRouters(
   itemRouter,
   fulfillmentRouter,
   workerRouter,
-  revertRouter,
+  revertRouter
 );
 
 module.exports = router;

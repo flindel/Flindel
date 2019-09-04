@@ -14,7 +14,7 @@ router = combineRouters(
   shopRouter,
   sendRouter,
   returnRouter,
-  sendEmailRouter,
+  sendEmailRouter
 );
 
 module.exports = router;
