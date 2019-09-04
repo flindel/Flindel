@@ -12,9 +12,7 @@ router.get("/", async ctx => {
   //Gets products all products from a collection
   const collectionid = ctx.query.id;
   console.log("collectionid:---------", collectionid);
-  const { cookies } = ctx;
-  const shop = cookies.get("shop_id");
-  const accessToken = cookies.get("accessToken");
+  const { shop, accessToken } = getShopHeaders(ctx);
   const option = {
     url: `https://${shop}/${api_link}/products.json?collection_id=${collectionid}&limit=250`,
     headers: {
@@ -63,35 +61,36 @@ router.post("/", async ctx => {
     } else if (err instanceof errors.RequestError) {
       ctx.status = 500;
       ctx.message = err.message;
+        }
     }
-  }
-});
+  });
 
-router.get("/all/", async ctx => {
-  const { cookies } = ctx;
-  const shop = cookies.get("shop_id");
-  const accessToken = cookies.get("accessToken");
-  const option = {
-    method: "GET",
-    url: `https://${shop}/${api_link}/smart_collections.json`,
-    headers: {
-      "X-Shopify-Access-Token": accessToken
-    },
-    json: true
-  };
-  try {
-    ctx.body = await rp(option);
-  } catch (err) {
-    console.log(err.message);
-    if (err instanceof errors.StatusCodeError) {
-      ctx.status = err.statusCode;
-      ctx.message = err.message;
-    } else if (err instanceof errors.RequestError) {
-      ctx.status = 500;
-      ctx.message = err.message;
+
+      
+  router.get('/all/', async ctx => {
+    const { shop, accessToken } = getShopHeaders(ctx);
+    const option = {
+        method: 'GET',
+        url: `https://${shop}/${api_link}/smart_collections.json`,
+        headers: {
+          'X-Shopify-Access-Token': accessToken
+        },
+        json: true,
     }
-  }
-});
+    try {
+        ctx.body = await rp(option);
+    } catch (err) {
+        console.log(err.message);
+        if (err instanceof errors.StatusCodeError) {
+            ctx.status = err.statusCode;
+            ctx.message = err.message;
+        } else if (err instanceof errors.RequestError) {
+            ctx.status = 500;
+            ctx.message = err.message;
+        }
+    }
+  });
+
 
 router.delete("/", async ctx => {
   const smart_collection_id = ctx.query.id;

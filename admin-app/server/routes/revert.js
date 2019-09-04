@@ -15,9 +15,8 @@ router.delete("/products/", async ctx => {
   );
   ctx.set("Access-Control-Allow-Methods", "POST, GET, PUT, DELETE, OPTIONS");
   const productid = ctx.query.id;
-  const { shop, accessToken } = getShopHeaders(ctx);
-  console.log("productID:---------" + productid);
-  const { cookies } = ctx;
+  const {shop, accessToken} = getShopHeaders(ctx);
+  console.log("productID:---------"+productid)
   const option = {
     method: "delete",
     url: `https://${shop}/${api_link}/products/${productid}.json`,
@@ -96,9 +95,8 @@ router.delete("/collections/", async ctx => {
   );
   ctx.set("Access-Control-Allow-Methods", "POST, GET, PUT, DELETE, OPTIONS");
   const smart_collection_id = ctx.query.id;
-  console.log("collection ID:---------" + smart_collection_id);
-  const { cookies } = ctx;
-  const { shop, accessToken } = getShopHeaders(ctx);
+  console.log("collection ID:---------"+smart_collection_id)
+  const {shop, accessToken} = getShopHeaders(ctx);
   const option = {
     method: "delete",
     url: `https://${shop}/${api_link}/smart_collections/${smart_collection_id}.json`,

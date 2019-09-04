@@ -72,7 +72,6 @@ router.get("/variant/exists", async ctx => {
 });
 
 router.get("/variant/productID", async ctx => {
-  const { cookies } = ctx;
   const varID = ctx.query.id;
   const shop = ctx.query.store;
   const { accessToken, torontoLocation } = await getAccessToken.getAccessToken(
@@ -101,10 +100,9 @@ router.get("/GITinformation", async ctx => {
   ctx.body = { variant: vGit, product: pGit };
 });
 
-router.get("/all", async ctx => {
-  const { cookies } = ctx;
-  const { shop, accessToken } = getShopHeaders(ctx);
-  console.log(shop);
+router.get('/all', async ctx=>{
+  const {shop, accessToken} = getShopHeaders(ctx);
+  console.log(shop)
   const option = {
     method: "GET",
     url: `https://${shop}/${api_link}/products.json`,
@@ -129,9 +127,7 @@ router.get("/all", async ctx => {
 });
 
 router.get("/ids/", async ctx => {
-  const { cookies } = ctx;
-  const shop = cookies.get("shop_id");
-  const accessToken = cookies.get("accessToken");
+  const {shop, accessToken} = getShopHeaders(ctx);
   const option = {
     method: "GET",
     url: `https://${shop}/${api_link}/products.json?fields=id`,
@@ -159,7 +155,6 @@ router.get("/ids/", async ctx => {
 router.get("/img", async ctx => {
   // Get product img src
   const productid = ctx.query.id;
-  const { cookies } = ctx;
   const { shop, accessToken } = getShopHeaders(ctx);
   db = ctx.db;
   console.log(accessToken);
@@ -219,7 +214,6 @@ router.post("/", async ctx => {
 router.post("/variant/", async ctx => {
   const product_id = ctx.query.id;
   // Create a product
-  const { cookies } = ctx;
   const { shop, accessToken } = getShopHeaders(ctx);
   const headers = {};
   if (process.env.DEBUG) {
@@ -250,8 +244,7 @@ router.post("/variant/", async ctx => {
 
 router.delete("/variant/", async ctx => {
   const product_id = ctx.query.id;
-  const variant_id = ctx.query.variant_id;
-  const { cookies } = ctx;
+  const variant_id = ctx.query.variant_id
   const { shop, accessToken } = getShopHeaders(ctx);
   const option = {
     method: "delete",
@@ -309,8 +302,7 @@ router.put("/", async ctx => {
 
 router.delete("/", async ctx => {
   const productid = ctx.query.id;
-  console.log("productID:---------" + productid);
-  const { cookies } = ctx;
+  console.log("productID:---------"+productid)
   const { shop, accessToken } = getShopHeaders(ctx);
   const option = {
     method: "delete",

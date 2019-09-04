@@ -1,7 +1,7 @@
 const Router = require("koa-router");
 const { calculateDistance, getLatLng } = require("../serverFunctions");
 const { receiveWebhook } = require("@shopify/koa-shopify-webhooks");
-const { SHOPIFY_API_SECRET_KEY, SERVEO_NAME } = process.env;
+const { SHOPIFY_API_SECRET_KEY, SERVEO_NAME, API_URL } = process.env;
 const router = Router();
 
 const webhookFulfillment = receiveWebhook({
@@ -28,7 +28,7 @@ router.post("/hookendpoint", webhookFulfillment, ctx => {
     if (hookload.line_items[i].fulfillment_service == "flindel") {
       console.log("found flindel");
       fetch(
-        `https://${SERVEO_NAME}/dbcall/update_order_database?items=${encodeURIComponent(
+        `${API_URL}/dbcall/update_order_database?items=${encodeURIComponent(
           JSON.stringify(hookload.line_items)
         )}&destination=${encodeURIComponent(
           JSON.stringify(hookload.destination)
@@ -84,7 +84,7 @@ router.post("/hookorderendpoint", webhookOrder, async ctx => {
     if (validLocation == false) {
       console.log("TOO FAR");
       fetch(
-        `https://${SERVEO_NAME}/send/brand?package=${encodeURIComponent(
+        `${API_URL}/send/brand?package=${encodeURIComponent(
           JSON.stringify(flindelItems)
         )}&store=${encodeURIComponent(
           ctx.header["x-shopify-shop-domain"]
@@ -97,7 +97,7 @@ router.post("/hookorderendpoint", webhookOrder, async ctx => {
     } else {
       //location is valid
       fetch(
-        `https://${SERVEO_NAME}/orders/fulfill?location_id=${encodeURIComponent(
+        `${API_URL}/orders/fulfill?location_id=${encodeURIComponent(
           hookload.location_id
         )}&lineitem_id=${encodeURIComponent(
           JSON.stringify(lineItemsID)

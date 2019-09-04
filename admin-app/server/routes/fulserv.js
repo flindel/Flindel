@@ -48,9 +48,10 @@ router.post("/", async ctx => {
 
 router.get("/", async ctx => {
   ctx.body = false;
-  const { cookies } = ctx;
-  const shop = cookies.get("shop_id");
-  const accessToken = cookies.get("accessToken");
+  // const { cookies } = ctx;
+  // const shop = cookies.get("shop_id");
+  // const accessToken = cookies.get("accessToken");
+  const { shop, accessToken } = getShopHeaders(ctx);
   const option = {
     method: "GET",
     url: `https://${shop}/${api_link}/fulfillment_services.json?scope=all`,
@@ -116,7 +117,7 @@ router.post("/firestore/id", async ctx => {
   ctx.set("Access-Control-Allow-Methods", "POST, GET, PUT, DELETE, OPTIONS");
 
   console.log("POST fulserv id to Firestore");
-  const { shop } = await getShopHeaders(ctx);
+  const { shop } = getShopHeaders(ctx);
   let body = JSON.parse(ctx.query.body);
   db = ctx.db;
   let docRef = db.collection("store").doc(shop);
@@ -132,7 +133,7 @@ router.get("/firestore/id", async ctx => {
   );
   ctx.set("Access-Control-Allow-Methods", "POST, GET, PUT, DELETE, OPTIONS");
   db = ctx.db;
-  const { shop } = await getShopHeaders(ctx);
+  const { shop } = getShopHeaders(ctx);
   console.log("SHOP:", shop);
   let myRef = db.collection("store").doc(shop);
   getDoc = await myRef.get();

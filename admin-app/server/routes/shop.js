@@ -7,10 +7,9 @@ const router = Router({
   prefix: "/shop"
 });
 
-router.get("/id/", async ctx => {
-  const { cookies } = ctx;
-  const shop = cookies.get("shop_id");
-  ctx.body = JSON.stringify({ shop_id: shop });
+router.get('/id/', async ctx => {
+  const { shop, accessToken } = getShopHeaders(ctx);
+  ctx.body = JSON.stringify({shop_id: shop});
 });
 
 //save myshopify domain in db
@@ -106,12 +105,6 @@ router.post("/onboardingStep", async ctx => {
 });
 
 router.get("/onboardingStep", async ctx => {
-  ctx.set("Access-Control-Allow-Origin", "*");
-  ctx.set(
-    "Access-Control-Allow-Headers",
-    "Origin, X-Requested-With, Content-Type, Accept"
-  );
-  ctx.set("Access-Control-Allow-Methods", "POST, GET, PUT, DELETE, OPTIONS");
   ctx.set("Access-Control-Allow-Origin", "*");
   ctx.set(
     "Access-Control-Allow-Headers",
