@@ -38,7 +38,7 @@ router.get("/requested/exists", async ctx => {
   myRef = db.collection("requestedReturns");
   ctx.body = {
     code: "none",
-    exsit: false
+    exist: false
   };
   let querySnapshot = await myRef
     .where("order", "==", order)
