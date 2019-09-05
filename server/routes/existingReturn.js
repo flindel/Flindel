@@ -39,7 +39,7 @@ router.get("/requested/exists", async ctx => {
   myRef = db.collection("requestedReturns");
   ctx.body = {
     code: "none",
-    exist: false
+    exsit: false
   };
   console.log(order + " - " + shopDomain);
   let querySnapshot = await myRef
