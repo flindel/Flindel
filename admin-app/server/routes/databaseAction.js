@@ -141,7 +141,7 @@ router.post("/warehouse_order", async ctx => {
   const headers = {};
   headers["Accept"] = "application/json";
   headers["Content-Type"] = "application/json";
-  headers["Authorization"] = "Bearer " + process.env.SEND_GRID;
+  headers["Authorization"] = "Bearer " + process.env.SENDGRID;
 
   const option = {
     method: "POST",

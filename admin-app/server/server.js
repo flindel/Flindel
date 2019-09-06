@@ -57,7 +57,7 @@ admin.initializeApp({
 const db = admin.firestore();
 
 const { SHOPIFY_API_SECRET_KEY, SHOPIFY_API_KEY, API_URL, DEBUG } = process.env;
-const SERVEO_NAME = API_URL.substring(8);
+//const SERVEO_NAME = API_URL.substring(8);
 
 app.prepare().then(() => {
   const server = new Koa();

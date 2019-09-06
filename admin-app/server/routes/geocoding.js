@@ -6,7 +6,7 @@ const { getShopHeaders } = require("../util/shop-headers");
 const router = Router({
   prefix: "/addValidation"
 });
-const geocodingKey = process.env.GOOGLE_GEOCODING_KEY;
+const geocodingKey = process.env.GOOGLE_GEO_API_KEY;
 const turf = require("@turf/turf");
 const warehoue = turf.point([-79.3802531703975, 43.6566807319543]);
 
