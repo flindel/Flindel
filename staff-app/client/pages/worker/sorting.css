@@ -1,0 +1,299 @@
+h1.scHeader{
+    padding-top: 25px;
+    font-size:180%;
+    font-weight:bold;
+}
+
+div.sc1{
+    text-align:center;
+}
+
+p.errorMessage{
+    color:red;
+}
+
+h3.subHeader{
+    font-size: 130%;
+    font-weight: bold;
+}
+
+input.numInput{
+    max-width: 40px;
+}
+/*ITEM DISPLAY*/
+div.container1SC{
+    width:13.4%;
+    text-align:center;
+    height: 120px;
+    padding-top: 10px;
+    padding-bottom: 10px;
+  }
+div.container1SCHeader{
+    width:13.4%;
+    text-align:center;
+}
+
+div.container2SC{
+    width:11.6%;
+    text-align:center;
+    height: 120px;
+    padding-top: 10px;
+    padding-bottom: 10px;
+  }
+div.container2SCHeader{
+    width:11.6%;
+    text-align:center;
+}
+div.containerReturnHeader{
+    width:19%;
+    text-align:center;
+}
+div.containerReturn{
+    width:19%;
+    text-align:center;
+    height: 120px;
+    padding-top: 10px;
+    padding-bottom: 10px;
+}
+
+hr.horiz{
+    padding-bottom: 2px;
+    margin-left: -5%;
+    margin-right: -5%;
+    background-color: black;
+      background-color: black;
+      color:black;
+      border-color: black;
+      border: none; 
+}
+hr.horizStrong{
+  height: 4px;
+    margin-left: -5%;
+    margin-right: -5%;
+    background-color: black;
+      background-color: black;
+      color:black;
+      border-color: black;
+      border: none; 
+}
+
+div.red{
+    background-color: lightpink;
+    width:11.6%;
+    text-align:center;
+    height: 120px;
+    padding-top: 10px;
+    padding-bottom: 10px;
+}
+
+div.grey{
+    width:11.6%;
+    text-align:center;
+    height: 120px;
+    padding-top: 10px;
+    padding-bottom: 10px;
+}
+
+div.green{
+    background-color: lightgreen;
+    width:11.6%;
+    text-align:center;
+    height: 120px;
+    padding-top: 10px;
+    padding-bottom: 10px;
+}
+
+p.workerID{
+    text-align:right;
+    margin-right: 3%;
+}
+
+div.vert{
+    width:1%
+}
+
+  div.itemContainerSC{
+    display: flex;
+    align-items: center;
+  }
+
+  p.itemHeader{
+      font-size: 125%;
+      font-weight: bold
+  }
+
+  fieldset.SC{
+      margin-left:2%;
+      margin-right:2%;
+  }
+
+  fieldset.Return{
+      margin-left:10%;
+      margin-right:10%;
+  }
+
+  hr.vertR{
+    margin-left:40%;
+      margin-top:-8px;
+      width:20%;
+      height: 160px;
+      background-color: black;
+      background-color: black;
+      color:black;
+      border-color: black;
+      border: none;   
+  }
+
+  hr.vertRI{
+    margin-left:40%;
+      margin-top:-8px;
+      width:20%;
+      height: 60px;
+      background-color: black;
+      background-color: black;
+      color:black;
+      border-color: black;
+      border: none;
+  }
+
+  hr.vert{
+      margin-left:40%;
+      margin-top:-8px;
+      width:20%;
+      height: 120px;
+      background-color: black;
+      background-color: black;
+      color:black;
+      border-color: black;
+      border: none;
+  }
+  hr.vertHeader{
+    margin-left:40%;
+      margin-top:-8px;
+      width:20%;
+      height: 50px;
+      background-color: black;
+      color:black;
+      border-color: black;
+      border: none;
+  }
+
+  p.itemOld{
+      font-size: 80%;
+  }
+
+  p.itemSC{
+      font-weight: bold;
+      max-width: 100%
+  }
+/* ASSEMBLING ITEMS*/
+  div.deliveryHeaderS{
+    width:10%;
+    text-align:center;
+  }
+  div.deliveryS{
+    width:10%;
+    text-align:center;
+    height: 200px;
+    padding-top: 10px;
+    padding-bottom: 10px;
+  }
+
+  div.deliveryHeaderM{
+    width:20%;
+    text-align:center; 
+  }
+  div.deliveryM{
+    width:20%;
+    text-align:center;
+    height: 200px;
+    padding-top: 10px;
+    padding-bottom: 10px;
+  }
+  div.deliveryHeaderL{
+    width:46%;
+    text-align:center;
+  }
+  div.deliveryL{
+    width:46%;
+    text-align:center;
+    height: 200px;
+    padding-top: 10px;
+    padding-bottom: 10px;
+  }
+
+  textarea{
+      resize: none;
+      height: 50%;
+      width: 95%;
+      text-align: left;
+  }
+
+  div.itemOrderHeader{
+    width:24.25%;
+    text-align:center;
+  }
+
+  div.itemOrder{
+    width:24.25%;
+    text-align:center;
+    height: 60px;
+    padding-top: 10px;
+    padding-bottom: 10px;
+  }
+
+  div.itemOrderRed{
+    width:24.25%;
+    text-align:center;
+    height: 60px;
+    padding-top: 10px;
+    padding-bottom: 10px;
+    background-color: lightpink;
+  }
+
+  div.redBackground{
+    background-color:lightpink;
+  }
+
+  div.greenBackground{
+    background-color:lightgreen;
+  }
+
+  div.itemOrderGreen{
+    width:24.25%;
+    text-align:center;
+    height: 60px;
+    padding-top: 10px;
+    padding-bottom: 10px;
+    background-color: lightgreen;
+  }
+
+  /*DELIVERING ITEMS*/
+  div.deliveryHeader2S{
+    width:10%;
+    text-align:center;
+  }
+  div.delivery2S{
+    width:10%;
+    text-align:center;
+    height: 120px;
+    padding-top: 10px;
+    padding-bottom: 10px;
+  }
+
+  div.deliveryHeader2L{
+    width:43.5%;
+    text-align:center;
+  }
+  div.delivery2L{
+    width:43.5%;
+    text-align:center;
+    height: 120px;
+    padding-top: 10px;
+    padding-bottom: 10px;
+  }
+
+  div.workerStoreBar{
+    margin-left: 40%;
+    max-width:20%
+  }

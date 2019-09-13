@@ -1,0 +1,7 @@
+.git*
+.env
+Dockerfile
+.dockerignore
+client/.next
+node_modules/
+prod_env

@@ -1,0 +1,52 @@
+{
+  "name": "staff-app",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "node server/server.js",
+    "build": "next build ./client",
+    "start": "NODE_ENV=production node server/server.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@koa/cors": "^2.2.3",
+    "@material-ui/core": "^4.2.1",
+    "@shopify/koa-shopify-auth": "^3.1.20",
+    "@shopify/koa-shopify-webhooks": "^1.1.11",
+    "@shopify/polaris": "^3.20.0",
+    "@turf/turf": "^5.1.6",
+    "@zeit/next-css": "^1.0.1",
+    "bootstrap": "^4.3.1",
+    "cors": "^2.8.5",
+    "cron": "^1.7.1",
+    "dotenv": "^7.0.0",
+    "firebase-admin": "^7.3.0",
+    "google-maps-react": "^2.0.2",
+    "isomorphic-fetch": "^2.2.1",
+    "koa": "^2.7.0",
+    "koa-better-http-proxy": "^0.2.4",
+    "koa-bodyparser": "^4.2.1",
+    "koa-combine-routers": "^4.0.2",
+    "koa-router": "^7.4.0",
+    "koa-session": "^5.10.1",
+    "libphonenumber-js": "^1.7.16",
+    "material-ui": "^0.20.2",
+    "material-ui-datetimepicker": "^1.0.7",
+    "next": "^8.0.4",
+    "react": "^16.8.6",
+    "react-bootstrap": "^1.0.0-beta.8",
+    "react-dom": "^16.8.6",
+    "react-router-dom": "^5.0.0",
+    "react-select": "^3.0.4",
+    "request": "^2.88.0",
+    "request-promise": "^4.2.4"
+  },
+  "devDependencies": {
+    "css-loader": "^2.1.1",
+    "style-loader": "^0.23.1"
+  }
+}

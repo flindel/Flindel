@@ -1,0 +1,13 @@
+h1.main{
+    padding-top: 20px;
+    font-size: 200%;
+    font-weight: bold;
+}
+
+h3.main{
+    font-size: 150%;
+}
+
+button.main{
+    margin-left: 20px;
+}

@@ -1,0 +1,761 @@
+/*Import font.................................................*/
+@import url('https://fonts.googleapis.com/css?family=Roboto:400,500,700');
+*{
+  font-family: 'Roboto', sans-serif;
+  text-align: center;
+}
+
+body{
+  background-color: #fafafa !important; 
+}
+p {
+  font-family: 'Roboto', sans-serif;
+  text-align: center;
+  font-weight: bold; 
+}
+*:focus {
+  outline:none;
+}
+
+/*Navbar.......................................................*/
+/*Store name order portal*/
+/* placeholder for fixed navbar without progress bar */
+div.top-fixed{
+  margin-top:24vh;
+}
+/* placeholder for fixed navbar with progress bar */
+div.top-fixed-bar{
+  height: calc(24vh + 50px);
+  background-color: #fafafa;
+}
+div.navbar{
+  position:fixed;
+  z-index:-1000;
+  width:100%;
+  background-color: #fafafa;
+  height:24vh;
+  left: 0;
+  top:0;
+}
+div.navbarPB{
+  position: fixed;
+  z-index: 100;
+  width: 100%;
+  background-color: #fafafa;
+  height: calc(24vh + 50px);
+  left: 0;
+  top: 0;
+}
+h1.top{
+  font-size:1.8em;
+  text-align: center;
+  padding-bottom: 10px;
+  padding-top:20px
+}
+/* .PBbackgound{
+  height:50px;
+  background-color: #fafafa
+} */
+.containerPB {
+  margin: auto;
+  max-width:600px;
+  background-color:#000000;
+}
+.progressbar {
+  counter-reset: step;
+  margin-left: -30px
+}
+
+.progressbar span{
+  font-weight: 400;
+  color: #000000;
+}
+.progressbar li {
+  list-style-type: none;
+  width: 33.33333%;
+  float: left;
+  font-size: 14px;
+  position: relative;
+  text-align: center;
+  text-transform: uppercase;
+  font-weight: 700;
+  color: #ffffff;
+}
+.progressbar li:before {
+  width: 20px;
+  height: 20px;
+  content: counter(step);
+  counter-increment: step;
+  line-height: 20px;
+  /* border: 2px solid #7d7d7d; */
+  display: block;
+  text-align: center;
+  margin: 0 auto 10px auto;
+  border-radius: 50%;
+  background-color: #999
+}
+.progressbar li:after {
+  width: 100%;
+  height: 7px;
+  content: '';
+  position: absolute;
+  background-color: #999;
+  top: 6px;
+  left: -50%;
+  z-index: -1;
+}
+.progressbar li:first-child:after {
+  content: none;
+}
+.progressbar li.active {
+  color:#ffffff;
+}
+
+/*CIRCLE*/
+.progressbar li.active:before {
+  border-color: #000000;
+  background-color: #000000;
+}
+.progressbar li.live:before{
+  border-color:#999;
+  background-color:#999;
+}
+
+/*LINE*/
+.progressbar li.active + li:after {
+  background-color:  #000000;
+}
+img.headerLogo{
+  background-color:black;
+  display:block;
+  max-height:13vh;
+  max-width:50vh;
+  padding:3vh;
+  width:auto;
+  height:auto;
+}
+p.headerLogo{
+  background-color: black;
+}
+/*End navbar ............................................................*/
+
+/*First Page (Find Order)................................................*/
+/*Submit button stuff*/
+button.Submit1{
+  background-color:#000000;
+  color: white;
+  cursor: pointer;
+  margin: auto;
+  text-align: center;
+  border-radius: 3px;
+  display: block;
+  border: none;
+  padding: 15px 45px;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  font-size: 13px;
+  font-weight: 700;
+}
+button.Submit1:hover{
+  background-color: #555555;
+}
+button.Submit1:active {
+  background-color:#555555;
+  /* box-shadow: 0 0.125em #666666;
+  transform: translateY(-0.25em); */
+}
+button.Blackout1{
+  background-color: #555555;
+  color:white;
+  /* padding: 3% 10%; */
+  margin: auto;
+  text-align: center;
+  border-radius: 3px;
+  display: block;
+  pointer-events: none;
+  border: none;
+  padding: 15px 45px;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+/*input fields(text boxes)*/
+div.Search{
+  position: fixed;
+  width: 100%;
+}
+.Search-block{
+  display: inline-block;
+  position: relative;
+  /* overflow: hidden; */
+  width: 100%;
+  margin-bottom: 10px
+}
+
+.Search-block input{
+  text-align: left;
+  height: 37px;
+  font-size: 120%;
+  border: 0.5px solid black;
+  width: 100%;
+  border-radius: 3px;
+  padding-left: 20px;
+}
+
+.Search-block span{
+  position: absolute;
+  height: 37px;
+  margin-left: -35px;
+  top: 8px
+}
+
+.Search-block img{
+  margin: auto;
+  width: 70%
+}
+
+.Search-block p{
+  font-size: 0.85em;
+  margin-top: 5px;
+  margin-bottom: 15px;
+  color: #555555;
+}
+
+::placeholder{
+  text-align: left;
+  color: #d1cfcf;
+  font-size: 1em;
+}
+/*Order number/email label text*/
+p.label{
+  text-align:center;
+}
+/*Box around form*/
+fieldset.page1 { 
+  margin: auto;
+  max-width:700px;
+  border: 0;
+  border-color: white;
+  border-radius: 10%
+}
+/*End First Page..............................................................*/
+
+/*Second Page (Item Select)...................................................*/
+/*submit button stuff*/
+button.Submit2{
+  background-color:#000000;
+  color: white;
+  cursor: pointer;
+  margin: auto;
+  text-align: center;
+  border-radius: 3px;
+  display: block;
+  border: none;
+  padding: 15px 45px;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  font-size: 13px;
+  font-weight: 700;
+}
+button.Submit2:hover{
+  background-color:  #555555;
+}
+button.Submit2:active {
+  background-color:#555555;
+}
+button.Blackout2{
+  background-color: #555555;
+  color:white;
+  /* padding: 3% 10%; */
+  margin: auto;
+  text-align: center;
+  border-radius: 3px;
+  display: block;
+  pointer-events: none;
+  border: none;
+  padding: 15px 45px;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  font-size: 13px;
+  font-weight: 700;
+}
+p.errorMessage{
+  color:red;
+  text-align:center;
+}
+Select.qty{
+  max-width: 10%
+}
+.Select-menu-outer {
+  z-index: 999 !important;
+}
+div.container1{
+  width:26%;
+  /* float:left; */
+  /* height:150px; */
+  text-align:center;
+}
+div.container2{
+  width: 45%;
+  /* height: 150px; */
+  /* float:left; */
+  text-align:center;
+}
+div.container3{
+  width:25%;
+  /* float: right; */
+  /* height: 150px; */
+  text-align:center;
+}
+div.container1Grey{
+  width:30%;
+  /* float:left; */
+  /* height:150px; */
+  text-align:center;
+  color: #999
+}
+div.container2Grey{
+  width: 45%;
+  /* height: 150px; */
+  /* float:left; */
+  text-align:center;
+  color: #999
+}
+div.container3Grey{
+  width:25%;
+  /* float: right; */
+  /* height: 150px; */
+  text-align:center;
+  color: #999
+}
+img.item2{
+  object-fit: contain;
+   max-width: 100%;
+   max-height: 100%;
+   width: auto;
+   height: auto;
+}
+fieldset.page2{
+  margin: auto;
+  max-width:750px;
+  min-width:288px;
+  overflow-x:auto;
+  padding-bottom:120px;
+  border:0;
+}
+/*fieldset.page2{
+  margin-left: 25%;
+  margin-right: 25%;
+  border-color: white; 
+}*/
+.itemContainer{
+  display: flex;
+  max-height: 150px;
+  padding: 15px 0;
+  align-items: center;
+  border-bottom: 0.5px solid #999;
+  border-top: 0.5px solid #999;
+  margin-bottom: -1px;
+}
+
+p.item2{
+  vertical-align: middle;
+  line-height: normal;
+  text-align:left;
+  padding-right:20px;
+  padding-left:15px
+}
+.container3 p {
+  font-size: 1.35em;
+}
+p.title {
+  font-weight: 400;
+  font-size:1.5em
+}
+
+p.variantTitle{
+  font-weight: 400;
+  font-size:1.2em
+}
+@media only screen and (max-width: 600px){
+  p.title{
+    font-size: 1.2em   
+  }
+  p.variantTitle{
+    font-size: 1.0em
+  }
+  p.noReturnMsg {
+    font-size: 0.8em;
+    padding-left: 0px
+  }
+  .container3 p {
+    font-size: 1.0em;
+  }
+  .reasonSelect{
+    font-size: 0.76em   
+  }
+}
+/*End Second Page.........................................................*/
+/*Third Page (Reason Select)..............................................*/
+/*Email form*/
+div.getEmail{
+  position:fixed;
+  left:0;
+  right:0;
+  bottom: calc(46px + 6vh);
+  background-color: #fafafa;
+}
+.getEmail img {
+  width: 19px;
+  margin-bottom: -3px;
+}
+/*Label for email (email indent)*/
+span.emailLabel{
+  width: 130px;
+  text-align: left;
+  display: inline-block;
+}
+label.l3On{
+  margin:auto;
+  text-align:center;
+  font-size:100%
+}
+label.l3Off{
+  color: grey;
+  text-align:center;
+  font-size: 100%;
+  margin:auto;
+}
+label.l3Hidden{
+  text-align:center;
+  display:none;
+  margin:auto;
+}
+input.l3On{
+  color: black;
+  width:auto;
+  font-size:100%;
+  max-width: 600px;
+  text-align:center;
+  margin:auto;
+}
+input.l3Off{
+  color:grey;
+  font-size: 100%;
+  width:auto;
+  max-width: 600px;
+  text-align:center;
+  margin:auto;
+  padding:none;
+}
+/*Email header*/
+h3.emailHead{
+  text-align:center;
+  font-size: 150%;
+  padding-bottom:9px;
+  padding-top: 9px;
+}
+p.emailText{
+  margin:auto;
+  text-align:center;
+}
+/*End third page.....................................................*/
+/*Fourth Page (Confirm)..............................................*/
+h3.pageTitle4{
+  text-align: center
+}
+/*End fourth page.....................................................*/
+/*Fifth Page (Confirmation)...........................................*/
+div.centre{
+  text-align: center;
+  width: 80%;
+  max-width: 1000px;
+  margin: 20px auto;
+}
+.explanation {
+  text-align: left;
+  padding-bottom:20px;
+}
+.confirmCode {
+  font-size: 180%;
+  padding-bottom: 30px;
+  padding-top: 20px;
+}
+.confirmTitle {
+  padding-bottom:10px
+}
+div.confirmation1{
+  width:80%;
+  max-width: 1000px;
+  margin:0 auto;
+  text-align:center;
+  padding-top: 20px;
+}
+.instructions p {
+  text-align: left;
+  padding-bottom: 10px
+}
+div.confirmation2{
+  width: 80%;
+  max-width:1000px;
+  margin: 0 auto;
+  text-align:center;
+  padding-top: 20px;
+}
+div.confirmation3{
+  width:40%;
+  float: right;
+  padding-top: 20px;
+  text-align:center;
+}
+h2.confirmation{
+  text-align:center;
+  font-size: 170%;
+}
+div.instructions{
+  text-align:left;
+  margin-left: 10px
+}
+.dropLocations{
+  display:flex;
+  position:relative;
+  overflow: hidden;
+  min-height: 300px
+}
+.confirmation2 h2{
+  padding-bottom:25px
+}
+.dropAdd{
+  margin-left:500px
+}
+.dropAddress{
+  text-align:left;
+  margin-bottom:10px
+}
+.mapContainer{
+  position: absolute;
+  width: 1300px;
+  height: 600px;
+}
+.customerService{
+  color: #555555;
+  margin-top: 30px;
+  margin-bottom:30px;
+}
+@media only screen and (max-width: 700px){
+  .dropLocations{
+    display: flex;
+    flex-wrap: wrap;
+    position: relative;
+    overflow: hidden;
+  }
+  .mapContainer {
+    position: absolute;
+    width: 260%;
+    height: 600px;
+  }
+  .dropAdd{
+    width:100%;
+    margin-top:338px;
+    margin-left:0px
+  }
+  .customerService{
+    color: #555555;
+    margin-top: 30px;
+    margin-bottom:30px;
+  }
+}
+@media only screen and (max-width: 640px){
+  div.centre{
+    max-width: 99%;
+  }
+}
+
+/*End fifth page......................................................*/
+
+/*UTIL*/
+p.orderHeader{
+  text-align: center;
+  font-weight: bold;
+}
+
+body{
+  font-family: sans-serif;
+}
+/*Restart Popup............................................................*/
+
+.popup {
+  position: fixed;
+  width: 100%;
+  height: 100%;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  margin: auto;
+  z-index: 200;
+  background-color: rgba(0,0,0, 0.5);
+}
+.popup_inner {
+  position: absolute;
+  left: 12%;
+  right: 12%;
+  top: 20vh;
+  bottom: 20vh;
+  margin: auto;
+  background: white;
+  display: flex;
+}
+.popup_content{
+  max-width:440px;
+  width: 90%;
+  margin:auto;
+}
+h2.r2.popup_title{
+  font-weight:400;
+  font-size:2.0em;
+  text-transform: uppercase;
+}
+h2.r2{
+  font-size:150%;
+  font-weight:thick;
+}
+.reviewInfo p{
+  padding-top:20px
+}
+p.reviewInfo2{
+  margin-top:20px;
+  margin-bottom:15px;
+  text-align:left;
+}
+button.Submit2.Small{
+  padding: 10px 30px;
+  font-size: 12px
+}
+button.r2{
+  background-color: #50B83C;
+  color: white;
+  padding: 0.5% 1.6%;
+  cursor: pointer;
+  text-align: center;
+  border-radius: 15%;
+  border: none;
+}
+button.r2:hover{
+  background-color:  #108043;
+}
+button.r2:active {
+  background-color:#108043;
+  box-shadow: 0 0.125em #666666;
+  transform: translateY(-0.25em);
+}
+
+button.r2Home{
+  background-color: #5C6AC4;
+  color: white;
+  padding: 0.5% 1.6%;
+  cursor: pointer;
+  text-align: center;
+  border-radius: 15%;
+  border: none;
+}
+button.r2Home:hover{
+  background-color:  #202E78;
+}
+button.r2Home:active {
+  background-color:#202E78;
+  box-shadow: 0 0.125em #666666;
+  transform: translateY(-0.25em);
+}
+
+button.r2cancel{
+  background-color:#DE3618;
+  margin-left: 1%;
+  margin-top:3%;
+  float:left;
+  color: white;
+  padding: 1.5vh 4vw;
+  max-width: 40vw;
+  cursor: pointer;
+  text-align: center;
+  border-radius: 15%;
+  display: block;
+  border: none;
+}
+button.r2cancel:hover{
+  background-color:  #BF0711;
+}
+button.r2cancel:active {
+  background-color:#BF0711;
+  box-shadow: 0 0.125em #666666;
+  transform: translateY(-0.25em);
+}
+
+button.r2delete{
+  background-color: #50B83C;
+  margin-top: 3%;
+  margin-right:1%;
+  float:right;
+  color: white;
+  padding: 1.5vh 4vw;
+  max-width: 40vw;
+  cursor: pointer;
+  text-align: center;
+  border-radius: 15%;
+  display: block;
+  border: none;
+}
+button.r2delete:hover{
+  background-color:  #108043;
+}
+button.r2delete:active {
+  background-color:#108043;
+  box-shadow: 0 0.125em #666666;
+  transform: translateY(-0.25em);
+}
+
+/*End Restart Popup........................................................*/
+div.fixed-footer{
+  width: 100%;
+  height: calc(46px + 5vh);
+}
+div.fixed-footer-email{
+  height:calc(150px + 5vh);
+  width:100%;
+}
+footer.f1{
+  position: fixed;
+  z-index:100;
+  left:0;
+  right:0;
+  bottom: 0;
+  padding-bottom:3vh;
+  padding-top:3vh;
+  background-color: #fafafa
+}
+/* Hide scrollbar in itemList */
+::-webkit-scrollbar { display: none }
+select__menu-list::-webkit-scrollbar {
+  display: block !important
+}
+div.itemList{
+  /* max-height:100vh;
+  overflow-y:auto; */
+  -ms-overflow-style: none;
+  overflow: -moz-scrollbars-none;
+}
+div.itemListSmall{
+  /* max-height:100vh;
+  overflow-y:auto; */
+  -ms-overflow-style: none;
+  overflow: -moz-scrollbars-none;
+}
+
+div.loading{
+  color:black;
+  text-align:center;
+  font-size: 150%;
+}
+
