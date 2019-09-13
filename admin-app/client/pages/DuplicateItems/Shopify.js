@@ -1,5 +1,6 @@
 //A bunch of front end functions that connect to shopify api
 import getConfig from "next/config";
+import Bottleneck from 'bottleneck';
 //import {serveo_name} from '../config'
 const { publicRuntimeConfig } = getConfig();
 const { API_URL } = publicRuntimeConfig;

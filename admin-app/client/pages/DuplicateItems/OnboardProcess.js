@@ -309,7 +309,7 @@ class OnboardProcess extends Component {
   }
   //Creates a dublicate of original product and posts it to shopify and firestore
   fixGitDne(norm) {
-    if (this.checkRequiresShipping(norm)) {
+      if (this.checkRequiresShipping(norm)) {
       let gitBody = JSON.parse(JSON.stringify(norm));
       gitBody.published_at = null;
       gitBody.title = norm.title + " - Get it Today";
@@ -337,6 +337,7 @@ class OnboardProcess extends Component {
   fixNormDefaultPara(norm) {
     let normBody = JSON.parse(JSON.stringify(norm));
     for (let j = 0; j < norm.variants.length; j++) {
+      //if weight == 0g, change it to 0.1kg
       if (normBody.variants[j].grams == 0) {
         normBody.variants[j].weight_unit = "kg";
       }
@@ -368,6 +369,7 @@ class OnboardProcess extends Component {
   finishedFixing() {
     gitProducts += 1;
     console.log("Fixed: ", gitProducts);
+    console.log("origCollection length "+this.state.origCollection.products.length)
     if (gitProducts == this.state.origCollection.products.length) {
       this.completeStep(2);
       this.setState({ isLoading: false });

@@ -3,6 +3,7 @@ const rp = require("request-promise");
 const errors = require("request-promise/errors");
 const { api_link } = require("../default-shopify-api.json");
 const { getShopHeaders } = require("../util/shop-headers");
+const apiRequestManager = require('../util/apiRequestManager');
 
 const router = Router({
   prefix: "/collections"
@@ -21,8 +22,10 @@ router.get("/", async ctx => {
     json: true
   };
   try {
+    // shopifyRequest = new apiRequestManager(option, 500);
+    // ctx.body = await shopifyRequest.send();
     ctx.body = await rp(option);
-    //console.log("body..."+JSON.stringify(ctx.body));
+    console.log("body..."+JSON.stringify(ctx.body));
   } catch (err) {
     console.log(err.message);
     if (err instanceof errors.StatusCodeError) {
@@ -36,7 +39,7 @@ router.get("/", async ctx => {
 });
 
 router.post("/", async ctx => {
-  // Create a product
+  // post a collection
   const { shop, accessToken } = getShopHeaders(ctx);
   const headers = {};
   if (process.env.DEBUG) {
@@ -52,6 +55,8 @@ router.post("/", async ctx => {
     body: ctx.request.body
   };
   try {
+    // apiRequest = new apiRequestManager(option, 500);
+    // ctx.body = await apiRequest.send();
     ctx.body = await rp(option);
   } catch (err) {
     console.log(err.message);
@@ -78,7 +83,9 @@ router.post("/", async ctx => {
         json: true,
     }
     try {
-        ctx.body = await rp(option);
+      // apiRequest = new apiRequestManager(option, 500);
+      // ctx.body = await apiRequest.send();
+      ctx.body = await rp(option);
     } catch (err) {
         console.log(err.message);
         if (err instanceof errors.StatusCodeError) {
@@ -107,7 +114,9 @@ router.delete("/", async ctx => {
     json: true
   };
   try {
-    ctx.body = await rp(option);
+    apiRequest = new apiRequestManager(option, 500);
+    ctx.body = await apiRequest.send();
+    //ctx.body = await rp(option);
     //console.log("body..."+JSON.stringify(ctx.body));
   } catch (err) {
     console.log(err.message);

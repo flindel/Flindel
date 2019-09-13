@@ -21,6 +21,7 @@
     "@turf/turf": "^5.1.6",
     "@zeit/next-css": "^1.0.1",
     "bootstrap": "^4.3.1",
+    "bottleneck": "^2.19.5",
     "cors": "^2.8.5",
     "cron": "^1.7.1",
     "dotenv": "^7.0.0",

@@ -1,3 +1,5 @@
+//import Bottleneck from "bottleneck";
+const Bottleneck = require("bottleneck/es5");
 const Router = require("koa-router");
 const rp = require("request-promise");
 const errors = require("request-promise/errors");
@@ -5,6 +7,10 @@ const { api_link } = require("../default-shopify-api.json");
 const { getShopHeaders } = require("../util/shop-headers");
 const getAccessToken = require("../util/editInventory");
 const mainHelper = require("../util/mainHelper");
+const apiRequestManager = require('../util/apiRequestManager');
+const limiter = new Bottleneck({
+  minTime: 1000
+});
 const router = Router({
   prefix: "/products"
 });
@@ -26,6 +32,8 @@ router.get("/", async ctx => {
     json: true
   };
   try {
+    // apiRequest = new apiRequestManager(option, 500);
+    // ctx.body = await apiRequest.send();
     ctx.body = await rp(option);
     //console.log("body..."+JSON.stringify(ctx.body));
   } catch (err) {
@@ -199,6 +207,7 @@ router.post("/", async ctx => {
   };
   try {
     ctx.body = await rp(option);
+    //ctx.body = await limiter.schedule(()=>rp(option));
   } catch (err) {
     console.log(err.message);
     if (err instanceof errors.StatusCodeError) {
@@ -288,6 +297,9 @@ router.put("/", async ctx => {
   };
   try {
     ctx.body = await rp(option);
+    //ctx.body = await limiter.schedule(()=>rp(option));
+    // apiRequest = new apiRequestManager(option, 500);
+    // ctx.body = await apiRequest.send();
   } catch (err) {
     console.log(err.message);
     if (err instanceof errors.StatusCodeError) {
