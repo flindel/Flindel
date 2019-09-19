@@ -3,7 +3,7 @@ const rp = require("request-promise");
 const errors = require("request-promise/errors");
 const { api_link } = require("../default-shopify-api.json");
 const { getShopHeaders } = require("../util/shop-headers");
-// const {accessTokenDB} = require('../util/acessTokenDB');
+const {accessTokenDB} = require('../util/acessTokenDB');
 const router = Router({
   prefix: "/products"
 });
@@ -12,9 +12,9 @@ router.get("/", async ctx => {
   ctx.body = false;
   const productid = ctx.query.id;
   const { cookies } = ctx;
-  //   const shop = ctx.query.shop;
-  //   const accessToken = await accessTokenDB(ctx)
-  const { shop, accessToken } = getShopHeaders(ctx);
+  const shop = ctx.query.shop;
+  const accessToken = await accessTokenDB(ctx)
+  // const { shop, accessToken } = getShopHeaders(ctx);
   db = ctx.db;
   const option = {
     method: "GET",
@@ -71,9 +71,9 @@ router.get("/img", async ctx => {
   // Get product img src
   const productid = ctx.query.id;
   const { cookies } = ctx;
-  // const shop = ctx.query.shop;
-  // const accessToken = await accessTokenDB(ctx)
-  const { shop, accessToken } = getShopHeaders(ctx);
+  const shop = ctx.query.shop;
+  const accessToken = await accessTokenDB(ctx)
+  // const { shop, accessToken } = getShopHeaders(ctx);
   db = ctx.db;
   console.log(accessToken);
   const option = {

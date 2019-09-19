@@ -21,4 +21,4 @@ async function accessToken(ctx, next) {
   await next();
 }
 
-module.exports = { accessToken };
+module.exports = { accessToken, accessTokenDB };
