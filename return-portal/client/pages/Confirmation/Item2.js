@@ -148,7 +148,7 @@ class Item extends Component {
         return (
           <div className="itemContainer">
             {/*<hr className = 'hl4'></hr> */}
-            <div className="container1Grey">
+            <div className="container1">
               <img className="item2" src={this.state.src} />
             </div>
             {/* dropdown menu to choose return quantity */}
