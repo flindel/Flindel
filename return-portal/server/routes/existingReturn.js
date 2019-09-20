@@ -102,15 +102,15 @@ router.put("/requested/orderStatus", async ctx => {
 //make new entry in requested returns
 router.post("/requested/new", async ctx => {
   db = ctx.db;
-  const shop = ctx.query.shop;
+  const shop = ctx.request.body.shop;
   //.substring(8,100)
   console.log("THE SHOP IS " + shop);
-  const rawItems = ctx.query.items;
-  const orderNum = ctx.query.orderNum;
-  const date = ctx.query.date;
-  const code = ctx.query.code;
-  const email = ctx.query.email;
-  const emailOriginal = ctx.query.emailOriginal;
+  const rawItems = ctx.request.body.items;
+  const orderNum = ctx.request.body.orderNum;
+  const date = ctx.request.body.date;
+  const code = ctx.request.body.code;
+  const email = ctx.request.body.email;
+  const emailOriginal = ctx.request.body.emailOriginal;
   let itemsJSON = await JSON.parse(rawItems);
   let data = {
     //base information

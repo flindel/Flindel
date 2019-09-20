@@ -260,22 +260,26 @@ class IdentifyApp extends Component {
       "/" +
       new Date().getFullYear();
     let items = JSON.stringify(this.state.returnlist);
+    const body = {
+      shop: this.state.shopDomain,
+      date:currentDate,
+      code: this.state.code,
+      orderNum: this.state.orderNum,
+      emailOriginal:this.state.emailOriginal,
+      email:this.state.email,
+      items:items
+    }
+    const options = {
+      method: "post",
+      headers: {
+        Accept: "application/json, text/plain, */*",
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify(body)
+    };
     fetch(
-      `https://${serveoname}/return/requested/new?shop=${encodeURIComponent(
-        this.state.shopDomain
-      )}&date=${encodeURIComponent(currentDate)}&code=${encodeURIComponent(
-        this.state.code
-      )}&orderNum=${encodeURIComponent(
-        this.state.orderNum
-      )}&emailOriginal=${encodeURIComponent(
-        this.state.emailOriginal
-      )}&email=${encodeURIComponent(
-        this.state.email
-      )}&items=${encodeURIComponent(items)}`,
-      {
-        method: "POST"
-      }
-    );
+      `https://${serveoname}/return/requested/new`,options)
+    
   }
 
   //set email from a manual entry from the checkover page
