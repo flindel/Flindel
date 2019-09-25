@@ -1,25 +1,28 @@
+"use strict";
 const inv = require("./editInventory");
 const dateUtil = require('../util/dateUtil');
 
 
 //get rid of anything that's been in orders/items for over 7 days
 async function checkExpired(db) {
-    clearExpiredItems(db);
-    clearExpiredOrders(db);
+  let a = db.collection('testCron').doc('B3rV');
+                let result = await a.get();
+                console.log(result.data());
+    await clearExpiredItems(db);
+    await clearExpiredOrders(db);
 }
 
 //clear orders from requestedReturns that have expired
-async function clearExpiredOrders(dbIn) {
-  db = dbIn;
+async function clearExpiredOrders(db) {
   //batch for efficiency
   let batch = db.batch();
   let currentDate = dateUtil.getCurrentDate();
-  myRef = db.collection("requestedReturns");
+  let myRef = db.collection("requestedReturns");
   let query = await myRef.get();
   await query.forEach(async doc => {
     let orderDate = doc._fieldsProto.createdDate.stringValue;
     //get time elapsed since return was requested
-    diffDays = dateUtil.getDateDifference(currentDate, orderDate);
+    let diffDays = dateUtil.getDateDifference(currentDate, orderDate);
     //if there's a 7 day difference, return is expired
     if (Math.abs(diffDays) >= 7) {
       //copy items over
@@ -96,21 +99,20 @@ async function clearExpiredOrders(dbIn) {
     }
   });
   //commit
-  batch.commit();
+  await batch.commit();
 }
 
 //pull items off reselling if they've been there for 7 days
-async function clearExpiredItems(dbIn) {
-  db = dbIn;
+async function clearExpiredItems(db) {
   //batch for efficiency
   let batch = db.batch();
   let currentDate = dateUtil.getCurrentDate();
-  myRef = db.collection("items");
+  let myRef = db.collection("items");
   let query = await myRef.where("status", "==", "reselling").get();
   await query.forEach(async doc => {
     //calculate time difference between current and date of entry
     let processedDate = doc._fieldsProto.dateProcessed.stringValue;
-    diffDays = dateUtil.getDateDifference(processedDate, currentDate);
+    let diffDays = dateUtil.getDateDifference(processedDate, currentDate);
     //if item has been reselling for 7 days:
     if (diffDays >= 7) {
       //mark item with status returning, write to batch
@@ -119,11 +121,11 @@ async function clearExpiredItems(dbIn) {
 
       let varID = doc._fieldsProto.variantid.stringValue; //FOR LIVE: let varID = doc._fieldsProto.variantidGIT.stringValue
       //decrement inventory
-      inv.editInventory(-1, store, varID, "", db);
+      await inv.editInventory(-1, store, varID, "", db);
     }
   });
   //commit batch
-  batch.commit();
+  await batch.commit();
 }
 
 module.exports = checkExpired;
