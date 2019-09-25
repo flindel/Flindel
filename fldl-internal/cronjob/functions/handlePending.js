@@ -1,11 +1,11 @@
+'use strict';
 const emailHelper = require('./emailHelper');
 const dateUtil = require('../util/dateUtil');
 const inv = require("./editInventory");
 const mainHelper = require("./mainHelper");
 
 //update inv for reselling items
-async function updateInventory(items, dbIn) {
-    db = dbIn;
+async function updateInventory(items, db) {
     for (var i = 0; i < items.length; i++) {
       let idActive = items[i].variantid.stringValue; //let idActive = items[i].variantidGIT.stringValue CHANGE IT TO THIS ONE WHEN WE ACTUALLY HAVE DUPLICATES
       let storeActive = items[i].store;
@@ -20,9 +20,8 @@ async function updateInventory(items, dbIn) {
 
 
   //add item to items database
-async function addItems(items, status, dbIn) {
+async function addItems(items, status, db) {
     let currentDate = dateUtil.getCurrentDate();
-    db = dbIn;
     //efficiency
     let batch = db.batch();
     for (var i = 0; i < items.length; i++) {
@@ -38,10 +37,10 @@ async function addItems(items, status, dbIn) {
         dateProcessed: currentDate,
         shipmentCode: ""
       };
-      setDoc = db.collection("items").doc();
+      let setDoc = db.collection("items").doc();
       batch.set(setDoc, data);
     }
-    batch.commit();
+    await batch.commit();
 }
 
 
@@ -49,10 +48,10 @@ async function addItems(items, status, dbIn) {
 async function itemUpdate(db) {
     let items = await mainHelper.getItems(db);
     let [acceptedItems, returningItems] = await mainHelper.breakdown(db, items);
-    addItems(returningItems, "returning", db);
-    updateInventory(acceptedItems, db);
-    addItems(acceptedItems, "reselling", db);
-    mainHelper.sortNewItems(acceptedItems, db);
+    await addItems(returningItems, "returning", db);
+    await updateInventory(acceptedItems, db);
+    await addItems(acceptedItems, "reselling", db);
+    await mainHelper.sortNewItems(acceptedItems, db);
 }
 
 //send information about which items need to be refunded
@@ -93,13 +92,12 @@ async function refundInformation(db) {
         orderRejectItems
       );
     });
-    mainHelper.sortRefundItems(refundItems, db);
-    emailHelper.sendSpecialEmail(specialItems);
+    await mainHelper.sortRefundItems(refundItems, db);
+    await emailHelper.sendSpecialEmail(specialItems);
 }
 
 //wipe pending, everything has been dealt with by this point
-async function clearPending(dbIn) {
-    db = dbIn;
+async function clearPending(db) {
     let batch = db.batch();
     let myRef = db.collection("pendingReturns"); //duplicate to history
     let query = await myRef.get();
@@ -177,7 +175,7 @@ async function clearPending(dbIn) {
       batch.set(set, data);
       batch.delete(doc.ref);
     });
-    batch.commit();
+    await batch.commit();
   }
 
 
@@ -197,9 +195,9 @@ async function handlePending(db) {
     });
     //only move forward if the checkover is done
     if (checked == true) {
-      itemUpdate(db);
-      refundInformation(db);
-      clearPending();
+      await itemUpdate(db);
+      await refundInformation(db);
+      await clearPending();
     }
   }
 
