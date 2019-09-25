@@ -1,9 +1,8 @@
 const emailHelper = require('./emailHelper');
 
-async function fulfillmentReport(dbIn) {
+async function fulfillmentReport(db) {
     let fulfillmentList = [];
-    db = dbIn;
-    myRef = db.collection("fulfillments");
+    let myRef = db.collection("fulfillments");
     let query = await myRef.get();
     await query.forEach(async doc => {
       if (doc._fieldsProto.code.stringValue == "") {
@@ -39,7 +38,7 @@ async function fulfillmentReport(dbIn) {
         fulfillmentList.push(tempOrder);
       }
     });
-    emailHelper.sendFulfillmentEmail(fulfillmentList);
+    await emailHelper.sendFulfillmentEmail(fulfillmentList);
   }
 
   module.exports = fulfillmentReport;
