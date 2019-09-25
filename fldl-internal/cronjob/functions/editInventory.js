@@ -35,12 +35,12 @@ async function getInvID(store, varID, accessToken) {
 }
 
 //actually increment inventory
-async function increment(quantity, torontoLocation, invId, store) {
+async function increment(quantity, torontoLocation, invId, store, accessToken) {
   let option2 = {
     method: "POST",
     url: `https://${store}/${api_link}/inventory_levels/adjust.json`,
     headers: {
-      Authorization: process.env.SHOP_AUTH
+      "X-Shopify-Access-Token": accessToken
     },
     json: true,
     body: {
