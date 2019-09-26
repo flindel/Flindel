@@ -1,3 +1,4 @@
+"use strict";
 const Router = require("koa-router");
 const rp = require("request-promise");
 const errors = require("request-promise/errors");
@@ -10,14 +11,14 @@ const router = Router({
 
 //make sure ID is unique, return yes/no
 router.get("/requested/uuid", async ctx => {
-  db = ctx.db;
-  code = ctx.query.code;
+  const db = ctx.db;
+  const code = ctx.query.code;
   //check requested returns
-  myRef = db.collection("requestedReturns");
+  let myRef = db.collection("requestedReturns");
   let query = await myRef.where("code", "==", code).get();
   if (query.empty) {
     //check pending
-    myRef2 = db.collection("pendingReturns");
+    let myRef2 = db.collection("pendingReturns");
     let query2 = await myRef2.where("code", "==", code).get();
     if (query2.empty) {
       ctx.body = { unique: true };
@@ -31,11 +32,11 @@ router.get("/requested/uuid", async ctx => {
 
 //see if order exists for review/restart
 router.get("/requested/exists", async ctx => {
-  order = ctx.query.orderNum;
-  shopDomain = ctx.query.shopDomain;
+  const order = ctx.query.orderNum;
+  const shopDomain = ctx.query.shopDomain;
   console.log("DB+++" + shopDomain);
-  db = ctx.db;
-  myRef = db.collection("requestedReturns");
+  const db = ctx.db;
+  let myRef = db.collection("requestedReturns");
   ctx.body = {
     code: "none",
     exist: false
@@ -76,9 +77,9 @@ router.get("/requested/exists", async ctx => {
 
 //delete from requested return and write to history when order is cancelled
 router.put("/requested/orderStatus", async ctx => {
-  db = ctx.db;
-  code = ctx.query.code;
-  myRef = db.collection("requestedReturns").doc(code);
+  const db = ctx.db;
+  const code = ctx.query.code;
+  let myRef = db.collection("requestedReturns").doc(code);
   let query = await myRef.update({
     order_status: "cancelled"
   });
@@ -101,7 +102,7 @@ router.put("/requested/orderStatus", async ctx => {
 
 //make new entry in requested returns
 router.post("/requested/new", async ctx => {
-  db = ctx.db;
+  const db = ctx.db;
   const shop = ctx.request.body.shop;
   //.substring(8,100)
   console.log("THE SHOP IS " + shop);
@@ -154,7 +155,7 @@ router.post("/requested/new", async ctx => {
     });
   }
   //write to requested returns
-  setDoc = db
+  let setDoc = db
     .collection("requestedReturns")
     .doc(code)
     .set(data);

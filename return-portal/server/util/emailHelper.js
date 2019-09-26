@@ -1,3 +1,4 @@
+"use strict";
 const rp = require("request-promise");
 
 //get email of store to know who to send to

@@ -1,8 +1,9 @@
+"use strict";
 const { Error } = require("../error");
 const { getShopHeaders } = require("./shop-headers");
 
 async function accessTokenDB(ctx) {
-  db = ctx.db;
+  const db = ctx.db;
   const shop = ctx.query.shop;
   if (shop) {
     let tokenRef = db.collection("shop_tokens").doc(shop);

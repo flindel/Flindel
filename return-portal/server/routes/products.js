@@ -1,3 +1,4 @@
+"use strict";
 const Router = require("koa-router");
 const rp = require("request-promise");
 const errors = require("request-promise/errors");
@@ -15,7 +16,7 @@ router.get("/", async ctx => {
   const shop = ctx.query.shop;
   const accessToken = await accessTokenDB(ctx)
   // const { shop, accessToken } = getShopHeaders(ctx);
-  db = ctx.db;
+  const db = ctx.db;
   const option = {
     method: "GET",
     url: `https://${shop}/${api_link}/products/${productid}.json`,
@@ -74,7 +75,7 @@ router.get("/img", async ctx => {
   const shop = ctx.query.shop;
   const accessToken = await accessTokenDB(ctx)
   // const { shop, accessToken } = getShopHeaders(ctx);
-  db = ctx.db;
+  const db = ctx.db;
   console.log(accessToken);
   const option = {
     url: `https://${shop}/${api_link}/products/${productid}.json`,

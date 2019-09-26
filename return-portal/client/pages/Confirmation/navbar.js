@@ -1,3 +1,4 @@
+"use strict";
 import React, { Component } from "react";
 import "./universal.css";
 //import { app } from '@shopify/app-bridge/actions/Print';

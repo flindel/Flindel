@@ -1,3 +1,5 @@
+"use strict";
+
 // Add new error message here and use them from here
 const Error = {
   invalidShop: "Expected a valid shop.",

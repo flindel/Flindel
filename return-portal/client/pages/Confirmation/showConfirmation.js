@@ -1,3 +1,4 @@
+"use strict";
 import React from "react";
 //change this to live map when time comes
 import MapContainer from "./dropOffLocMap";

@@ -1,3 +1,4 @@
+"use strict";
 const Router = require("koa-router");
 const rp = require("request-promise");
 const errors = require("request-promise/errors");

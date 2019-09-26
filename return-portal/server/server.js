@@ -1,3 +1,4 @@
+"use strict";
 require("isomorphic-fetch");
 const Koa = require("koa");
 const next = require("next");

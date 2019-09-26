@@ -1,3 +1,4 @@
+"use strict";
 const combineRouters = require("koa-combine-routers");
 const rootRouter = require("./root");
 const orderRouter = require("./orders");
@@ -7,7 +8,7 @@ const sendRouter = require("./sendEmail");
 const returnRouter = require("./existingReturn");
 const sendEmailRouter = require("./sendEmail");
 
-router = combineRouters(
+const router = combineRouters(
   rootRouter,
   orderRouter,
   productRouter,

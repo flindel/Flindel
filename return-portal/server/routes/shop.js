@@ -1,3 +1,4 @@
+"use strict";
 const Router = require("koa-router");
 const rp = require("request-promise");
 const errors = require("request-promise/errors");
@@ -8,10 +9,10 @@ const router = Router({
 });
 
 router.get("/myshopifydomain", async ctx => {
-  db = ctx.db;
+  const db = ctx.db;
   const shop = ctx.query.shop;
   console.log(shop);
-  myRef = db.collection("shopDomain");
+  let myRef = db.collection("shopDomain");
   let query = await myRef.doc(shop).get();
   //console.log(query._fieldsProto.myshopifyDomain.stringValue)
   ctx.body = {
@@ -24,8 +25,8 @@ router.get("/returnPolicy", async ctx => {
   const shop = ctx.query.shop;
   //const { cookies } = ctx;
   //const shop = cookies.get('shop_id');
-  db = ctx.db;
-  myRef = db.collection("store");
+  const db = ctx.db;
+  let myRef = db.collection("store");
   let query = await myRef.doc(shop).get();
   ctx.body = {
     res: query._fieldsProto.returnPolicy,
