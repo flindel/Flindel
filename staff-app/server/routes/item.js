@@ -1,3 +1,4 @@
+"use strict";
 const Router = require("koa-router");
 const rp = require("request-promise");
 const errors = require("request-promise/errors");
@@ -11,7 +12,7 @@ router.get("/storeList", async ctx => {
   const store = ctx.query.store;
   const db = ctx.db;
   let itemList = [];
-  myRef = db.collection("items");
+  let myRef = db.collection("items");
   let query = await myRef
     .where("store", "==", store)
     .where("status", "==", "returning")
@@ -53,13 +54,13 @@ router.put("/returned", async ctx => {
       });
     }
   });
-  batch.commit();
+  await batch.commit();
   ctx.body = true;
 });
 
 router.get("/code/unique", async ctx => {
   const code = ctx.query.code;
-  db = ctx.db;
+  const db = ctx.db;
   let valid = false;
   let myRef = db.collection("items");
   let query = await myRef
@@ -76,7 +77,7 @@ router.get("/code/unique", async ctx => {
 
 router.put("/confirmDelivery", async ctx => {
   const code = ctx.query.code;
-  db = ctx.db;
+  const db = ctx.db;
   let batch = db.batch();
   let store = "";
   let myRef = db.collection("items");
@@ -88,7 +89,7 @@ router.put("/confirmDelivery", async ctx => {
     store = doc._fieldsProto.store.stringValue;
     batch.update(doc.ref, { status: "returned" });
   });
-  batch.commit();
+  await batch.commit();
   ctx.body = { store: store };
 });
 

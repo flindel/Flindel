@@ -1,3 +1,4 @@
+"use strict";
 const rp = require("request-promise");
 const { api_link } = require("../default-shopify-api.json");
 const expired = require("./expiredHelper");
@@ -5,7 +6,7 @@ const inv = require("./editInventory");
 
 //mark item as sold (webhook)
 async function sellReturnItem(db, varId, store, orderNum) {
-  myRef = db.collection("items");
+  let myRef = db.collection("items");
   let found = false;
   let tempDate = "1/1/2100";
   let tempRef = "";
@@ -44,7 +45,7 @@ async function completeReturnItem(
   code
 ) {
   //UPDATE FLINDEL STATUS
-  myRef = db.collection("items");
+  let myRef = db.collection("items");
   let count = 0;
   let query = await myRef
     .where("status", "==", "sold")
@@ -62,7 +63,7 @@ async function completeReturnItem(
     }
   });
   //actually update the shopify fulfillment ///////////////////////////////////////////////////////////////////////
-  //updateFulfillment(db, store, orderId, itemId, quantity)
+  updateFulfillment(db, store, orderId, itemId, quantity)
 }
 
 async function updateFulfillment(db, store, orderId, itemId, quantity) {

@@ -1,7 +1,7 @@
+"use strict";
 const dotenv = require("dotenv");
 const turf = require("@turf/turf");
 dotenv.config();
-const serveo_name = "https://923e8fe8.ngrok.io";
 const { API_URL, GOOGLE_GEO_API_KEY } = process.env;
 
 async function generateReturnPortalToken(db, shop, accessToken) {

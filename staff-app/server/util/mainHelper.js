@@ -1,9 +1,10 @@
-emailHelper = require("./emailHelper");
+"use strict"
+const emailHelper = require("./emailHelper");
 
 //get items that have been processed and are in pending
 async function getItems(dbIn) {
   let itemList = [];
-  db = dbIn;
+  const db = dbIn;
   let myRef = db.collection("pendingReturns");
   let query = await myRef.get();
   await query.forEach(async doc => {
@@ -41,7 +42,7 @@ async function getGITInformation(db, variantid, productid) {
   let productid_git = "1";
   let variantid_original = variantid;
   let variantid_git = "2";
-  myRef = db.collection("products");
+  let myRef = db.collection("products");
   let query = await myRef.where("orig_id", "==", productid).get();
   if (query.empty) {
     let query2 = await myRef.where("git_id", "==", productid).get();

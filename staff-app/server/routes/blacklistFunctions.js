@@ -1,3 +1,4 @@
+"use strict";
 const Router = require("koa-router");
 const rp = require("request-promise");
 const errors = require("request-promise/errors");
@@ -8,19 +9,19 @@ const router = Router({
 });
 
 router.put("/", async ctx => {
-  db = ctx.db;
-  store = ctx.query.store;
-  items = await JSON.parse(ctx.query.items);
+  const db = ctx.db;
+  const store = ctx.query.store;
+  let items = await JSON.parse(ctx.query.items);
   let docToUpdate = db.collection("store").doc(store);
-  updateFields = docToUpdate.update({ blacklist: items });
+  let updateFields = docToUpdate.update({ blacklist: items });
   ctx.body = { success: true };
 });
 
 router.get("/", async ctx => {
-  db = ctx.db;
+  const db = ctx.db;
   let store = ctx.query.store;
   let products = [];
-  myRef = db.collection("store");
+  let myRef = db.collection("store");
   let query = await myRef.doc(store).get();
   if (query._fieldsProto) {
     for (
@@ -37,13 +38,13 @@ router.get("/", async ctx => {
 });
 
 router.get("/exists", async ctx => {
-  db = ctx.db;
+  const db = ctx.db;
   //productID comes in as integer, database only responds to string
   const target = ctx.query.id;
   const target2 = ctx.query.id2;
   const store = ctx.query.store;
   //let query = await myRef.where('productid','==',target).where('store','==',store).get()
-  myRef = db.collection("store");
+  let myRef = db.collection("store");
   let query = await myRef.doc(store).get();
   let found = false;
   for (

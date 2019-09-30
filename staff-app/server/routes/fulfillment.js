@@ -1,3 +1,4 @@
+"use strict";
 const Router = require("koa-router");
 const rp = require("request-promise");
 const errors = require("request-promise/errors");
@@ -13,10 +14,10 @@ const router = Router({
 //get all orders for assembly step
 router.get("/assemble", async ctx => {
   let date = expiredHelper.getCurrentDate();
-  db = ctx.db;
-  code = ctx.query.workerID;
+  const db = ctx.db;
+  const code = ctx.query.workerID;
   let orders = [];
-  myRef = db.collection("fulfillments");
+  let myRef = db.collection("fulfillments");
   if (code == "1") {
     let query = await myRef.get();
     await query.forEach(async doc => {
@@ -42,10 +43,10 @@ router.get("/assemble", async ctx => {
 //get all orders matching id for delivery step
 router.get("/deliver", async ctx => {
   let date = expiredHelper.getCurrentDate();
-  db = ctx.db;
-  code = ctx.query.workerID;
+  const db = ctx.db;
+  const code = ctx.query.workerID;
   let orders = [];
-  myRef = db.collection("fulfillments");
+  let myRef = db.collection("fulfillments");
   if (code == "1") {
     let query = await myRef.get();
     await query.forEach(async doc => {
@@ -73,17 +74,17 @@ router.get("/deliver", async ctx => {
 
 //update fulfillments table
 router.put("/update", async ctx => {
-  db = ctx.db;
+  const db = ctx.db;
   let batch = db.batch();
   let myRef = db.collection("fulfillments");
-  orders = await JSON.parse(ctx.query.orders);
+  let orders = await JSON.parse(ctx.query.orders);
   for (var i = 0; i < orders.length; i++) {
     let query = await myRef.where("orderid", "==", orders[i].orderid).get();
     await query.forEach(async doc => {
       batch.set(doc.ref, orders[i]);
     });
   }
-  batch.commit();
+  await batch.commit();
   ctx.body = true;
 });
 //get time helper function
@@ -101,7 +102,7 @@ function getTime() {
   if (second.length != 2) {
     second = "0" + second;
   }
-  currTime =
+  let currTime =
     month + "/" + day + "/" + year + "-" + hour + ":" + minute + ":" + second;
   return currTime;
 }
@@ -110,12 +111,12 @@ function getTime() {
 router.post("/complete", async ctx => {
   //delete from curr + add to fulfillmentHistory in batch
   //for each item, add to whatever
-  db = ctx.db;
+  const db = ctx.db;
   let batch = db.batch();
   let myRef = db.collection("fulfillments");
   let newRef = db.collection("fulfillmentHistory");
   let currTime = await getTime();
-  orders = await JSON.parse(ctx.query.orders);
+  let orders = await JSON.parse(ctx.query.orders);
   for (var i = 0; i < orders.length; i++) {
     //set time
     orders[i].dateCompleted = currTime;
@@ -143,7 +144,7 @@ router.post("/complete", async ctx => {
     }
   }
   //commit all
-  batch.commit();
+  await batch.commit();
   ctx.body = true;
 });
 

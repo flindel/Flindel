@@ -1,3 +1,4 @@
+"use strict";
 const { Error } = require("../error");
 // When return empty object means either shop and token are incorrect and should return 401 bad request
 function getShopHeaders(ctx) {

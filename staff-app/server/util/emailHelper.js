@@ -1,9 +1,10 @@
+"use strict";
 const rp = require("request-promise");
 
 //get email of store to know who to send to
 async function getStoreEmail(dbIn, store) {
-  db = dbIn;
-  myRef = db.collection("store").doc(store.toLowerCase());
+  const db = dbIn;
+  let myRef = db.collection("store").doc(store.toLowerCase());
   let query = await myRef.get();
   const email = query._fieldsProto.email.stringValue;
   return email;

@@ -1,18 +1,19 @@
+"use strict";
 const inv = require("./editInventory");
 const rp = require("request-promise");
 
 //clear orders from requestedReturns that have expired
 async function clearExpiredOrders(dbIn) {
-  db = dbIn;
+  const db = dbIn;
   //batch for efficiency
   let batch = db.batch();
   let currentDate = getCurrentDate();
-  myRef = db.collection("requestedReturns");
+  let myRef = db.collection("requestedReturns");
   let query = await myRef.get();
   await query.forEach(async doc => {
     let orderDate = doc._fieldsProto.createdDate.stringValue;
     //get time elapsed since return was requested
-    diffDays = getDateDifference(currentDate, orderDate);
+    let diffDays = getDateDifference(currentDate, orderDate);
     //if there's a 7 day difference, return is expired
     if (Math.abs(diffDays) >= 7) {
       //copy items over
@@ -89,21 +90,21 @@ async function clearExpiredOrders(dbIn) {
     }
   });
   //commit
-  batch.commit();
+  await batch.commit();
 }
 
 //pull items off reselling if they've been there for 7 days
 async function clearExpiredItems(dbIn) {
-  db = dbIn;
+  const db = dbIn;
   //batch for efficiency
   let batch = db.batch();
   let currentDate = getCurrentDate();
-  myRef = db.collection("items");
+  let myRef = db.collection("items");
   let query = await myRef.where("status", "==", "reselling").get();
   await query.forEach(async doc => {
     //calculate time difference between current and date of entry
     let processedDate = doc._fieldsProto.dateProcessed.stringValue;
-    diffDays = getDateDifference(processedDate, currentDate);
+    let diffDays = getDateDifference(processedDate, currentDate);
     //if item has been reselling for 7 days:
     if (diffDays >= 7) {
       //mark item with status returning, write to batch
@@ -116,7 +117,7 @@ async function clearExpiredItems(dbIn) {
     }
   });
   //commit batch
-  batch.commit();
+  await batch.commit();
 }
 
 //returns current date (MM/DD/YYYY)

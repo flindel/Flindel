@@ -1,3 +1,4 @@
+"use strict";
 const rp = require("request-promise");
 const { api_link } = require("../default-shopify-api.json");
 const expired = require("./expiredHelper");
@@ -11,12 +12,12 @@ async function editInventory(change, store, varID, locoIn, dbIn) {
 
 //get access token and toronto location from databse (expand later)
 async function getAccessToken(dbIn, store) {
-  db = dbIn;
-  myRefToken = db.collection("shop_tokens").doc(store);
-  getToken = await myRefToken.get();
+  const db = dbIn;
+  let myRefToken = db.collection("shop_tokens").doc(store);
+  let getToken = await myRefToken.get();
   let accessToken = getToken._fieldsProto.token.stringValue; //access token stored here
-  myRefLocation = db.collection("store").doc(store);
-  getLocation = await myRefLocation.get();
+  let myRefLocation = db.collection("store").doc(store);
+  let getLocation = await myRefLocation.get();
   let torontoLocation = getLocation._fieldsProto.torontoLocation.stringValue;
   return { accessToken, torontoLocation };
 }

@@ -1,3 +1,4 @@
+"use strict";
 const Router = require("koa-router");
 const rp = require("request-promise");
 const errors = require("request-promise/errors");
@@ -9,92 +10,25 @@ const router = Router({
   prefix: "/return"
 });
 
-//make sure ID is unique, return yes/no
-router.get("/requested/uuid", async ctx => {
-  db = ctx.db;
-  code = ctx.query.code;
-  //check requested returns
-  myRef = db.collection("requestedReturns");
-  let query = await myRef.where("code", "==", code).get();
-  if (query.empty) {
-    //check pending
-    myRef2 = db.collection("pendingReturns");
-    let query2 = await myRef2.where("code", "==", code).get();
-    if (query2.empty) {
-      ctx.body = { unique: true };
-    } else {
-      ctx.body = { unique: false };
-    }
-  } else {
-    ctx.body = { unique: false };
-  }
-});
-
-//see if order exists for review/restart
-router.get("/requested/exists", async ctx => {
-  order = ctx.query.orderNum;
-  shopDomain = ctx.query.shopDomain;
-  console.log("DB+++" + shopDomain);
-  db = ctx.db;
-  myRef = db.collection("requestedReturns");
-  ctx.body = {
-    code: "none",
-    exist: false
-  };
-  console.log(order + " - " + shopDomain);
-  let querySnapshot = await myRef
-    .where("order", "==", order)
-    .where("shop", "==", shopDomain)
-    .get();
-  if (!querySnapshot.empty) {
-    //data.items is the origianl items Array in db, which may contain repeat items
-    const data = querySnapshot.docs[0].data();
-    const email = data.email;
-    //returnItems is the return array without repeated item
-    let returnItems = [data.items[0]];
-    returnItems[0].quantity = 1;
-    for (let i = 1; i < data.items.length; i++) {
-      if (
-        data.items[i].variantid != returnItems[returnItems.length - 1].variantid
-      ) {
-        returnItems.push(data.items[i]);
-        returnItems[returnItems.length - 1].quantity = 1;
-      } else {
-        returnItems[returnItems.length - 1].quantity++;
-      }
-    }
-    returnItems.forEach(e => {
-      e.productID = e.productid;
-    });
-    ctx.body = {
-      exist: true,
-      code: data.code,
-      items: returnItems,
-      email: email,
-      emailOriginal: data.emailOriginal
-    };
-  }
-});
-
 //change item status
 router.put("/requested/itemStatus", async ctx => {
-  code = ctx.query.code;
-  rawItems = ctx.query.items;
-  db = ctx.db;
+  const code = ctx.query.code;
+  const rawItems = ctx.query.items;
+  const db = ctx.db;
   let itemsJSON = await JSON.parse(rawItems);
-  myRef = db.collection("requestedReturns").doc(code);
-  updateFields = myRef.update({ items: itemsJSON });
+  let myRef = db.collection("requestedReturns").doc(code);
+  let updateFields = myRef.update({ items: itemsJSON });
   ctx.body = { success: true };
 });
 
 //write when items are received from DROPOFF
 router.put("/requested/receive", async ctx => {
-  db = ctx.db;
-  code = ctx.query.code;
-  worker = ctx.query.workerID;
-  time = await getTime();
-  myRef = db.collection("requestedReturns").doc(code);
-  updateFields = myRef.update({
+  const db = ctx.db;
+  const code = ctx.query.code;
+  const worker = ctx.query.workerID;
+  const time = await getTime();
+  let myRef = db.collection("requestedReturns").doc(code);
+  let updateFields = myRef.update({
     order_status: "received",
     received_by: worker,
     itemsDropped: time
@@ -104,9 +38,9 @@ router.put("/requested/receive", async ctx => {
 
 //get all codes received by drop off worker
 router.get("/dropoffSummary", async ctx => {
-  db = ctx.db;
-  id = ctx.query.id;
-  myRef = db.collection("pendingReturns");
+  const db = ctx.db;
+  const id = ctx.query.id;
+  let myRef = db.collection("pendingReturns");
   let query = await myRef.where("received_by", "==", id).get();
   let codes = [];
   await query.forEach(async doc => {
@@ -122,9 +56,9 @@ router.get("/dropoffSummary", async ctx => {
 
 //get items associated with order
 router.get("/requested/items", async ctx => {
-  code = ctx.query.code;
-  db = ctx.db;
-  myRef = db.collection("requestedReturns");
+  const code = ctx.query.code;
+  const db = ctx.db;
+  let myRef = db.collection("requestedReturns");
   let query = await myRef.where("code", "==", code).get();
   if (query.empty) {
     ctx.body = { valid: false };
@@ -135,131 +69,44 @@ router.get("/requested/items", async ctx => {
   }
 });
 
-//delete from requested return and write to history when order is cancelled
-router.put("/requested/orderStatus", async ctx => {
-  db = ctx.db;
-  code = ctx.query.code;
-  myRef = db.collection("requestedReturns").doc(code);
-  let query = await myRef.update({
-    order_status: "cancelled"
-  });
-  let getDoc = await db
-    .collection("requestedReturns")
-    .doc(code)
-    .get();
-  let data = getDoc.data();
-  let setDoc = db
-    .collection("historyReturns")
-    .doc()
-    .set(data);
-  let deleteDoc = db
-    .collection("requestedReturns")
-    .doc(code)
-    .delete();
-
-  ctx.body = { success: true };
-});
-
 //get item list from pending (helper fn)
 router.get("/pending/itemList", async ctx => {
   let fullList = await itemList.getItems(ctx.db);
   ctx.body = fullList;
 });
 
-//make new entry in requested returns
-router.post("/requested/new", async ctx => {
-  db = ctx.db;
-  const shop = ctx.query.shop;
-  //.substring(8,100)
-  console.log("THE SHOP IS " + shop);
-  const rawItems = ctx.query.items;
-  const orderNum = ctx.query.orderNum;
-  const date = ctx.query.date;
-  const code = ctx.query.code;
-  const email = ctx.query.email;
-  const emailOriginal = ctx.query.emailOriginal;
-  let itemsJSON = await JSON.parse(rawItems);
-  let data = {
-    //base information
-    code: code,
-    email: email,
-    emailOriginal: emailOriginal,
-    shop: shop,
-    order: orderNum,
-    order_status: "submitted",
-    items: [],
-    createdDate: date,
-    received_by: "",
-    processEnd: "",
-    processBegin: "",
-    itemsDropped: ""
-  };
-  //all items start submitted
-  const myStatus = "submitted";
-  for (var i = 0; i < itemsJSON.length; i++) {
-    let [
-      originalID,
-      gitID,
-      originalVarID,
-      gitVarID
-    ] = await itemList.getGITInformation(
-      ctx.db,
-      itemsJSON[i].variantid.toString(),
-      itemsJSON[i].productID.toString()
-    );
-    data.items.push({
-      name: itemsJSON[i].name,
-      flag: "0",
-      title: itemsJSON[i].title,
-      variantTitle: itemsJSON[i].variantTitle,
-      productid: originalID,
-      productidGIT: gitID,
-      reason: itemsJSON[i].reason,
-      variantid: originalVarID,
-      variantidGIT: gitVarID,
-      status: myStatus
-    });
-  }
-  //write to requested returns
-  setDoc = db
-    .collection("requestedReturns")
-    .doc(code)
-    .set(data);
-  ctx.body = "success";
-});
-
 //set time that processing began in sorting center
 router.put("/requested/openTime", async ctx => {
-  code = ctx.query.code;
-  db = ctx.db;
-  myRef = db.collection("requestedReturns").doc(code);
+  const code = ctx.query.code;
+  const db = ctx.db;
+  let myRef = db.collection("requestedReturns").doc(code);
   let currTime = await getTime();
-  updateFields = myRef.update({ processBegin: currTime });
+  let updateFields = myRef.update({ processBegin: currTime });
   ctx.body = true;
 });
 
 //set time that processing ended in sorting center
 router.put("/requested/closeTime", async ctx => {
-  code = ctx.query.code;
-  db = ctx.db;
-  myRef = db.collection("requestedReturns").doc(code);
+  const code = ctx.query.code;
+  const db = ctx.db;
+  let myRef = db.collection("requestedReturns").doc(code);
   let currTime = await getTime();
-  updateFields = myRef.update({ processEnd: currTime });
+  let updateFields = myRef.update({ processEnd: currTime });
   ctx.body = true;
 });
 
 //update item status in pending
 router.put("/pending/items", async ctx => {
-  code = ctx.query.code;
-  items = await JSON.parse(ctx.query.items);
-  db = ctx.db;
-  myRef = db.collection("pendingReturns");
+  const code = ctx.query.code;
+  const items = await JSON.parse(ctx.query.items);
+  const db = ctx.db;
+  let myRef = db.collection("pendingReturns");
   let query = await myRef.where("code", "==", code).get();
   let dRef = "";
   await query.forEach(doc => {
     dRef = doc.ref;
   });
-  updateItems = dRef.update({ items: items });
+  let updateItems = dRef.update({ items: items });
   ctx.body = true;
 });
 
@@ -285,7 +132,7 @@ function getTime() {
 
 //make new entry in pending, delete from requested
 router.post("/pending/new", async ctx => {
-  db = ctx.db;
+  const db = ctx.db;
   const codeIn = ctx.query.code;
   let myRef = db.collection("requestedReturns").doc(codeIn);
   let oldDoc = await myRef.get();
