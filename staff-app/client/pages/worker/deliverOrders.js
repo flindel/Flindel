@@ -59,25 +59,33 @@ class deliverOrders extends Component {
     let orders = JSON.stringify(failedList);
     //send failed deliveries to update
     if (failedList.length > 0) {
+      const options = {
+        method: "put",
+        headers: {
+          Accept: "application/json, text/plain, */*",
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify(orders)
+      };
       await fetch(
-        `${API_URL}/fulfillment/update?orders=${encodeURIComponent(
-          orders
-        )}`,
-        {
-          method: "put"
-        }
+        `${API_URL}/fulfillment/update`,
+        options
       );
     }
     orders = JSON.stringify(deliveredList);
     //send successful deliveries to update
     if (deliveredList.length > 0) {
+      const options = {
+        method: "post",
+        headers: {
+          Accept: "application/json, text/plain, */*",
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify(orders)
+      };
       await fetch(
-        `${API_URL}/fulfillment/complete?orders=${encodeURIComponent(
-          orders
-        )}`,
-        {
-          method: "post"
-        }
+        `${API_URL}/fulfillment/complete`,
+        options
       );
     }
     this.setState({ step: 2 });
