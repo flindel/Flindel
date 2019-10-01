@@ -124,14 +124,18 @@ router.post("/complete", async ctx => {
     let query = await myRef.where("orderid", "==", orders[i].orderid).get();
     await query.forEach(async doc => {
       //delete old
+      console.log("delete");
+      //console.log(doc);
       batch.delete(doc.ref);
     });
     let newDoc = newRef.doc();
     //write new
     batch.set(newDoc, orders[i]);
     for (var j = 0; j < orders[i].items.length; j++) {
-      if (orders[i].returnItems[j].fulfilled == 1) {
+      console.log("update items to fulfill status");
+      if (orders[i].items[j].fulfilled == 1) {
         //update items
+        console.log(orders[i].items[j]);
         fulfillHelper.completeReturnItem(
           ctx.db,
           orders[i].orderid,
