@@ -77,7 +77,7 @@ router.put("/update", async ctx => {
   const db = ctx.db;
   let batch = db.batch();
   let myRef = db.collection("fulfillments");
-  let orders = await JSON.parse(ctx.request.body);
+  let orders = ctx.request.body;
   for (var i = 0; i < orders.length; i++) {
     let query = await myRef.where("orderid", "==", orders[i].orderid).get();
     await query.forEach(async doc => {
@@ -116,7 +116,8 @@ router.post("/complete", async ctx => {
   let myRef = db.collection("fulfillments");
   let newRef = db.collection("fulfillmentHistory");
   let currTime = await getTime();
-  let orders = await JSON.parse(ctx.request.body);
+  let orders = ctx.request.body;
+  //console.log(orders);
   for (var i = 0; i < orders.length; i++) {
     //set time
     orders[i].dateCompleted = currTime;

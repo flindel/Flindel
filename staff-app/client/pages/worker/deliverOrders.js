@@ -65,7 +65,7 @@ class deliverOrders extends Component {
           Accept: "application/json, text/plain, */*",
           "Content-Type": "application/json"
         },
-        body: JSON.stringify(orders)
+        body: orders,
       };
       await fetch(
         `${API_URL}/fulfillment/update`,
@@ -81,7 +81,7 @@ class deliverOrders extends Component {
           Accept: "application/json, text/plain, */*",
           "Content-Type": "application/json"
         },
-        body: JSON.stringify(orders)
+        body: orders,
       };
       await fetch(
         `${API_URL}/fulfillment/complete`,
