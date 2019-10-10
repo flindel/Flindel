@@ -5,16 +5,13 @@ const dateUtil = require('../util/dateUtil');
 
 //get rid of anything that's been in orders/items for over 7 days
 async function checkExpired(db) {
-  let a = db.collection('testCron').doc('B3rV');
-                let result = await a.get();
-                console.log(result.data());
-    await clearExpiredItems(db);
+  console.log("checkExpried");
+    //await clearExpiredItems(db);
     await clearExpiredOrders(db);
 }
 
 //clear orders from requestedReturns that have expired
-async function clearExpiredOrders(db) {
-  //batch for efficiency
+async function clearExpiredOrders(db) {  //batch for efficiency
   let batch = db.batch();
   let currentDate = dateUtil.getCurrentDate();
   let myRef = db.collection("requestedReturns");
@@ -24,6 +21,7 @@ async function clearExpiredOrders(db) {
     //get time elapsed since return was requested
     let diffDays = dateUtil.getDateDifference(currentDate, orderDate);
     //if there's a 7 day difference, return is expired
+    console.log("diff days: "+diffDays);
     if (Math.abs(diffDays) >= 7) {
       //copy items over
       let data = {
@@ -120,8 +118,12 @@ async function clearExpiredItems(db) {
       let store = doc._fieldsProto.store.stringValue;
 
       let varID = doc._fieldsProto.variantid.stringValue; //FOR LIVE: let varID = doc._fieldsProto.variantidGIT.stringValue
+      let { accessToken, torontoLocation } = await inv.getAccessToken(
+        db,
+        storeActive
+      );
       //decrement inventory
-      await inv.editInventory(-1, store, varID, "", db);
+      await inv.editInventory(-1, store, varID, "", db, accessToken);
     }
   });
   //commit batch

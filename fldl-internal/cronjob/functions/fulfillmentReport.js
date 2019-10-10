@@ -1,3 +1,4 @@
+"use strict";
 const emailHelper = require('./emailHelper');
 
 async function fulfillmentReport(db) {

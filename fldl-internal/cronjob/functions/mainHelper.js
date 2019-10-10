@@ -1,4 +1,5 @@
-emailHelper = require("./emailHelper");
+"use strict";
+const emailHelper = require("./emailHelper");
 
 //get items that have been processed and are in pending
 async function getItems(dbIn) {

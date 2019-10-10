@@ -1,3 +1,4 @@
+"use strict";
 const rp = require("request-promise");
 const { api_link } = require("../../default-shopify-api.json");
 

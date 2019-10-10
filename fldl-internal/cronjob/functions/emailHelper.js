@@ -1,3 +1,4 @@
+"use strict";
 const rp = require("request-promise");
 
 //get email of store to know who to send to
@@ -244,7 +245,7 @@ async function sendRefundEmail(orderList, email) {
   await rp(option);
 }
 
-//send email to store about orders that need to be refunded
+//send email to flindel warehouse about recent GIT order need to be fulfilled (delivered).
 async function sendFulfillmentEmail(fulfillments) {
   const headers = {};
   headers["Accept"] = "application/json";
@@ -293,7 +294,7 @@ async function sendFulfillmentEmail(fulfillments) {
         {
           to: [
             {
-              email: "ludiwang66@gmail.com"
+              email: "ludiwang66@gmail.com" //change to flindel warehouse email once go live
             }
           ],
           subject: "Recent Fulfillments"

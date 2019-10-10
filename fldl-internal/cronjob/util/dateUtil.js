@@ -1,3 +1,4 @@
+"use strict";
 //returns current date (MM/DD/YYYY)
 function getCurrentDate() {
     let currentDate = "";

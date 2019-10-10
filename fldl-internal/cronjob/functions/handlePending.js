@@ -92,7 +92,9 @@ async function refundInformation(db) {
         orderRejectItems
       );
     });
+    //send email to store asking refund
     await mainHelper.sortRefundItems(refundItems, db);
+    //send email to flindel warehouse asking to process special items manually
     await emailHelper.sendSpecialEmail(specialItems);
 }
 
